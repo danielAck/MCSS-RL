@@ -1,22 +1,22 @@
 package com.linghang.CalculateTest;
 
-import NettyTest.BlockDetail;
+import com.linghang.NettyTest.BlockDetail;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public class ClientFileQuestHandler extends ChannelInboundHandlerAdapter {
 
     private static final int bufLength = 10240;
-    private boolean receivedData;
+    private boolean isFirstReceiveData;
     private String questFileName;
     private byte[] buf;
-    private int start;
+    private long start;
     private FileWriter fileWriter;
 
     public ClientFileQuestHandler(String questFileName) throws Exception{
         this.questFileName = questFileName;
         this.start = 0;
-        this.receivedData = false;
+        this.isFirstReceiveData = true;
         fileWriter = new FileWriter(questFileName);
     }
 
@@ -35,16 +35,15 @@ public class ClientFileQuestHandler extends ChannelInboundHandlerAdapter {
 
         if (msg instanceof BlockDetail){
             BlockDetail blockDetail = (BlockDetail) msg;
-            int readByte = blockDetail.getEndPos();
+            int readByte = blockDetail.getReadByte();
             // 第一次接收数据
-            if (!receivedData){
+            if (isFirstReceiveData){
                 this.start = blockDetail.getStartPos();
-                receivedData = true;
+                isFirstReceiveData = false;
             }
             buf = blockDetail.getBytes();
-            System.out.println("======== CLIENT RECEIVE BYTE LENGTH : " + blockDetail.getEndPos() + " ========");
+            System.out.println("======== CLIENT RECEIVE BYTE LENGTH : " + blockDetail.getReadByte() + " ========");
 
-            // TODO: 将 byte[] 写入磁盘
             fileWriter.write(start, buf, readByte);
             start = start + readByte;
 

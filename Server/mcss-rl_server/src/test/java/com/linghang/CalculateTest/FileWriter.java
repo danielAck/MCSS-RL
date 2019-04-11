@@ -53,7 +53,7 @@ public class FileWriter {
         }
     }
 
-    public void write(int start, byte[] msg, int writeLength) throws Exception{
+    public void write(long start, byte[] msg, int writeLength) throws Exception{
         read(start);
         add(msg, writeLength);
 
@@ -61,7 +61,7 @@ public class FileWriter {
         writeRF.write(readBuf, 0, writeLength);
     }
 
-    private void read(int start) throws Exception{
+    private void read(long start) throws Exception{
         readRF.seek(start);
         readRF.read(readBuf);
     }

@@ -1,6 +1,6 @@
 package com.linghang.CalculateTest;
 
-import NettyTest.BlockDetail;
+import com.linghang.NettyTest.BlockDetail;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.Util;
 import io.netty.channel.ChannelHandlerContext;
@@ -44,7 +44,7 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
 
             int readByte = randomAccessFile.read(buf);
             blockDetail.setBytes(buf);
-            blockDetail.setEndPos(readByte);
+            blockDetail.setReadByte(readByte);
 
             ctx.writeAndFlush(blockDetail);
 
@@ -59,7 +59,7 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
                     && (randomAccessFile.length() - start) > 0){
 
                 blockDetail.setBytes(buf);
-                blockDetail.setEndPos(readByte);
+                blockDetail.setReadByte(readByte);
                 ctx.writeAndFlush(blockDetail);
             } else {
                 randomAccessFile.close();
