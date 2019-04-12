@@ -6,14 +6,16 @@ public class SendFileJobDescription extends JobDescription{
 
     private String filePath;
     private String fileName;
-    private long startPos;
-    private long endPos;
+    private SendPosition sendPosition;
+    private String host;
+    private int port;
 
-    public SendFileJobDescription(String filePath, String fileName, long startPos, long endPos) {
+    public SendFileJobDescription(String filePath, String fileName, SendPosition sendPosition, String host, int port) {
         this.filePath = filePath;
         this.fileName = fileName;
-        this.startPos = startPos;
-        this.endPos = endPos;
+        this.sendPosition = sendPosition;
+        this.host = host;
+        this.port = port;
     }
 
     public String getFilePath() {
@@ -32,20 +34,27 @@ public class SendFileJobDescription extends JobDescription{
         this.fileName = fileName;
     }
 
-    public long getStartPos() {
-        return startPos;
+    public SendPosition getSendPosition() {
+        return sendPosition;
     }
 
-    public void setStartPos(int startPos) {
-        this.startPos = startPos;
+    public void setSendPosition(SendPosition sendPosition) {
+        this.sendPosition = sendPosition;
     }
 
-    public long getEndPos() {
-        return endPos;
+    public String getHost() {
+        return host;
     }
 
-    public void setEndPos(int endPos) {
-        this.endPos = endPos;
+    public void setHost(String host) {
+        this.host = host;
     }
 
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
 }

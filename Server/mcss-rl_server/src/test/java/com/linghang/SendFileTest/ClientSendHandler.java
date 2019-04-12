@@ -22,8 +22,8 @@ public class ClientSendHandler extends ChannelInboundHandlerAdapter {
 
     public ClientSendHandler(SendFileJobDescription jobDescription) {
         this.jobDescription = jobDescription;
-        this.startPos = jobDescription.getStartPos();
-        this.endPos = jobDescription.getEndPos();
+        this.startPos = jobDescription.getSendPosition().getStartPos();
+        this.endPos = jobDescription.getSendPosition().getEndPos();
         initBlockDetail();
     }
 

@@ -6,12 +6,32 @@ import com.linghang.pojo.Job;
 import com.linghang.pojo.JobFactory;
 import com.linghang.pojo.SendFileJob;
 import com.linghang.pojo.SendFileJobFactory;
+import com.linghang.util.ConstantUtil;
+import com.linghang.util.PropertiesUtil;
 import com.linghang.util.Util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class NameNode {
+
+    private HashMap<Integer, String> slaves;
+
+    public NameNode() {
+        initSlaves();
+    }
+
+    private void initSlaves(){
+        slaves = new HashMap<>();
+        PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
+        String slave1IP = propertiesUtil.getValue("host.slave1");
+        String slave2IP = propertiesUtil.getValue("host.slave2");
+        String slave3IP = propertiesUtil.getValue("host.slave3");
+        slaves.put(0, slave1IP);
+        slaves.put(1, slave2IP);
+        slaves.put(2, slave3IP);
+    }
 
     /**
      * 将文件分块传输给三个DataNode
@@ -19,27 +39,43 @@ public class NameNode {
      * @param fileName 上传文件名
      */
     public void sendData(String filePath, String fileName) {
-
-        File file  = new File(filePath + fileName);
-        if (!file.exists()){
-            System.err.println("======= ERROR : SENDING FILE DOESN'T EXIST ! ========");
-            return;
+        Job[] jobs = createJobs(filePath, fileName);
+        for (Job job : jobs){
+            if (job != null)
+                job.start();
         }
-
-        startJobs(file, filePath, fileName);
     }
 
-    private void startJobs(File file, String filePath, String fileName){
-
-        int colSize = Util.getColSize(file.length());
-        String host1 = "";
-        String host2 = "";
-        String host3 = "";
-        int port = 9999;
-        Job host1_job = new SendFileJob(filePath, fileName, 1,0, colSize-1, host1, port);
-        Job host2_job = new SendFileJob(filePath, fileName, 2, colSize, colSize*2-1, host2, port);
-        Job host3_job = new SendFileJob(filePath, fileName, 3, colSize*2, colSize*3-1, host3, port);
-        host1_job.start();
+    private Job[] createJobs(String filePath, String fileName){
+        SendFileJobFactory sendFileJobFactory = new SendFileJobFactory(filePath, fileName, slaves);
+        Job[] jobs = new Job[3];
+        for (int i = 0; i < 3; i++){
+            sendFileJobFactory.setBlockIdx(i);
+            sendFileJobFactory.setSlaveId(i);
+            jobs[i] = sendFileJobFactory.createJob();
+        }
+        return jobs;
     }
 
+
+    // ===================  Test Function ====================
+
+    public void sendDataTest(String filePath, String fileName){
+        Job job = createJobsTest(filePath, fileName);
+        if (job != null)
+            job.start();
+    }
+
+    private Job createJobsTest(String filePath, String fileName){
+        HashMap<Integer, String> slave = new HashMap<>();
+        PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
+        String slave1IP = propertiesUtil.getValue("host.localslave");
+        slave.put(0, slave1IP);
+
+        SendFileJobFactory sendFileJobFactory = new SendFileJobFactory(filePath, fileName, slave);
+        sendFileJobFactory.setSlaveId(0);
+        sendFileJobFactory.setBlockIdx(0);
+
+        return sendFileJobFactory.createJob();
+    }
 }
