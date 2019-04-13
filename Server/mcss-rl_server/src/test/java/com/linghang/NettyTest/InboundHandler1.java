@@ -1,9 +1,9 @@
 package com.linghang.NettyTest;
 
+import com.linghang.rpc.BlockDetail;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
-import java.io.RandomAccessFile;
 import java.util.Date;
 
 public class InboundHandler1 extends ChannelInboundHandlerAdapter {

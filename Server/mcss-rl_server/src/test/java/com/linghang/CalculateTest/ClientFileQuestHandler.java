@@ -1,6 +1,6 @@
 package com.linghang.CalculateTest;
 
-import com.linghang.NettyTest.BlockDetail;
+import com.linghang.rpc.BlockDetail;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 

@@ -1,14 +1,10 @@
-package com.linghang.SendFileTest;
+package com.linghang.rpc;
 
-import com.linghang.NettyTest.BlockDetail;
-import com.linghang.pojo.JobDescription;
 import com.linghang.pojo.SendFileJobDescription;
 import com.linghang.util.ConstantUtil;
-import com.linghang.util.Util;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
-import java.io.File;
 import java.io.RandomAccessFile;
 
 public class ClientSendHandler extends ChannelInboundHandlerAdapter {
@@ -50,28 +46,48 @@ public class ClientSendHandler extends ChannelInboundHandlerAdapter {
 
         blockDetail.setReadByte(readByte);
         blockDetail.setBytes(buf);
+
+        System.out.println("======= CLIENT BEGIN SEND FILE : " + jobDescription.getFileName() + " ========");
+        System.out.println("======= CLIENT SEND " + readByte + " BYTES ========");
         ctx.writeAndFlush(blockDetail);
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (msg instanceof Integer){
+        if (msg instanceof Long){
             int readByte;
-            Integer serverReadCnt = (Integer) msg;
-
-            // TODO: 多余的 0 byte 发送问题
+            Long serverReadCnt = (Long) msg;
 
             rf.seek(startPos + serverReadCnt);
+            long remainByteCnt = endPos - (startPos + serverReadCnt);
 
             if ((readByte = rf.read(buf)) != -1
-                    && (endPos - (startPos + serverReadCnt)) > 0){
+                    && remainByteCnt > 0){
 
                 blockDetail.setBytes(buf);
-                blockDetail.setReadByte(readByte);
+                if (readByte > remainByteCnt){
+                    blockDetail.setReadByte((int)remainByteCnt);
+                } else {
+                    blockDetail.setReadByte(readByte);
+                }
+
+                System.out.println("======= CLIENT SEND " + readByte + " BYTES ========");
                 ctx.writeAndFlush(blockDetail);
             } else {
-                rf.close();
-                ctx.close();
+                if (remainByteCnt > 0){
+                    if (remainByteCnt < Integer.MAX_VALUE){
+                        byte[] redundantBytes = new byte[(int)remainByteCnt];
+                        blockDetail.setBytes(redundantBytes);
+                        blockDetail.setReadByte((int)remainByteCnt);
+                        ctx.writeAndFlush(blockDetail);
+                    } else {
+                        System.err.println("======== SERVER SEND WORN READ BYTE COUNT ! =========");
+                        ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
+                    }
+                } else {
+                    rf.close();
+                    ctx.writeAndFlush(ConstantUtil.SEND_FINISH_CODE);
+                }
             }
         }
     }

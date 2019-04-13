@@ -72,7 +72,7 @@ public class SendFileJobFactory implements JobFactory {
         File file = new File(filePath + fileName);
         long col_size = Util.getColSize(file.length());
         long startPos = col_size * blockIdx;
-        long endPos = startPos + col_size - 1;
+        long endPos = startPos + col_size;
         return new SendPosition(startPos, endPos);
     }
 

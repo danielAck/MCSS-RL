@@ -1,5 +1,7 @@
 package com.linghang.pojo;
 
+import com.linghang.rpc.SendFileClient;
+
 public class SendFileJob extends Thread implements Job {
 
     private SendFileJobDescription jobDescription;
@@ -10,8 +12,16 @@ public class SendFileJob extends Thread implements Job {
     }
 
     @Override
-    public void start() {
-
+    public void start(){
+        // create client
+        SendFileClient sendClient = new SendFileClient(jobDescription);
+        try {
+            sendClient.start();
+            System.out.println("======== CLIENT SEND FINISH =========");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("======== CLIENT SEND FAILED =========");
+        }
     }
 
     // 多线程

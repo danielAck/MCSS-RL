@@ -1,5 +1,6 @@
 package com.linghang.NettyTest;
 
+import com.linghang.rpc.BlockDetail;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;

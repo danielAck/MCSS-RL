@@ -74,7 +74,7 @@ public class NameNode {
 
         SendFileJobFactory sendFileJobFactory = new SendFileJobFactory(filePath, fileName, slave);
         sendFileJobFactory.setSlaveId(0);
-        sendFileJobFactory.setBlockIdx(0);
+        sendFileJobFactory.setBlockIdx(2);
 
         return sendFileJobFactory.createJob();
     }

@@ -1,4 +1,4 @@
-package com.linghang.NettyTest;
+package com.linghang.rpc;
 
 import java.io.Serializable;
 

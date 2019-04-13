@@ -1,5 +1,6 @@
 package com.linghang.NettyTest;
 
+import com.linghang.rpc.BlockDetail;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -29,7 +30,7 @@ public class InboundHandler2 extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof BlockDetail){
             BlockDetail blockDetail = (BlockDetail) msg;
-            int readByte = blockDetail.getEndPos();
+            int readByte = blockDetail.getReadByte();
 
             if (readByte > 0){
                 System.out.println("======= " + (cnt++) + " SERVER RECEIVE " + readByte + " BYTES =======");

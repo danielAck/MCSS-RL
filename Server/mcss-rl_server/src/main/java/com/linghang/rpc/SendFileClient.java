@@ -1,8 +1,6 @@
-package com.linghang.SendFileTest;
+package com.linghang.rpc;
 
-import com.linghang.pojo.Job;
 import com.linghang.pojo.SendFileJobDescription;
-import com.linghang.pojo.SendFileJobFactory;
 import com.linghang.pojo.SendPosition;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
@@ -30,20 +28,21 @@ public class SendFileClient {
         String fileName = "1M.pdf";
         File file = new File(filePath + fileName);
         int startPos = 0;
-        long endPos = file.length();
+        long endPos = 10249;
 
-        SendPosition sendPosition = new SendPosition(0, file.length());
+        SendPosition sendPosition = new SendPosition(startPos, endPos);
 
         // create job description
         SendFileJobDescription jobDescription = new SendFileJobDescription(filePath, fileName, sendPosition, "127.0.0.1", 9999);
 
         // new Client
+
         SendFileClient sendClient = new SendFileClient(jobDescription);
         sendClient.start();
+        System.out.println("======== CLIENT SEND FINISH =========");
     }
 
     public void start() throws Exception{
-
 
         NioEventLoopGroup group = new NioEventLoopGroup(1);
         try{
