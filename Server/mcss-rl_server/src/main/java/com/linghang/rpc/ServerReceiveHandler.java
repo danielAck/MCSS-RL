@@ -1,6 +1,7 @@
 package com.linghang.rpc;
 
 import com.linghang.util.ConstantUtil;
+import com.linghang.util.PropertiesUtil;
 import com.linghang.util.Util;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -15,9 +16,14 @@ public class ServerReceiveHandler extends ChannelInboundHandlerAdapter {
     private RandomAccessFile rf;
     private String fileName;
     private long start;
+    private PropertiesUtil propertiesUtil;
+    private String partSavePath;
+    private boolean test;
 
-    public ServerReceiveHandler() {
-        isFirstReceive = true;
+    public ServerReceiveHandler(boolean test) {
+        this.isFirstReceive = true;
+        this.propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
+        this.test = test;
     }
 
     @Override
@@ -27,7 +33,11 @@ public class ServerReceiveHandler extends ChannelInboundHandlerAdapter {
 
             blockDetail = (BlockDetail) msg;
             if (isFirstReceive){
-                handleFirstReceive();
+                boolean initSuccess = init();
+                if (!initSuccess){
+                    System.err.println("======== SERVER INIT RECEIVE JOB FAILED ========");
+                    ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
+                }
             }
 
             try{
@@ -35,13 +45,13 @@ public class ServerReceiveHandler extends ChannelInboundHandlerAdapter {
                 System.out.println("======== SERVER RECEIVE " + blockDetail.getReadByte() + " BYTES FROM CLIENT =======");
             } catch (Exception e){
                 handleError();
-                ctx.close();
-                return;
+                ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
             }
 
             start = start + blockDetail.getReadByte();
             ctx.writeAndFlush(start);
         }
+
         // receive finish code
         else if (msg instanceof Integer){
             Integer res = (Integer) msg;
@@ -52,10 +62,12 @@ public class ServerReceiveHandler extends ChannelInboundHandlerAdapter {
             }
 
             else if (res.equals(ConstantUtil.SEND_ERROR_CODE)){
+                System.err.println("======== ERROR OCCUR IN CLIENT ========");
                 handleError();
             }
             ctx.close();
         }
+
         else {
             System.err.println("======== SERVER RECEIVE ERROR TYPE OF DATA ! ========");
             ctx.close();
@@ -68,33 +80,49 @@ public class ServerReceiveHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
-    private boolean deleteFile(){
-        boolean res = false;
-        File file = new File(ConstantUtil.CLIENT_PART_SAVE_PATH + fileName);
-        if (file.exists()){
-            res = file.delete();
-        }
-        return res;
-    }
-
-    private void handleFirstReceive() throws Exception{
+    private Boolean init() throws Exception{
         fileName = blockDetail.getFileName();
         start = 0;
-        File file = new File(ConstantUtil.CLIENT_PART_SAVE_PATH + Util.genePartName(fileName));
+
+        if (test){
+            partSavePath = propertiesUtil.getValue("service.local_part_save_path");
+        } else {
+            partSavePath = propertiesUtil.getValue("service.part_save_path");
+        }
+
+        if (partSavePath == null){
+            System.err.println("======== PLEASE SPECIFY PART SAVE PATH IN PROPERTY ========");
+            return false;
+        }
+
+        File file = new File(partSavePath + Util.genePartName(fileName));
         rf = new RandomAccessFile(file, "rw");
         rf.seek(0);
+
         System.out.println("======== SERVER BEGIN RECEIVE FILE : " + blockDetail.getFileName() + " ========");
         isFirstReceive = false;
+
+        return true;
     }
 
     private void handleError() throws Exception{
-        System.out.println("======== SERVER SEND FAILED ========");
-        rf.close();
+        if (rf != null){
+            rf.close();
+        }
         boolean deleteSuccess = deleteFile();
         if (deleteSuccess){
             System.out.println("======== SERVER DELETE FILE : " + fileName + " =========");
         } else {
             System.err.println("======== SERVER DELETE FILE : " + fileName + " FAILED =========");
         }
+    }
+
+    private boolean deleteFile(){
+        boolean res = false;
+        File file = new File(partSavePath + fileName);
+        if (file.exists()){
+            res = file.delete();
+        }
+        return res;
     }
 }

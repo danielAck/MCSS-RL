@@ -90,6 +90,20 @@ public class ClientSendHandler extends ChannelInboundHandlerAdapter {
                 }
             }
         }
+
+        // handle error
+        else if (msg instanceof Integer){
+            Integer res = (Integer) msg;
+            if (res.equals(ConstantUtil.SEND_ERROR_CODE)){
+                System.err.println("======== ERROR OCCUR IN SERVER ========");
+                ctx.close();
+            }
+        }
+
+        else {
+            System.err.println("======== SERVER RECEIVE ERROR TYPE OF DATA ! ========");
+            ctx.close();
+        }
     }
 
     @Override

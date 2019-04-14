@@ -69,7 +69,7 @@ public class NameNode {
     private Job createJobsTest(String filePath, String fileName){
         HashMap<Integer, String> slave = new HashMap<>();
         PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
-        String slave1IP = propertiesUtil.getValue("host.localslave");
+        String slave1IP = "39.106.48.26";
         slave.put(0, slave1IP);
 
         SendFileJobFactory sendFileJobFactory = new SendFileJobFactory(filePath, fileName, slave);

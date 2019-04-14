@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class BlockDetail implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2254153731312156649L;
 
     private String fileName;
     private long startPos;
