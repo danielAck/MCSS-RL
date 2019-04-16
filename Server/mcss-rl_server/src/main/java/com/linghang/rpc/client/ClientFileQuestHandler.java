@@ -1,12 +1,12 @@
-package com.linghang.CalculateTest;
+package com.linghang.rpc.client;
 
 import com.linghang.io.BlockDetail;
+import com.linghang.io.FileWriter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public class ClientFileQuestHandler extends ChannelInboundHandlerAdapter {
 
-    private static final int bufLength = 10240;
     private boolean isFirstReceiveData;
     private String questFileName;
     private byte[] buf;

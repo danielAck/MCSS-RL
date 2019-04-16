@@ -1,6 +1,6 @@
 package com.linghang.pojo;
 
-import com.linghang.rpc.SendFileClient;
+import com.linghang.rpc.client.SendFileClient;
 
 public class SendFileJob extends Thread implements Job {
 

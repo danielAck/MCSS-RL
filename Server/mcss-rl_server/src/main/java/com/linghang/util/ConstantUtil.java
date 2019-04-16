@@ -9,4 +9,6 @@ public class ConstantUtil {
     public static final String SERVER_PROPERTY_NAME = "server.properties";
     public static final Integer SEND_FINISH_CODE = 200;
     public static final Integer SEND_ERROR_CODE = 500;
+    public static final Integer CALCULATE_SERVICE_PORT = 9800;
+    public static final Integer SEND_FILE_SERVICE_PORT = 9999;
 }
