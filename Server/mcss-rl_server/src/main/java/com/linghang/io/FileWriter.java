@@ -1,5 +1,6 @@
 package com.linghang.io;
 
+import com.linghang.rpc.client.ClientFileQuestHandler;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.Util;
 
@@ -7,23 +8,32 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FileWriter {
 
     private static final int bufLength = ConstantUtil.BUFLENGTH;
     private String questFileName;
     private byte[] readBuf;
-    private long flg;
+    private ConcurrentHashMap<String, Long> fileReadFlg;
     private RandomAccessFile localReadRF;
     private RandomAccessFile writeRF;
-
-    public FileWriter(){}
+    private Object writeLock;
 
     public FileWriter(String fileName) {
         readBuf = new byte[bufLength];
         questFileName = fileName;
+        writeLock = new Object();
         initReadFile();
         initWriteFile();
+        initFlg();
+    }
+
+    private void initFlg(){
+        fileReadFlg = ClientFileQuestHandler.fileReadFlg;
+        if (fileReadFlg.get(questFileName) == null){
+            fileReadFlg.put(questFileName, ConstantUtil.FILE_READ_INIT_FLG);
+        }
     }
 
     private void initReadFile() {
@@ -31,7 +41,6 @@ public class FileWriter {
         File file = new File(ConstantUtil.CLIENT_PART_SAVE_PATH + readFileName);
         try {
             localReadRF = new RandomAccessFile(file, "r");
-            flg = -1;
         } catch (FileNotFoundException e) {
             System.out.println("======= SEGMENT PART DOESN'T EXIT IN SERVER =======");
             e.printStackTrace();
@@ -56,6 +65,10 @@ public class FileWriter {
     }
 
     public void write(long start, byte[] msg, int writeLength) throws Exception{
+
+        Long flg = fileReadFlg.get(questFileName);
+
+        // 单线程不用考虑并发
         if (start > flg){
             read(localReadRF, start);
         } else {
@@ -66,6 +79,15 @@ public class FileWriter {
 
         writeRF.seek(start);
         writeRF.write(readBuf, 0, writeLength);
+        fileReadFlg.put(questFileName, start + writeLength);
+    }
+
+    private void multiThread(long start, byte[] msg, int writeLength){
+
+        while(start > fileReadFlg.get(questFileName)){
+            // 第一次写，持锁直到写入
+        }
+
     }
 
     private void read(RandomAccessFile rf, long start) throws Exception{

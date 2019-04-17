@@ -1,4 +1,4 @@
-package com.linghang.CalculateTest;
+package com.linghang.rpc.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;

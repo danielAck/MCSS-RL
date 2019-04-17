@@ -2,8 +2,11 @@ package com.linghang.rpc.client;
 
 import com.linghang.io.BlockDetail;
 import com.linghang.io.FileWriter;
+import com.linghang.util.ConstantUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ClientFileQuestHandler extends ChannelInboundHandlerAdapter {
 
@@ -12,12 +15,14 @@ public class ClientFileQuestHandler extends ChannelInboundHandlerAdapter {
     private byte[] buf;
     private long start;
     private FileWriter fileWriter;
+    public static ConcurrentHashMap<String, Long> fileReadFlg = new ConcurrentHashMap<>();
 
     public ClientFileQuestHandler(String questFileName) throws Exception{
+
         this.questFileName = questFileName;
         this.start = 0;
         this.isFirstReceiveData = true;
-        fileWriter = new FileWriter(questFileName);
+        this.fileWriter = new FileWriter(questFileName);
     }
 
     public void setFileName(String fileName) {
