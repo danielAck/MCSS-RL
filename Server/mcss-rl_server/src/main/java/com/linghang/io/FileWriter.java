@@ -13,17 +13,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FileWriter {
 
     private static final int bufLength = ConstantUtil.BUFLENGTH;
+    private static ConcurrentHashMap<String, Long> fileReadFlg;
     private String questFileName;
     private byte[] readBuf;
-    private ConcurrentHashMap<String, Long> fileReadFlg;
     private RandomAccessFile localReadRF;
     private RandomAccessFile writeRF;
-    private Object writeLock;
 
     public FileWriter(String fileName) {
         readBuf = new byte[bufLength];
         questFileName = fileName;
-        writeLock = new Object();
         initReadFile();
         initWriteFile();
         initFlg();
@@ -80,14 +78,6 @@ public class FileWriter {
         writeRF.seek(start);
         writeRF.write(readBuf, 0, writeLength);
         fileReadFlg.put(questFileName, start + writeLength);
-    }
-
-    private void multiThread(long start, byte[] msg, int writeLength){
-
-        while(start > fileReadFlg.get(questFileName)){
-            // 第一次写，持锁直到写入
-        }
-
     }
 
     private void read(RandomAccessFile rf, long start) throws Exception{

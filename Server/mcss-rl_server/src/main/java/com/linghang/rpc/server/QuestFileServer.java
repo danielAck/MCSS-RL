@@ -13,16 +13,16 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 
 import java.net.InetSocketAddress;
 
-public class CalculateServer {
+public class QuestFileServer {
 
     private int port;
 
-    public CalculateServer(int port) {
+    public QuestFileServer(int port) {
         this.port = port;
     }
 
     public static void main(String[] args) throws Exception {
-        CalculateServer server = new CalculateServer(9999);
+        QuestFileServer server = new QuestFileServer(9999);
         server.start();
     }
 

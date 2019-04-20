@@ -11,15 +11,17 @@ import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 
-public class CalculateClient {
+public class QuestFileClient {
 
+    private NioEventLoopGroup group;
     private String ip;
     private int port;
     private String questFileName;
 
-    public CalculateClient(String ip, int port) {
+    public QuestFileClient(String ip, int port, NioEventLoopGroup group) {
         this.ip = ip;
         this.port = port;
+        this.group = group;
         this.questFileName = null;
     }
 
@@ -27,11 +29,18 @@ public class CalculateClient {
         this.questFileName = questFileName;
     }
 
+    public void resetClientConf(String ip, int port, String questFileName){
+        this.ip = ip;
+        this.port = port;
+        this.questFileName = questFileName;
+    }
+
     public static void main(String[] args) throws Exception {
         String host = "127.0.0.1";
         int port = 9999;
         String questFileName = "1M.pdf";
-        CalculateClient client = new CalculateClient(host, port);
+        NioEventLoopGroup group = new NioEventLoopGroup(1);
+        QuestFileClient client = new QuestFileClient(host, port, group);
         client.setQuestFileName(questFileName);
         client.start();
     }
@@ -43,7 +52,6 @@ public class CalculateClient {
             return;
         }
 
-        EventLoopGroup group = new NioEventLoopGroup(1);
         try{
             Bootstrap b = new Bootstrap();
             b.group(group)
