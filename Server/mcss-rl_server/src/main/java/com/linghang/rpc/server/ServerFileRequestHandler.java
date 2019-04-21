@@ -24,6 +24,7 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+
         // 获取到获取文件请求
         if (msg instanceof String){
 
@@ -37,7 +38,7 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
             File file = new File(ConstantUtil.CLIENT_PART_SAVE_PATH + saveFileName);
             if (!file.exists()){
                 System.out.println("======= ERROR : QUEST FILE DOESN'T EXIST IN SERVER ========");
-                ctx.close();
+                ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
             }
             randomAccessFile = new RandomAccessFile(file, "r");
 
@@ -48,6 +49,7 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
             ctx.writeAndFlush(blockDetail);
 
         }
+
         // 收到客户端的读取情况
         if (msg instanceof Integer){
             int readByte;
@@ -62,7 +64,7 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
                 ctx.writeAndFlush(blockDetail);
             } else {
                 randomAccessFile.close();
-                ctx.close();
+                ctx.writeAndFlush(ConstantUtil.SEND_FINISH_CODE);
             }
         }
     }

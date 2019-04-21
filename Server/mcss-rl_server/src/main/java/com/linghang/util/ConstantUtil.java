@@ -9,7 +9,6 @@ public class ConstantUtil {
     public static final String SERVER_PROPERTY_NAME = "server.properties";
     public static final Long FILE_READ_INIT_FLG = -1L;
     public static final Integer SEND_FINISH_CODE = 200;
-    public static final Integer RPC_JOB_FINISH_CODE = 400;
     public static final Integer SEND_ERROR_CODE = 500;
     public static final Integer RS_CALC_RPC_PORT = 9700;
     public static final Integer CALCULATE_SERVICE_PORT = 9800;

@@ -21,68 +21,118 @@ import java.util.concurrent.CountDownLatch;
 public class RSCalcServiceProxy implements InvocationHandler{
 
     private String fileName;
-    private CountDownLatch countDownLatch;
 
     public RSCalcServiceProxy(String fileName) {
         this.fileName = fileName;
-        this.countDownLatch = new CountDownLatch(3);
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-        // 开启 service 线程
-        Thread serviceThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                NioEventLoopGroup rsCalcGroup = new NioEventLoopGroup(1);
-                PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
-
-                // 获取 Slave 结点
-                String[] slaves = new String[3];
-                slaves[0] = propertiesUtil.getValue("host.slave1");
-                slaves[1] = propertiesUtil.getValue("host.slave2");
-                slaves[2] = propertiesUtil.getValue("host.slave3");
-
-                // 获取 service 对应端口
-                int port = ConstantUtil.RS_CALC_RPC_PORT;
-
-                // 对节点依次使用同一个 I/O 线程创建客户端连接
-                for (String host : slaves){
-                    startClient(host, port, rsCalcGroup);
-                }
-
-                try {
-                    countDownLatch.await();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                rsCalcGroup.shutdownGracefully();
-                System.out.println("Service 调用结束");
-            }
-        });
-        serviceThread.start();
+        // 开启 Demon线程 拉起3个service线程
+        Thread demonThread = new Thread(new RSCalcServiceDemon(fileName));
+        demonThread.setName(fileName + "-demon");
+        demonThread.start();
 
         return null;
     }
 
-    public void startClient(String host, int port, NioEventLoopGroup group){
-        Bootstrap b = new Bootstrap();
-        b.group(group)
-                .channel(NioSocketChannel.class)
-                .remoteAddress(host, port)
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel socketChannel) throws Exception {
-                        socketChannel.pipeline()
-                                .addLast(new ObjectEncoder())
-                                .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
-                                        .weakCachingConcurrentResolver(null)))
-                                .addLast(new RSCalcClientHandler(countDownLatch, fileName));
-                    }
-                });
-        b.connect();
+    private static class RSCalcServiceDemon implements Runnable{
+
+        CountDownLatch countDownLatch;
+        String fileName;
+        NioEventLoopGroup group;
+
+        public RSCalcServiceDemon(String fileName) {
+            this.fileName = fileName;
+            this.countDownLatch = new CountDownLatch(3);
+            this.group = new NioEventLoopGroup(1);
+        }
+
+        @Override
+        public void run() {
+
+            System.out.println("======== " + fileName + "-demon" + " THREAD BEGIN ========");
+            PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
+
+            // 获取 Slave 结点IP
+            String[] slaves = new String[3];
+            slaves[0] = propertiesUtil.getValue("host.slave1");
+            slaves[1] = propertiesUtil.getValue("host.slave2");
+            slaves[2] = propertiesUtil.getValue("host.slave3");
+
+            int port = ConstantUtil.RS_CALC_RPC_PORT;
+
+            for (String host : slaves){
+                Thread t = new Thread(new RSCalcServiceJob(fileName, host, port, group, countDownLatch));
+                t.setName(fileName + "-thread");
+                t.start();
+            }
+
+            try {
+                countDownLatch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("======== ALL JOB FINISHED ========");
+            group.shutdownGracefully();
+
+        }
+    }
+
+    private static class RSCalcServiceJob implements Runnable{
+
+        CountDownLatch countDownLatch;
+        CountDownLatch demon;
+        NioEventLoopGroup group;
+        String fileName;
+        String host;
+        int port;
+
+        public RSCalcServiceJob(String fileName, String host, int port, NioEventLoopGroup group, CountDownLatch demon) {
+            this.group = group;
+            this.fileName = fileName;
+            this.host = host;
+            this.port = port;
+            this.demon = demon;
+            countDownLatch = new CountDownLatch(2);
+        }
+
+        @Override
+        public void run() {
+
+            System.out.println("======== " + fileName + "-" + host + "-job" + " JOB BEGIN ========");
+
+            startClient(host, port, group);
+            try {
+                countDownLatch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // Job finished
+            System.out.println("======== " + fileName + "-" + host + "-job" + " JOB FINISHED ========");
+            demon.countDown();
+        }
+
+        public void startClient(String host, int port, NioEventLoopGroup group){
+            Bootstrap b = new Bootstrap();
+            b.group(group)
+                    .channel(NioSocketChannel.class)
+                    .remoteAddress(host, port)
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel socketChannel) throws Exception {
+                            socketChannel.pipeline()
+                                    .addLast(new ObjectEncoder())
+                                    .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
+                                            .weakCachingConcurrentResolver(null)))
+                                    .addLast(new RSCalcClientHandler(countDownLatch, fileName));
+                        }
+                    });
+            b.connect();
+        }
     }
 
     private static class RSCalcClientHandler extends ChannelInboundHandlerAdapter {
@@ -103,7 +153,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             if (msg instanceof Integer){
                 Integer res = (Integer) msg;
-                if (res.equals(ConstantUtil.RPC_JOB_FINISH_CODE)){
+                if (res.equals(ConstantUtil.SEND_FINISH_CODE)){
                     System.out.println("======== " + ctx.channel().remoteAddress().toString() + " FINISH RPC CALL ========");
                 }
                 else{

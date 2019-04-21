@@ -12,13 +12,14 @@ public class ClientFileQuestHandler extends ChannelInboundHandlerAdapter {
 
     private boolean isFirstReceiveData;
     private String questFileName;
-    private byte[] buf;
     private long start;
     private FileWriter fileWriter;
+    private ChannelHandlerContext rpcContext;
     public static ConcurrentHashMap<String, Long> fileReadFlg = new ConcurrentHashMap<>();
 
-    public ClientFileQuestHandler(String questFileName) throws Exception{
+    public ClientFileQuestHandler(String questFileName, ChannelHandlerContext ctx) throws Exception{
 
+        this.rpcContext = ctx;
         this.questFileName = questFileName;
         this.start = 0;
         this.isFirstReceiveData = true;
@@ -46,7 +47,7 @@ public class ClientFileQuestHandler extends ChannelInboundHandlerAdapter {
                 this.start = blockDetail.getStartPos();
                 isFirstReceiveData = false;
             }
-            buf = blockDetail.getBytes();
+            byte[] buf = blockDetail.getBytes();
             System.out.println("======== CLIENT RECEIVE BYTE LENGTH : " + blockDetail.getReadByte() + " ========");
 
             // 将接收到的数据和本地数据进行异或相加
@@ -54,6 +55,12 @@ public class ClientFileQuestHandler extends ChannelInboundHandlerAdapter {
             start = start + readByte;
 
             ctx.writeAndFlush(start);
+        }
+
+        if (msg instanceof Integer){
+            Integer res = (Integer) msg;
+            rpcContext.writeAndFlush(res);
+            ctx.close();
         }
     }
 
