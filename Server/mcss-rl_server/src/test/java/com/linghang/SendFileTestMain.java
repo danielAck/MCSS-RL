@@ -1,15 +1,12 @@
 package com.linghang;
 
 import com.linghang.rpc.NameNode;
-import com.linghang.util.Util;
 
-import java.io.File;
-
-public class Main {
+public class SendFileTestMain {
 
     public static void main(String[] args) {
-        Main testMain = new Main();
-        testMain.clusterTest();
+        SendFileTestMain testMain = new SendFileTestMain();
+        testMain.standaloneTest();
     }
 
     public void standaloneTest(){
@@ -25,5 +22,4 @@ public class Main {
         NameNode nameNode = new NameNode();
         nameNode.sendData(filePath, fileName);
     }
-
 }

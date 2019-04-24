@@ -43,14 +43,16 @@ public class SendFileJobFactory implements JobFactory {
             return null;
         }
 
+
         // get service corresponds port
-        String serviceName = "service.sendfile";
-        String servicePortValue = serverProperties.getValue(serviceName);
-        if (servicePortValue == null){
-            System.err.println("======= SERVICE: " + serviceName + " DOESN'T EXIST IN PROPERTY : " + ConstantUtil.SERVER_PROPERTY_NAME);
-            return null;
-        }
-        int servicePort = Integer.parseInt(servicePortValue);
+//        String serviceName = "service.sendfile";
+//        String servicePortValue = serverProperties.getValue(serviceName);
+//        if (servicePortValue == null){
+//            System.err.println("======= SERVICE: " + serviceName + " DOESN'T EXIST IN PROPERTY : " + ConstantUtil.SERVER_PROPERTY_NAME);
+//            return null;
+//        }
+//        int servicePort = Integer.parseInt(servicePortValue);
+        int servicePort = ConstantUtil.SEND_FILE_SERVICE_PORT;
 
         // get send position
         SendPosition sendPosition = getSendPosition();

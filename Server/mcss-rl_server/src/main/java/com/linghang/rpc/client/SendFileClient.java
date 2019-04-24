@@ -22,26 +22,6 @@ public class SendFileClient {
         this.jobDescription = jobDescription;
     }
 
-    public static void main(String[] args) throws Exception {
-
-        String filePath = "F:\\WUST\\program\\dsz\\";
-        String fileName = "1M.pdf";
-        File file = new File(filePath + fileName);
-        int startPos = 0;
-        long endPos = 10249;
-
-        SendPosition sendPosition = new SendPosition(startPos, endPos);
-
-        // create job description
-        SendFileJobDescription jobDescription = new SendFileJobDescription(filePath, fileName, sendPosition, "127.0.0.1", 9999);
-
-        // new Client
-
-        SendFileClient sendClient = new SendFileClient(jobDescription);
-        sendClient.start();
-        System.out.println("======== CLIENT SEND FINISH =========");
-    }
-
     public void start() throws Exception{
 
         NioEventLoopGroup group = new NioEventLoopGroup(1);

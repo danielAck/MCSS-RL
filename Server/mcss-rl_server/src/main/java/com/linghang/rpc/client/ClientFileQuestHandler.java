@@ -58,8 +58,10 @@ public class ClientFileQuestHandler extends ChannelInboundHandlerAdapter {
         }
 
         if (msg instanceof Integer){
+            // 将从文件传输服务器端传送的结果转发给rpc调用客户端，最后关闭文件传输连接
             Integer res = (Integer) msg;
             rpcContext.writeAndFlush(res);
+
             ctx.close();
         }
     }

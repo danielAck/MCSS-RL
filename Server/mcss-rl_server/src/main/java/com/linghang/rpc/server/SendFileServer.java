@@ -1,5 +1,6 @@
 package com.linghang.rpc.server;
 
+import com.linghang.util.ConstantUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -15,15 +16,13 @@ import java.util.Date;
 
 public class SendFileServer {
 
-    private int port;
 
-    public SendFileServer(int port) {
-        this.port = port;
+    public SendFileServer() {
     }
 
     public static void main(String[] args) throws Exception {
         int port = 9999;
-        SendFileServer server = new SendFileServer(port);
+        SendFileServer server = new SendFileServer();
         server.start();
     }
 
@@ -33,7 +32,7 @@ public class SendFileServer {
             ServerBootstrap b = new ServerBootstrap();
             b.group(group)
                     .channel(NioServerSocketChannel.class)
-                    .localAddress(new InetSocketAddress(port))
+                    .localAddress(new InetSocketAddress(ConstantUtil.SEND_FILE_SERVICE_PORT))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
@@ -45,7 +44,7 @@ public class SendFileServer {
                         }
                     });
             ChannelFuture f = b.bind().sync();
-            System.out.println("Bind finished... " + new Date());
+            System.out.println("Send file Server Bind finished... " + new Date());
             f.channel().closeFuture().sync();
         } finally {
             group.shutdownGracefully();

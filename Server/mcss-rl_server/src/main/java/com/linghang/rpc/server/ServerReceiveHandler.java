@@ -27,12 +27,13 @@ public class ServerReceiveHandler extends ChannelInboundHandlerAdapter {
         this.test = test;
     }
 
+    // 作为客户端，接收客户端上传的文件块
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        // receive file block
         if (msg instanceof BlockDetail){
-
             blockDetail = (BlockDetail) msg;
+
+            // 接收新文件块，对相关数据进行初始化
             if (isFirstReceive){
                 boolean initSuccess = init();
                 if (!initSuccess){

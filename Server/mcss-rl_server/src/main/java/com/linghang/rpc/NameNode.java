@@ -35,8 +35,8 @@ public class NameNode {
 
     /**
      * 将文件分块传输给三个DataNode
-     * @param filePath 上传文件路径
-     * @param fileName 上传文件名
+     * @param filePath 需要上传的文件的路径
+     * @param fileName 需要上传的文件的文件名
      */
     public void sendData(String filePath, String fileName) {
         Job[] jobs = createJobs(filePath, fileName);
@@ -46,6 +46,12 @@ public class NameNode {
         }
     }
 
+    /**
+     *
+     * @param filePath 需要上传的文件的路径
+     * @param fileName 需要上传的文件的文件名
+     * @return 可执行任务列表
+     */
     private Job[] createJobs(String filePath, String fileName){
         SendFileJobFactory sendFileJobFactory = new SendFileJobFactory(filePath, fileName, slaves);
         Job[] jobs = new Job[3];
@@ -68,13 +74,12 @@ public class NameNode {
 
     private Job createJobsTest(String filePath, String fileName){
         HashMap<Integer, String> slave = new HashMap<>();
-        PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
-        String slave1IP = "192.168.31.120";
+        String slave1IP = "127.0.0.1";
         slave.put(0, slave1IP);
 
         SendFileJobFactory sendFileJobFactory = new SendFileJobFactory(filePath, fileName, slave);
         sendFileJobFactory.setSlaveId(0);
-        sendFileJobFactory.setBlockIdx(2);
+        sendFileJobFactory.setBlockIdx(0);
 
         return sendFileJobFactory.createJob();
     }

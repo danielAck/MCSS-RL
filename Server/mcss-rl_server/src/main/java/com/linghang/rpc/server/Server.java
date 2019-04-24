@@ -1,7 +1,5 @@
 package com.linghang.rpc.server;
 
-import com.linghang.service.RSCalcServerService;
-
 public class Server {
 
     public Server() {}
@@ -17,11 +15,11 @@ public class Server {
     private boolean exposeService(){
 
         // init server service
-        RSCalcServerService calcService = new RSCalcServerService();
+        RSCalcServer calcService = new RSCalcServer();
 
         // expose service
         try {
-            calcService.expose();
+            calcService.start();
         } catch (Exception e) {
             e.printStackTrace();
             return false;

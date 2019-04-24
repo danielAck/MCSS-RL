@@ -81,6 +81,47 @@ public class RSCalcServiceProxy implements InvocationHandler{
         }
     }
 
+    public static class RSCalcServiceDemonTest implements Runnable{
+        CountDownLatch countDownLatch;
+        String fileName;
+        NioEventLoopGroup group;
+
+        public RSCalcServiceDemonTest(String fileName) {
+            this.fileName = fileName;
+            this.countDownLatch = new CountDownLatch(1);
+            this.group = new NioEventLoopGroup(1);
+        }
+
+        @Override
+        public void run() {
+
+            System.out.println("======== " + fileName + "-demon" + " THREAD BEGIN ========");
+            PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
+
+            // 获取 Slave 结点IP
+            String[] slaves = new String[1];
+            slaves[0] = "127.0.0.1";
+
+            int port = ConstantUtil.RS_CALC_RPC_PORT;
+
+            for (String host : slaves){
+                Thread t = new Thread(new RSCalcServiceJob(fileName, host, port, group, countDownLatch));
+                t.setName(fileName + "-thread");
+                t.start();
+            }
+
+            try {
+                countDownLatch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("======== ALL JOB FINISHED ========");
+            group.shutdownGracefully();
+
+        }
+    }
+
     private static class RSCalcServiceJob implements Runnable{
 
         CountDownLatch countDownLatch;
@@ -116,6 +157,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
             demon.countDown();
         }
 
+        // 启动RPC调用客户端
         public void startClient(String host, int port, NioEventLoopGroup group){
             Bootstrap b = new Bootstrap();
             b.group(group)
@@ -166,7 +208,11 @@ public class RSCalcServiceProxy implements InvocationHandler{
             }
 
             countDownLatch.countDown();
-            ctx.close();
+
+            // 单个结点计算任务结束，关闭单个结点的rpc连接
+            if (countDownLatch.getCount() == 0){
+                ctx.close();
+            }
         }
 
         @Override

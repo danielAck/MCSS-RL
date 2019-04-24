@@ -1,4 +1,4 @@
-package com.linghang.service;
+package com.linghang.rpc.server;
 
 import com.linghang.rpc.server.ServerFileRequestHandler;
 import com.linghang.util.ConstantUtil;
@@ -8,16 +8,18 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 
-public class RSCalcServerService {
+public class RSCalcServer {
 
-
-    public RSCalcServerService() {
+    public RSCalcServer() {
     }
 
     // start server
-    public void expose() throws Exception{
-        int service_port = ConstantUtil.CALCULATE_SERVICE_PORT;
+    public void start() throws Exception{
+        int service_port = ConstantUtil.RS_CALC_SERVICE_PORT;
         NioEventLoopGroup group = new NioEventLoopGroup();
         try{
             ServerBootstrap b = new ServerBootstrap();
@@ -28,10 +30,14 @@ public class RSCalcServerService {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             socketChannel.pipeline()
+                                    .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
+                                            .weakCachingConcurrentResolver(null)))
+                                    .addLast(new ObjectEncoder())
                                     .addLast(new ServerFileRequestHandler());
                         }
                     });
             ChannelFuture f = b.bind().sync();
+            System.out.println("======== RS CALCULATE SERVER START ========");
             f.channel().closeFuture().sync();
         } finally {
             group.shutdownGracefully();
