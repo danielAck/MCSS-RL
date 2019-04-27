@@ -1,6 +1,6 @@
 package com.linghang.io;
 
-import com.linghang.rpc.client.ClientFileQuestHandler;
+import com.linghang.rpc.client.ClientRSCalcHandler;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
 import com.linghang.util.Util;
@@ -17,7 +17,7 @@ public class FileWriter {
     private static ConcurrentHashMap<String, Long> fileReadFlg;
     private String questFileName;
     private byte[] readBuf;
-    private RandomAccessFile tempReadRF;
+    private RandomAccessFile localReadRF;
     private RandomAccessFile writeRF;
     private PropertiesUtil propertiesUtil;
 
@@ -30,8 +30,20 @@ public class FileWriter {
         initFlg();
     }
 
+    public boolean closeRF(){
+        boolean res = true;
+        try {
+            localReadRF.close();
+            writeRF.close();
+        } catch (IOException e) {
+            res = false;
+            e.printStackTrace();
+        }
+        return res;
+    }
+
     private void initFlg(){
-        fileReadFlg = ClientFileQuestHandler.fileReadFlg;
+        fileReadFlg = ClientRSCalcHandler.fileReadFlg;
         if (fileReadFlg.get(questFileName) == null){
             fileReadFlg.put(questFileName, ConstantUtil.FILE_READ_INIT_FLG);
         }
@@ -44,7 +56,7 @@ public class FileWriter {
         String path = propertiesUtil.getValue("service.local_part_save_path");
         File file = new File(path + readFileName);
         try {
-            tempReadRF = new RandomAccessFile(file, "r");
+            localReadRF = new RandomAccessFile(file, "r");
         } catch (FileNotFoundException e) {
             System.out.println("======= SEGMENT PART DOESN'T EXIT IN SERVER =======");
             e.printStackTrace();
@@ -72,12 +84,18 @@ public class FileWriter {
 
     public void write(long start, byte[] msg, int writeLength) throws Exception{
 
+        // flg = 下一个需要新写入的字节
         Long flg = fileReadFlg.get(questFileName);
 
         // 单线程不用考虑并发
-        if (start > flg){
-            read(tempReadRF, start);
+        if (start >= flg){
+            System.out.println("======== READ FROM LOCAL FILE ========");
+            read(localReadRF, start);
+
+            // 更新读取下标
+            fileReadFlg.put(questFileName, start + writeLength);
         } else {
+            System.out.println("======== READ FROM WRITE FILE ========");
             read(writeRF, start);
         }
 
@@ -85,7 +103,6 @@ public class FileWriter {
 
         writeRF.seek(start);
         writeRF.write(readBuf, 0, writeLength);
-        fileReadFlg.put(questFileName, start + writeLength);
     }
 
     private void read(RandomAccessFile rf, long start) throws Exception{
@@ -98,4 +115,5 @@ public class FileWriter {
             readBuf[i] = (byte)(readBuf[i] ^ msg[i]);
         }
     }
+
 }

@@ -1,12 +1,11 @@
 package com.linghang.rpc;
 
-import com.linghang.service.RSCalcService;
 import com.linghang.service.RSCalcServiceFactory;
+import com.linghang.service.Service;
 
 public class DataNode {
 
     public static void main(String[] args) {
-
         DataNode datanode = new DataNode();
         datanode.doRSCalc("1M.pdf");
     }
@@ -22,5 +21,4 @@ public class DataNode {
         Service service = factory.createService();
         service.call();
     }
-
 }

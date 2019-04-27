@@ -13,8 +13,8 @@ public class EchoClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("Client Active！ " + new Date());
-        ctx.writeAndFlush(
-            Unpooled.copiedBuffer("Netty rocks!", CharsetUtil.UTF_8));
+        long i = 1;
+        ctx.writeAndFlush(i);
 }
 
     @Override
@@ -25,8 +25,7 @@ public class EchoClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, ByteBuf in) throws Exception {
-        System.out.println(
-                "Client received: " + in.toString(CharsetUtil.UTF_8));
+        System.out.println("receive");
         channelHandlerContext.channel().close();
     }
 }

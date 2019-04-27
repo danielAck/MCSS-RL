@@ -1,6 +1,5 @@
 package com.linghang.service;
 
-import com.linghang.rpc.Service;
 import com.linghang.rpc.RSCalcServiceProxy;
 
 import java.lang.reflect.Proxy;

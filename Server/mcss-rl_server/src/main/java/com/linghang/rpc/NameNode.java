@@ -47,7 +47,7 @@ public class NameNode {
     }
 
     /**
-     *
+     * 创建可执行任务列表
      * @param filePath 需要上传的文件的路径
      * @param fileName 需要上传的文件的文件名
      * @return 可执行任务列表
@@ -79,7 +79,7 @@ public class NameNode {
 
         SendFileJobFactory sendFileJobFactory = new SendFileJobFactory(filePath, fileName, slave);
         sendFileJobFactory.setSlaveId(0);
-        sendFileJobFactory.setBlockIdx(0);
+        sendFileJobFactory.setBlockIdx(1);
 
         return sendFileJobFactory.createJob();
     }

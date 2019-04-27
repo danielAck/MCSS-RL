@@ -36,7 +36,7 @@ public class Client {
         File file = new File(filePath + fileName);
         BlockDetail blockDetail = new BlockDetail();
         blockDetail.setFileName("1M.pdf");
-        blockDetail.setStartPos(0);
+        blockDetail.setStartPos(0L);
         return blockDetail;
     }
 

@@ -27,14 +27,18 @@ public class RSCalcServiceProxy implements InvocationHandler{
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, Object[] args) {
 
         // 开启 Demon线程 拉起3个service线程
-        Thread demonThread = new Thread(new RSCalcServiceDemon(fileName));
+//        Thread demonThread = new Thread(new RSCalcServiceDemon(fileName));
+//        demonThread.setName(fileName + "-demon");
+//        demonThread.start();
+
+        Thread demonThread  = new Thread(new RSCalcServiceDemonTest(fileName));
         demonThread.setName(fileName + "-demon");
         demonThread.start();
 
-        return null;
+        return new Object();
     }
 
     private static class RSCalcServiceDemon implements Runnable{
@@ -88,6 +92,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
 
         public RSCalcServiceDemonTest(String fileName) {
             this.fileName = fileName;
+            // demon 线程 countDownLatch
             this.countDownLatch = new CountDownLatch(1);
             this.group = new NioEventLoopGroup(1);
         }
@@ -98,7 +103,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
             System.out.println("======== " + fileName + "-demon" + " THREAD BEGIN ========");
             PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
 
-            // 获取 Slave 结点IP
+            // 获取 RPC 结点IP, call RPC
             String[] slaves = new String[1];
             slaves[0] = "127.0.0.1";
 
@@ -137,6 +142,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
             this.host = host;
             this.port = port;
             this.demon = demon;
+            // 文件块请求 countDownLatch
             countDownLatch = new CountDownLatch(2);
         }
 
@@ -170,18 +176,18 @@ public class RSCalcServiceProxy implements InvocationHandler{
                                     .addLast(new ObjectEncoder())
                                     .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
                                             .weakCachingConcurrentResolver(null)))
-                                    .addLast(new RSCalcClientHandler(countDownLatch, fileName));
+                                    .addLast(new RSCalcRPCClientHandler(countDownLatch, fileName));
                         }
                     });
             b.connect();
         }
     }
 
-    private static class RSCalcClientHandler extends ChannelInboundHandlerAdapter {
+    private static class RSCalcRPCClientHandler extends ChannelInboundHandlerAdapter {
         private CountDownLatch countDownLatch;
         private String fileName;
 
-        public RSCalcClientHandler(CountDownLatch countDownLatch, String fileName) {
+        public RSCalcRPCClientHandler(CountDownLatch countDownLatch, String fileName) {
             this.countDownLatch = countDownLatch;
             this.fileName = fileName;
         }

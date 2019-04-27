@@ -7,6 +7,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 
 import java.net.InetSocketAddress;
 import java.util.Date;
@@ -31,7 +34,11 @@ public class EchoClient {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new EchoClientHandler());
+                            ch.pipeline()
+                                    .addLast(new ObjectEncoder())
+                                    .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
+                                            .weakCachingConcurrentResolver(null)))
+                                    .addLast(new EchoClientHandler());
                         }
                     });
             ChannelFuture f = b.connect().sync(); // 同步阻塞至连接完成

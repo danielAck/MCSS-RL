@@ -1,6 +1,6 @@
 package com.linghang.rpc.server;
 
-import com.linghang.rpc.client.ClientFileQuestHandler;
+import com.linghang.rpc.client.ClientRSCalcHandler;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
 import io.netty.bootstrap.Bootstrap;
@@ -50,12 +50,17 @@ public class RSCalcRPCServer {
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             if (msg instanceof String){
                 String fileName = (String) msg;
-                String[] slaves = new String[1];
+
+                System.out.println("======== RPC SERVER RECEIVE RPC CALL FOR FILE : " + fileName + " ========");
+
+                String[] slaves = new String[2];
                 PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
                 slaves[0] = "127.0.0.1";
+                slaves[1] = "192.168.31.120";
                 for (String host : slaves){
                     // 创建的文件传输客户端与当前rpc服务端共用同一个I/O线程
                     // TODO：当调用当前服务端多个文件的传输服务时同一个IO线程需要为2*rpc连接数个连接服务，响应变慢？
+                    System.out.println("======== RPC SERVER START QUEST FILE CLIENT ========");
                     createQuestFileClient(fileName, host, ctx);
                 }
             }
@@ -86,7 +91,7 @@ public class RSCalcRPCServer {
                                     .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
                                             .weakCachingConcurrentResolver(null)))
                                     .addLast(new ObjectEncoder())
-                                    .addLast(new ClientFileQuestHandler(fileName, rpcCtx));
+                                    .addLast(new ClientRSCalcHandler(fileName, rpcCtx));
                         }
                     });
             b.connect();

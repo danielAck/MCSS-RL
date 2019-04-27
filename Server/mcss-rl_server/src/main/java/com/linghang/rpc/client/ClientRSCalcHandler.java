@@ -8,7 +8,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ClientFileQuestHandler extends ChannelInboundHandlerAdapter {
+public class ClientRSCalcHandler extends ChannelInboundHandlerAdapter {
 
     private boolean isFirstReceiveData;
     private String questFileName;
@@ -17,11 +17,10 @@ public class ClientFileQuestHandler extends ChannelInboundHandlerAdapter {
     private ChannelHandlerContext rpcContext;
     public static ConcurrentHashMap<String, Long> fileReadFlg = new ConcurrentHashMap<>();
 
-    public ClientFileQuestHandler(String questFileName, ChannelHandlerContext ctx) throws Exception{
+    public ClientRSCalcHandler(String questFileName, ChannelHandlerContext ctx) throws Exception{
 
         this.rpcContext = ctx;
         this.questFileName = questFileName;
-        this.start = 0;
         this.isFirstReceiveData = true;
         this.fileWriter = new FileWriter(questFileName);
     }
@@ -33,6 +32,8 @@ public class ClientFileQuestHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         // 发送读取请求文件名
+        System.out.println("======== RS CALC CLIENT SEND FILENAME " + "TO " +
+                ctx.channel().remoteAddress().toString() + " " + questFileName + " ========");
         ctx.writeAndFlush(questFileName);
     }
 
@@ -61,7 +62,10 @@ public class ClientFileQuestHandler extends ChannelInboundHandlerAdapter {
             // 将从文件传输服务器端传送的结果转发给rpc调用客户端，最后关闭文件传输连接
             Integer res = (Integer) msg;
             rpcContext.writeAndFlush(res);
-
+            boolean closeSuccess = fileWriter.closeRF();
+            if (!closeSuccess){
+                System.out.println("======== " + ctx.channel().remoteAddress().toString() + " CLOSE RANDOM ACCESS FILE FAILED ========");
+            }
             ctx.close();
         }
     }

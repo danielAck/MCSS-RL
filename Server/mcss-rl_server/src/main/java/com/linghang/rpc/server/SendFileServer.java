@@ -23,10 +23,11 @@ public class SendFileServer {
     public static void main(String[] args) throws Exception {
         int port = 9999;
         SendFileServer server = new SendFileServer();
-        server.start();
+        boolean isTest = true;
+        server.start(isTest);
     }
 
-    public void start() throws Exception{
+    public void start(final boolean test) throws Exception{
         NioEventLoopGroup group = new NioEventLoopGroup();
         try{
             ServerBootstrap b = new ServerBootstrap();
@@ -40,7 +41,7 @@ public class SendFileServer {
                                     .addLast(new ObjectEncoder())
                                     .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
                                             .weakCachingConcurrentResolver(null)))
-                                    .addLast(new ServerReceiveHandler(true));
+                                    .addLast(new ServerReceiveHandler(test));
                         }
                     });
             ChannelFuture f = b.bind().sync();
@@ -49,6 +50,5 @@ public class SendFileServer {
         } finally {
             group.shutdownGracefully();
         }
-
     }
 }

@@ -1,7 +1,6 @@
 package com.linghang.rpc.client;
 
 import com.linghang.pojo.SendFileJobDescription;
-import com.linghang.pojo.SendPosition;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;

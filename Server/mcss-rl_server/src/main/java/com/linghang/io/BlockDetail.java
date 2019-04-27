@@ -13,7 +13,7 @@ public class BlockDetail implements Serializable {
 
     public BlockDetail(){}
 
-    public BlockDetail(String fileName, int startPos, int readByte) {
+    public BlockDetail(String fileName, Long startPos, Integer readByte) {
         this.fileName = fileName;
         this.startPos = startPos;
         this.readByte = readByte;
@@ -28,12 +28,8 @@ public class BlockDetail implements Serializable {
                 '}';
     }
 
-    public byte[] getBytes() {
-        return bytes;
-    }
-
-    public void setBytes(byte[] bytes) {
-        this.bytes = bytes;
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
     }
 
     public String getFileName() {
@@ -58,5 +54,13 @@ public class BlockDetail implements Serializable {
 
     public void setReadByte(int readByte) {
         this.readByte = readByte;
+    }
+
+    public byte[] getBytes() {
+        return bytes;
+    }
+
+    public void setBytes(byte[] bytes) {
+        this.bytes = bytes;
     }
 }

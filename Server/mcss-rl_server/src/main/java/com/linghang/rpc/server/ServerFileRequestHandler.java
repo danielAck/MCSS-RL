@@ -2,6 +2,7 @@ package com.linghang.rpc.server;
 
 import com.linghang.io.BlockDetail;
 import com.linghang.util.ConstantUtil;
+import com.linghang.util.PropertiesUtil;
 import com.linghang.util.Util;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -14,11 +15,13 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
     private static final int bufLength = ConstantUtil.BUFLENGTH;
     private BlockDetail blockDetail;
     private RandomAccessFile randomAccessFile;
+    private PropertiesUtil propertiesUtil;
     private byte[] buf;
 
     public ServerFileRequestHandler() {
         blockDetail = null;
         randomAccessFile = null;
+        propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
         buf = new byte[bufLength];
     }
 
@@ -29,13 +32,15 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
         if (msg instanceof String){
 
             String fileName = (String) msg;
-            System.out.println("======= SERVER RECEIVE FILE NAME: " + fileName + " =======");
+            System.out.println("======= RS CALC RECEIVE FILE NAME: " + fileName + " =======");
 
             // 将文件分块发送到客户端
             blockDetail = new BlockDetail();
             blockDetail.setStartPos(0);
+
             String saveFileName = Util.genePartName(fileName);
-            File file = new File(ConstantUtil.CLIENT_PART_SAVE_PATH + saveFileName);
+            String path = propertiesUtil.getValue("service.local_part_save_path");
+            File file = new File(path + saveFileName);
             if (!file.exists()){
                 System.out.println("======= ERROR : QUEST FILE DOESN'T EXIST IN SERVER ========");
                 ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
@@ -51,9 +56,10 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
         }
 
         // 收到客户端的读取情况
-        if (msg instanceof Integer){
+        else if (msg instanceof Long){
+
             int readByte;
-            Integer start = (Integer) msg;
+            long start = (Long) msg;
             randomAccessFile.seek(start);
 
             if ((readByte = randomAccessFile.read(buf)) != -1
@@ -66,6 +72,16 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
                 randomAccessFile.close();
                 ctx.writeAndFlush(ConstantUtil.SEND_FINISH_CODE);
             }
+        }
+
+        else if (msg instanceof Integer){
+            System.out.println("======== RS CALC SERVER RECEIVE WRONG DATA TYPE : Integer ========");
+            ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
+        }
+
+        else{
+            System.out.println("======== RS CALC SERVER RECEIVE WRONG DATA TYPE ========");
+            ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
         }
     }
 
