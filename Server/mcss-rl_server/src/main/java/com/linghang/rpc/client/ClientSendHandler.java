@@ -1,7 +1,7 @@
 package com.linghang.rpc.client;
 
 import com.linghang.pojo.SendFileJobDescription;
-import com.linghang.io.BlockDetail;
+import com.linghang.proto.BlockDetail;
 import com.linghang.util.ConstantUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

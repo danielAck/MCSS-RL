@@ -1,6 +1,6 @@
 package com.linghang.NettyTest;
 
-import com.linghang.io.BlockDetail;
+import com.linghang.proto.BlockDetail;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 

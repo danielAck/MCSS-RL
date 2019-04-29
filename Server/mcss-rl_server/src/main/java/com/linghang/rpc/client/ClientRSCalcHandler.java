@@ -1,8 +1,7 @@
 package com.linghang.rpc.client;
 
-import com.linghang.io.BlockDetail;
+import com.linghang.proto.BlockDetail;
 import com.linghang.io.FileWriter;
-import com.linghang.util.ConstantUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -31,10 +30,12 @@ public class ClientRSCalcHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+
+        ctx.writeAndFlush(questFileName);
+
         // 发送读取请求文件名
         System.out.println("======== RS CALC CLIENT SEND FILENAME " + "TO " +
                 ctx.channel().remoteAddress().toString() + " " + questFileName + " ========");
-        ctx.writeAndFlush(questFileName);
     }
 
     @Override
@@ -76,3 +77,4 @@ public class ClientRSCalcHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 }
+

@@ -1,4 +1,4 @@
-package com.linghang.io;
+package com.linghang.proto;
 
 import java.io.Serializable;
 
@@ -10,13 +10,20 @@ public class BlockDetail implements Serializable {
     private long startPos;
     private int readByte;
     private byte[] bytes;
+    private boolean isRedundant;
 
     public BlockDetail(){}
 
-    public BlockDetail(String fileName, Long startPos, Integer readByte) {
+    public BlockDetail(String fileName, long startPos, int readByte) {
         this.fileName = fileName;
         this.startPos = startPos;
         this.readByte = readByte;
+        this.isRedundant = false;
+    }
+
+    public BlockDetail(String fileName, boolean isRedundant) {
+        this.fileName = fileName;
+        this.isRedundant = isRedundant;
     }
 
     @Override
@@ -28,8 +35,12 @@ public class BlockDetail implements Serializable {
                 '}';
     }
 
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
+    public boolean isRedundant() {
+        return isRedundant;
+    }
+
+    public void setRedundant(boolean redundant) {
+        isRedundant = redundant;
     }
 
     public String getFileName() {

@@ -1,6 +1,6 @@
 package com.linghang.rpc.server;
 
-import com.linghang.io.BlockDetail;
+import com.linghang.proto.BlockDetail;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
 import com.linghang.util.Util;
@@ -18,7 +18,7 @@ public class ServerReceiveHandler extends ChannelInboundHandlerAdapter {
     private String fileName;
     private long start;
     private PropertiesUtil propertiesUtil;
-    private String partSavePath;
+    private String savePath;
     private boolean test;
 
     public ServerReceiveHandler(boolean test) {
@@ -40,6 +40,7 @@ public class ServerReceiveHandler extends ChannelInboundHandlerAdapter {
                     System.err.println("======== SERVER INIT RECEIVE JOB FAILED ========");
                     ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
                 }
+                isFirstReceive = false;
             }
 
             try{
@@ -84,25 +85,36 @@ public class ServerReceiveHandler extends ChannelInboundHandlerAdapter {
 
     private Boolean init() throws Exception{
         fileName = blockDetail.getFileName();
-        start = 0;
+        start = blockDetail.getStartPos();
 
-        if (test){
-            partSavePath = propertiesUtil.getValue("service.local_part_save_path");
-        } else {
-            partSavePath = propertiesUtil.getValue("service.part_save_path");
-        }
-
-        if (partSavePath == null){
+        if (savePath == null){
             System.err.println("======== PLEASE SPECIFY PART SAVE PATH IN PROPERTY ========");
             return false;
         }
 
-        File file = new File(partSavePath + Util.genePartName(fileName));
+        // 判断接收的是否是计算生成的冗余块
+        File file;
+        if (blockDetail.isRedundant()){
+            if (test){
+                savePath = propertiesUtil.getValue("service.local_redundant_save_path");
+            } else {
+                savePath = propertiesUtil.getValue("service.redundant_save_path");
+            }
+            file = new File(savePath + Util.geneRedundancyName(fileName));
+        } else {
+            if (test){
+                savePath = propertiesUtil.getValue("service.local_part_save_path");
+            } else {
+                savePath = propertiesUtil.getValue("service.part_save_path");
+            }
+
+            file = new File(savePath + Util.genePartName(fileName));
+        }
+
         rf = new RandomAccessFile(file, "rw");
-        rf.seek(0);
+        rf.seek(start);
 
         System.out.println("======== SERVER BEGIN RECEIVE FILE : " + blockDetail.getFileName() + " ========");
-        isFirstReceive = false;
 
         return true;
     }
@@ -121,7 +133,7 @@ public class ServerReceiveHandler extends ChannelInboundHandlerAdapter {
 
     private boolean deleteFile(){
         boolean res = false;
-        File file = new File(partSavePath + fileName);
+        File file = new File(savePath + fileName);
         if (file.exists()){
             res = file.delete();
         }

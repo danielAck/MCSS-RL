@@ -1,6 +1,7 @@
 package com.linghang.rpc.server;
 
-import com.linghang.io.BlockDetail;
+import com.linghang.proto.BlockDetail;
+import com.linghang.proto.RSCalcRequestHeader;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
 import com.linghang.util.Util;
@@ -14,13 +15,14 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
 
     private static final int bufLength = ConstantUtil.BUFLENGTH;
     private BlockDetail blockDetail;
-    private RandomAccessFile randomAccessFile;
+    private RandomAccessFile rf;
     private PropertiesUtil propertiesUtil;
+    private long length;
     private byte[] buf;
 
     public ServerFileRequestHandler() {
         blockDetail = null;
-        randomAccessFile = null;
+        rf = null;
         propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
         buf = new byte[bufLength];
     }
@@ -29,14 +31,15 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
         // 获取到获取文件请求
-        if (msg instanceof String){
+        if (msg instanceof RSCalcRequestHeader){
 
-            String fileName = (String) msg;
+            RSCalcRequestHeader header = (RSCalcRequestHeader) msg;
+            String fileName = header.getFileName();
             System.out.println("======= RS CALC RECEIVE FILE NAME: " + fileName + " =======");
 
             // 将文件分块发送到客户端
             blockDetail = new BlockDetail();
-            blockDetail.setStartPos(0);
+            blockDetail.setStartPos(header.getStartPos());
 
             String saveFileName = Util.genePartName(fileName);
             String path = propertiesUtil.getValue("service.local_part_save_path");
@@ -45,9 +48,14 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
                 System.out.println("======= ERROR : QUEST FILE DOESN'T EXIST IN SERVER ========");
                 ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
             }
-            randomAccessFile = new RandomAccessFile(file, "r");
 
-            int readByte = randomAccessFile.read(buf);
+            rf = new RandomAccessFile(file, "r");
+            rf.seek(header.getStartPos());
+
+            // TODO: 看怎么处理这个 length 好一些
+            this.length = rf.length() / 3;
+
+            int readByte = rf.read(buf);
             blockDetail.setBytes(buf);
             blockDetail.setReadByte(readByte);
 
@@ -60,16 +68,16 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
 
             int readByte;
             long start = (Long) msg;
-            randomAccessFile.seek(start);
+            rf.seek(start);
 
-            if ((readByte = randomAccessFile.read(buf)) != -1
-                    && (randomAccessFile.length() - start) > 0){
+            if ((readByte = rf.read(buf)) != -1
+                    && (length - start) > 0){
 
                 blockDetail.setBytes(buf);
                 blockDetail.setReadByte(readByte);
                 ctx.writeAndFlush(blockDetail);
             } else {
-                randomAccessFile.close();
+                rf.close();
                 ctx.writeAndFlush(ConstantUtil.SEND_FINISH_CODE);
             }
         }
@@ -88,7 +96,7 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         cause.printStackTrace();
-        randomAccessFile.close();
+        rf.close();
         ctx.close();
     }
 }

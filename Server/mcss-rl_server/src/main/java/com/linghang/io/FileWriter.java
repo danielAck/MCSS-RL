@@ -82,7 +82,7 @@ public class FileWriter {
         }
     }
 
-    public void write(long start, byte[] msg, int writeLength) throws Exception{
+    public byte[] write(long start, byte[] msg, int writeLength) throws Exception{
 
         // flg = 下一个需要新写入的字节
         Long flg = fileReadFlg.get(questFileName);
@@ -101,8 +101,11 @@ public class FileWriter {
 
         add(msg, writeLength);
 
-        writeRF.seek(start);
-        writeRF.write(readBuf, 0, writeLength);
+        return readBuf;
+
+//        不写到本地
+//        writeRF.seek(start);
+//        writeRF.write(readBuf, 0, writeLength);
     }
 
     private void read(RandomAccessFile rf, long start) throws Exception{

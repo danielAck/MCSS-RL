@@ -1,5 +1,6 @@
 package com.linghang.rpc;
 
+import com.linghang.proto.RSCalcRequestHeader;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
 import io.netty.bootstrap.Bootstrap;
@@ -65,10 +66,12 @@ public class RSCalcServiceProxy implements InvocationHandler{
             slaves[1] = propertiesUtil.getValue("host.slave2");
             slaves[2] = propertiesUtil.getValue("host.slave3");
 
-            int port = ConstantUtil.RS_CALC_RPC_PORT;
-
             for (String host : slaves){
-                Thread t = new Thread(new RSCalcServiceJob(fileName, host, port, group, countDownLatch));
+
+                // 从数据库中获取 host 对应的 id， 使用 id 进行计算 startPos
+                long startPos = getCalcStartPos(host);
+
+                Thread t = new Thread(new RSCalcServiceJob(fileName, host, startPos, group, countDownLatch));
                 t.setName(fileName + "-thread");
                 t.start();
             }
@@ -82,6 +85,12 @@ public class RSCalcServiceProxy implements InvocationHandler{
             System.out.println("======== ALL JOB FINISHED ========");
             group.shutdownGracefully();
 
+        }
+
+        private long getCalcStartPos(String host){
+
+
+            return 0;
         }
     }
 
@@ -107,10 +116,11 @@ public class RSCalcServiceProxy implements InvocationHandler{
             String[] slaves = new String[1];
             slaves[0] = "127.0.0.1";
 
-            int port = ConstantUtil.RS_CALC_RPC_PORT;
-
             for (String host : slaves){
-                Thread t = new Thread(new RSCalcServiceJob(fileName, host, port, group, countDownLatch));
+
+                long startPos = getCalcStartPos(host);
+
+                Thread t = new Thread(new RSCalcServiceJob(fileName, host, startPos, group, countDownLatch));
                 t.setName(fileName + "-thread");
                 t.start();
             }
@@ -125,6 +135,13 @@ public class RSCalcServiceProxy implements InvocationHandler{
             group.shutdownGracefully();
 
         }
+
+        private long getCalcStartPos(String host){
+
+            // TODO: 从数据库中获取host对应的id， 用 id 计算对应的 startPos
+
+            return 0;
+        }
     }
 
     private static class RSCalcServiceJob implements Runnable{
@@ -133,15 +150,15 @@ public class RSCalcServiceProxy implements InvocationHandler{
         CountDownLatch demon;
         NioEventLoopGroup group;
         String fileName;
+        long startPos;
         String host;
-        int port;
 
-        public RSCalcServiceJob(String fileName, String host, int port, NioEventLoopGroup group, CountDownLatch demon) {
+        public RSCalcServiceJob(String fileName, String host, long startPos, NioEventLoopGroup group, CountDownLatch demon) {
             this.group = group;
             this.fileName = fileName;
             this.host = host;
-            this.port = port;
             this.demon = demon;
+            this.startPos = startPos;
             // 文件块请求 countDownLatch
             countDownLatch = new CountDownLatch(2);
         }
@@ -151,7 +168,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
 
             System.out.println("======== " + fileName + "-" + host + "-job" + " JOB BEGIN ========");
 
-            startClient(host, port, group);
+            startClient(host, startPos, group);
             try {
                 countDownLatch.await();
             } catch (InterruptedException e) {
@@ -164,11 +181,14 @@ public class RSCalcServiceProxy implements InvocationHandler{
         }
 
         // 启动RPC调用客户端
-        public void startClient(String host, int port, NioEventLoopGroup group){
+        public void startClient(String host, final long startPos, NioEventLoopGroup group){
+
+            final RSCalcRequestHeader rsCalcRequestHeader = new RSCalcRequestHeader(fileName, startPos);
+
             Bootstrap b = new Bootstrap();
             b.group(group)
                     .channel(NioSocketChannel.class)
-                    .remoteAddress(host, port)
+                    .remoteAddress(host, ConstantUtil.RS_CALC_RPC_PORT)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
@@ -176,7 +196,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
                                     .addLast(new ObjectEncoder())
                                     .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
                                             .weakCachingConcurrentResolver(null)))
-                                    .addLast(new RSCalcRPCClientHandler(countDownLatch, fileName));
+                                    .addLast(new RSCalcRPCClientHandler(countDownLatch, rsCalcRequestHeader));
                         }
                     });
             b.connect();
@@ -185,16 +205,18 @@ public class RSCalcServiceProxy implements InvocationHandler{
 
     private static class RSCalcRPCClientHandler extends ChannelInboundHandlerAdapter {
         private CountDownLatch countDownLatch;
-        private String fileName;
+        private RSCalcRequestHeader questHeader;
 
-        public RSCalcRPCClientHandler(CountDownLatch countDownLatch, String fileName) {
+        public RSCalcRPCClientHandler(CountDownLatch countDownLatch, RSCalcRequestHeader questHeader) {
             this.countDownLatch = countDownLatch;
-            this.fileName = fileName;
+            this.questHeader = questHeader;
         }
 
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
-            ctx.writeAndFlush(fileName);
+
+            // 发送计算请求头
+            ctx.writeAndFlush(questHeader);
         }
 
         @Override
