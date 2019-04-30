@@ -1,5 +1,6 @@
 package com.linghang.rpc.server;
 
+import com.linghang.proto.Block;
 import com.linghang.proto.BlockDetail;
 import com.linghang.proto.RSCalcRequestHeader;
 import com.linghang.util.ConstantUtil;
@@ -14,14 +15,14 @@ import java.io.RandomAccessFile;
 public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
 
     private static final int bufLength = ConstantUtil.BUFLENGTH;
-    private BlockDetail blockDetail;
+    private Block fileBlock;
     private RandomAccessFile rf;
     private PropertiesUtil propertiesUtil;
     private long length;
     private byte[] buf;
 
     public ServerFileRequestHandler() {
-        blockDetail = null;
+        fileBlock = null;
         rf = null;
         propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
         buf = new byte[bufLength];
@@ -38,8 +39,7 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
             System.out.println("======= RS CALC RECEIVE FILE NAME: " + fileName + " =======");
 
             // 将文件分块发送到客户端
-            blockDetail = new BlockDetail();
-            blockDetail.setStartPos(header.getStartPos());
+            fileBlock = new Block();
 
             String saveFileName = Util.genePartName(fileName);
             String path = propertiesUtil.getValue("service.local_part_save_path");
@@ -56,11 +56,10 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
             this.length = rf.length() / 3;
 
             int readByte = rf.read(buf);
-            blockDetail.setBytes(buf);
-            blockDetail.setReadByte(readByte);
+            fileBlock.setBytes(buf);
+            fileBlock.setReadByte(readByte);
 
-            ctx.writeAndFlush(blockDetail);
-
+            ctx.writeAndFlush(fileBlock);
         }
 
         // 收到客户端的读取情况
@@ -73,9 +72,9 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
             if ((readByte = rf.read(buf)) != -1
                     && (length - start) > 0){
 
-                blockDetail.setBytes(buf);
-                blockDetail.setReadByte(readByte);
-                ctx.writeAndFlush(blockDetail);
+                fileBlock.setBytes(buf);
+                fileBlock.setReadByte(readByte);
+                ctx.writeAndFlush(fileBlock);
             } else {
                 rf.close();
                 ctx.writeAndFlush(ConstantUtil.SEND_FINISH_CODE);

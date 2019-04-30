@@ -1,6 +1,7 @@
 package com.linghang.rpc.client;
 
 import com.linghang.pojo.SendFileJobDescription;
+import com.linghang.util.ConstantUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -28,7 +29,7 @@ public class SendFileClient {
             Bootstrap b = new Bootstrap();
             b.group(group)
                     .channel(NioSocketChannel.class)
-                    .remoteAddress(jobDescription.getHost(), jobDescription.getPort())
+                    .remoteAddress(jobDescription.getHost(), ConstantUtil.SEND_FILE_SERVICE_PORT)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {

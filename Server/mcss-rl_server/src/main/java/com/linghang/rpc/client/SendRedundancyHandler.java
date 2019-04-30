@@ -1,5 +1,6 @@
 package com.linghang.rpc.client;
 
+import com.linghang.proto.Block;
 import com.linghang.proto.BlockDetail;
 import com.linghang.io.FileWriter;
 import com.linghang.proto.RSCalcRequestHeader;
@@ -28,7 +29,7 @@ public class SendRedundancyHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
-        // 连接上接收端，启动计算请求客户端
+        // 连接上冗余数据块接收服务器，启动计算请求客户端
         startRSCalcClient(ctx);
 
         System.out.println("======== START RS CALC CLIENT TO " +
@@ -37,6 +38,9 @@ public class SendRedundancyHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+
+        // TODO：考虑怎么确保冗余块接收端正常消费完数据
+
         if (msg instanceof Integer){
             Integer res = (Integer) msg;
 
@@ -49,7 +53,7 @@ public class SendRedundancyHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
-    private void startRSCalcClient(final ChannelHandlerContext sendContext){
+    private void startRSCalcClient(final ChannelHandlerContext sendRedundancyCtx){
         Bootstrap b = new Bootstrap();
         b.group(rpcCtx.channel().eventLoop())
                 .channel(NioSocketChannel.class)
@@ -58,7 +62,7 @@ public class SendRedundancyHandler extends ChannelInboundHandlerAdapter {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
                         socketChannel.pipeline()
-                                .addLast(new RSCalcClientHandler(questHeader, sendContext, rpcCtx));
+                                .addLast(new RSCalcClientHandler(questHeader, sendRedundancyCtx, rpcCtx));
                     }
                 });
     }
@@ -66,7 +70,6 @@ public class SendRedundancyHandler extends ChannelInboundHandlerAdapter {
     private static class RSCalcClientHandler extends ChannelInboundHandlerAdapter{
 
         private long start;
-        private boolean isFirstReceiveData;
         private String questFileName;
         private ChannelHandlerContext sendRedundancyCtx;
         private ChannelHandlerContext rpcContext;
@@ -77,11 +80,11 @@ public class SendRedundancyHandler extends ChannelInboundHandlerAdapter {
 
         public RSCalcClientHandler(RSCalcRequestHeader questHeader, ChannelHandlerContext sendRedundancyCtx, ChannelHandlerContext rpcContext) {
             this.questHeader = questHeader;
+            this.start = questHeader.getStartPos();
             this.sendRedundancyCtx = sendRedundancyCtx;
             this.rpcContext = rpcContext;
             this.questFileName = questHeader.getFileName();
             this.fileWriter = new FileWriter(questFileName);
-            this.isFirstReceiveData = true;
             this.redundantBlockDetail = new BlockDetail(questFileName, true);
         }
 
@@ -96,25 +99,25 @@ public class SendRedundancyHandler extends ChannelInboundHandlerAdapter {
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            if (msg instanceof BlockDetail){
-                BlockDetail blockDetail = (BlockDetail) msg;
-                int readByte = blockDetail.getReadByte();
+            if (msg instanceof Block){
+                Block fileBlock = (Block) msg;
+                int readByte = fileBlock.getReadByte();
                 // 第一次接收数据
-                if (isFirstReceiveData){
-                    this.start = blockDetail.getStartPos();
-                    isFirstReceiveData = false;
-                }
-                byte[] buf = blockDetail.getBytes();
-                System.out.println("======== CLIENT RECEIVE BYTE LENGTH : " + blockDetail.getReadByte() + " ========");
+                byte[] buf = fileBlock.getBytes();
+                System.out.println("======== CLIENT RECEIVE BYTE LENGTH : " + fileBlock.getReadByte() + " ========");
 
                 // 将接收到的数据和本地数据进行异或相加,并将计算结果发送到接收结点
                 byte[] res = fileWriter.write(start, buf, readByte);
                 redundantBlockDetail.setBytes(res);
                 redundantBlockDetail.setReadByte(readByte);
                 redundantBlockDetail.setStartPos(start);
-                sendRedundancyCtx.writeAndFlush(redundantBlockDetail);
 
                 start = start + readByte;
+
+                // 发送计算结果至冗余块接收端
+                sendRedundancyCtx.writeAndFlush(redundantBlockDetail);
+
+                // 发送接收进度至文件块发送端
                 ctx.writeAndFlush(start);
             }
 

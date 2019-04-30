@@ -36,29 +36,16 @@ public class SendFileJobFactory implements JobFactory {
             return null;
 
         // get slave IP
-        PropertiesUtil serverProperties = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
         String slaveIP = slaves.get(slaveId);
         if (slaveIP == null){
             System.err.println("======= SLAVE ID:" + slaveId + " DOESN'T EXIST !");
             return null;
         }
 
-
-        // get service corresponds port
-//        String serviceName = "service.sendfile";
-//        String servicePortValue = serverProperties.getValue(serviceName);
-//        if (servicePortValue == null){
-//            System.err.println("======= SERVICE: " + serviceName + " DOESN'T EXIST IN PROPERTY : " + ConstantUtil.SERVER_PROPERTY_NAME);
-//            return null;
-//        }
-//        int servicePort = Integer.parseInt(servicePortValue);
-        int servicePort = ConstantUtil.SEND_FILE_SERVICE_PORT;
-
-        // get send position
+        // 获取发送文件块对应的字节下标
         SendPosition sendPosition = getSendPosition();
 
-        return new SendFileJob(filePath, fileName, sendPosition, slaveIP, servicePort);
-
+        return new SendFileJob(filePath, fileName, sendPosition, slaveIP);
     }
 
     private boolean checkFileExist(){
@@ -69,6 +56,7 @@ public class SendFileJobFactory implements JobFactory {
         }
         return true;
     }
+
 
     private SendPosition getSendPosition(){
         File file = new File(filePath + fileName);

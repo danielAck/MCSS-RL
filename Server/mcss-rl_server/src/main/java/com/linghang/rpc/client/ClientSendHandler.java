@@ -1,6 +1,7 @@
 package com.linghang.rpc.client;
 
 import com.linghang.pojo.SendFileJobDescription;
+import com.linghang.proto.Block;
 import com.linghang.proto.BlockDetail;
 import com.linghang.util.ConstantUtil;
 import io.netty.channel.ChannelHandlerContext;
@@ -14,6 +15,7 @@ public class ClientSendHandler extends ChannelInboundHandlerAdapter {
     private long startPos;
     private long endPos;
     private BlockDetail blockDetail;
+    private Block fileBlock;
     private RandomAccessFile rf;
     private byte[] buf;
 
@@ -21,7 +23,7 @@ public class ClientSendHandler extends ChannelInboundHandlerAdapter {
         this.jobDescription = jobDescription;
         this.startPos = jobDescription.getSendPosition().getStartPos();
         this.endPos = jobDescription.getSendPosition().getEndPos();
-        initBlockDetail();
+        this.fileBlock = new Block();
     }
 
     private void initBuf(){
@@ -37,6 +39,7 @@ public class ClientSendHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
         initBuf();
+        initBlockDetail();
 
         // read file
         String file = jobDescription.getFilePath()+jobDescription.getFileName();
@@ -65,22 +68,22 @@ public class ClientSendHandler extends ChannelInboundHandlerAdapter {
             if ((readByte = rf.read(buf)) != -1
                     && remainByteCnt > 0){
 
-                blockDetail.setBytes(buf);
+                fileBlock.setBytes(buf);
                 if (readByte > remainByteCnt){
-                    blockDetail.setReadByte((int)remainByteCnt);
+                    fileBlock.setReadByte((int)remainByteCnt);
                 } else {
-                    blockDetail.setReadByte(readByte);
+                    fileBlock.setReadByte(readByte);
                 }
 
                 System.out.println("======= CLIENT SEND " + readByte + " BYTES ========");
-                ctx.writeAndFlush(blockDetail);
+                ctx.writeAndFlush(fileBlock);
             } else {
                 if (remainByteCnt > 0){
                     if (remainByteCnt < Integer.MAX_VALUE){
                         byte[] redundantBytes = new byte[(int)remainByteCnt];
-                        blockDetail.setBytes(redundantBytes);
-                        blockDetail.setReadByte((int)remainByteCnt);
-                        ctx.writeAndFlush(blockDetail);
+                        fileBlock.setBytes(redundantBytes);
+                        fileBlock.setReadByte((int)remainByteCnt);
+                        ctx.writeAndFlush(fileBlock);
                     } else {
                         System.err.println("======== SERVER SEND WORN READ BYTE COUNT ! =========");
                         ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);

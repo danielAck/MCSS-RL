@@ -168,7 +168,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
 
             System.out.println("======== " + fileName + "-" + host + "-job" + " JOB BEGIN ========");
 
-            startClient(host, startPos, group);
+            startClient(group);
             try {
                 countDownLatch.await();
             } catch (InterruptedException e) {
@@ -181,7 +181,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
         }
 
         // 启动RPC调用客户端
-        public void startClient(String host, final long startPos, NioEventLoopGroup group){
+        public void startClient(NioEventLoopGroup group){
 
             final RSCalcRequestHeader rsCalcRequestHeader = new RSCalcRequestHeader(fileName, startPos);
 

@@ -1,5 +1,6 @@
 package com.linghang.rpc.server;
 
+import com.linghang.proto.Block;
 import com.linghang.proto.BlockDetail;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
@@ -10,10 +11,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import java.io.File;
 import java.io.RandomAccessFile;
 
-public class ServerReceiveHandler extends ChannelInboundHandlerAdapter {
+public class ServerReceiveFileBlockHandler extends ChannelInboundHandlerAdapter {
 
-    private BlockDetail blockDetail;
-    private boolean isFirstReceive;
     private RandomAccessFile rf;
     private String fileName;
     private long start;
@@ -21,8 +20,7 @@ public class ServerReceiveHandler extends ChannelInboundHandlerAdapter {
     private String savePath;
     private boolean test;
 
-    public ServerReceiveHandler(boolean test) {
-        this.isFirstReceive = true;
+    public ServerReceiveFileBlockHandler(boolean test) {
         this.propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
         this.test = test;
     }
@@ -30,28 +28,32 @@ public class ServerReceiveHandler extends ChannelInboundHandlerAdapter {
     // 作为客户端，接收客户端上传的文件块
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+
+        // receive send header
         if (msg instanceof BlockDetail){
-            blockDetail = (BlockDetail) msg;
+
+            BlockDetail header = (BlockDetail) msg;
 
             // 接收新文件块，对相关数据进行初始化
-            if (isFirstReceive){
-                boolean initSuccess = init();
-                if (!initSuccess){
-                    System.err.println("======== SERVER INIT RECEIVE JOB FAILED ========");
-                    ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
-                }
-                isFirstReceive = false;
+            boolean initSuccess = init(header);
+            if (!initSuccess){
+                System.err.println("======== SERVER INIT RECEIVE JOB FAILED ========");
+                ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
             }
+        }
 
+        // receive file block
+        else if (msg instanceof Block){
+            Block fileBlock = (Block) msg;
             try{
-                rf.write(blockDetail.getBytes(), 0, blockDetail.getReadByte());
-                System.out.println("======== SERVER RECEIVE " + blockDetail.getReadByte() + " BYTES FROM CLIENT =======");
+                rf.write(fileBlock.getBytes(), 0, fileBlock.getReadByte());
+                System.out.println("======== SERVER RECEIVE " + fileBlock.getReadByte() + " BYTES FROM CLIENT =======");
             } catch (Exception e){
                 handleError();
                 ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
             }
 
-            start = start + blockDetail.getReadByte();
+            start = start + fileBlock.getReadByte();
             ctx.writeAndFlush(start);
         }
 
@@ -83,9 +85,9 @@ public class ServerReceiveHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
-    private Boolean init() throws Exception{
-        fileName = blockDetail.getFileName();
-        start = blockDetail.getStartPos();
+    private Boolean init(BlockDetail header) throws Exception{
+        fileName = header.getFileName();
+        start = header.getStartPos();
 
         if (savePath == null){
             System.err.println("======== PLEASE SPECIFY PART SAVE PATH IN PROPERTY ========");
@@ -94,7 +96,7 @@ public class ServerReceiveHandler extends ChannelInboundHandlerAdapter {
 
         // 判断接收的是否是计算生成的冗余块
         File file;
-        if (blockDetail.isRedundant()){
+        if (header.isRedundant()){
             if (test){
                 savePath = propertiesUtil.getValue("service.local_redundant_save_path");
             } else {
@@ -114,7 +116,7 @@ public class ServerReceiveHandler extends ChannelInboundHandlerAdapter {
         rf = new RandomAccessFile(file, "rw");
         rf.seek(start);
 
-        System.out.println("======== SERVER BEGIN RECEIVE FILE : " + blockDetail.getFileName() + " ========");
+        System.out.println("======== SERVER BEGIN RECEIVE FILE : " + header.getFileName() + " ========");
 
         return true;
     }

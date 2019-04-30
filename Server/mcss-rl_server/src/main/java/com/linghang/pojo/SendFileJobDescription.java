@@ -8,14 +8,12 @@ public class SendFileJobDescription extends JobDescription{
     private String fileName;
     private SendPosition sendPosition;
     private String host;
-    private int port;
 
-    public SendFileJobDescription(String filePath, String fileName, SendPosition sendPosition, String host, int port) {
+    public SendFileJobDescription(String filePath, String fileName, SendPosition sendPosition, String host) {
         this.filePath = filePath;
         this.fileName = fileName;
         this.sendPosition = sendPosition;
         this.host = host;
-        this.port = port;
     }
 
     public String getFilePath() {
@@ -50,11 +48,4 @@ public class SendFileJobDescription extends JobDescription{
         this.host = host;
     }
 
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
 }

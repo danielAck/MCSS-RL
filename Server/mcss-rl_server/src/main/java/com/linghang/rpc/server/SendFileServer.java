@@ -41,7 +41,7 @@ public class SendFileServer {
                                     .addLast(new ObjectEncoder())
                                     .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
                                             .weakCachingConcurrentResolver(null)))
-                                    .addLast(new ServerReceiveHandler(test));
+                                    .addLast(new ServerReceiveFileBlockHandler(test));
                         }
                     });
             ChannelFuture f = b.bind().sync();

@@ -56,6 +56,8 @@ public class NameNode {
         SendFileJobFactory sendFileJobFactory = new SendFileJobFactory(filePath, fileName, slaves);
         Job[] jobs = new Job[3];
         for (int i = 0; i < 3; i++){
+
+            // TODO: 将文件块号和对应的slave编号写入数据库
             sendFileJobFactory.setBlockIdx(i);
             sendFileJobFactory.setSlaveId(i);
             jobs[i] = sendFileJobFactory.createJob();

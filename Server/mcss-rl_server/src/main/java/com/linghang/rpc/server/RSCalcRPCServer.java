@@ -50,6 +50,8 @@ public class RSCalcRPCServer {
     private static class RSCalcRPCServerHandler extends ChannelInboundHandlerAdapter{
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+
+            // receive RS calculation request header
             if (msg instanceof RSCalcRequestHeader){
                 RSCalcRequestHeader questHeader = (RSCalcRequestHeader) msg;
                 String fileName = questHeader.getFileName();
@@ -60,13 +62,15 @@ public class RSCalcRPCServer {
                 PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
                 slaves[0] = "127.0.0.1";
                 slaves[1] = "192.168.31.120";
+
+                String redundantBlockRecvHost = "192.168.31.123";
                 for (String calcHost : slaves){
                     // 创建的文件传输客户端与当前rpc服务端共用同一个I/O线程
                     // TODO：当调用当前服务端多个文件的传输服务时同一个IO线程需要为2*rpc连接数个连接服务，响应变慢？
                     // TODO: 随机确定冗余块接收主机
 
                     System.out.println("======== RPC SERVER START SEND REDUNDANCY CLIENT TO " + calcHost +"========");
-                    createQuestFileClient(questHeader, calcHost, "192.168.31.123", ctx);
+                    createSendRedundancyClient(questHeader, calcHost, redundantBlockRecvHost, ctx);
                 }
             }
         }
@@ -85,7 +89,7 @@ public class RSCalcRPCServer {
          * @param redundancyRecvHost 接收冗余计算结果的主机IP
          * @param rpcCtx rpc连接
          */
-        private void createQuestFileClient(final RSCalcRequestHeader questHeader, final String calcHost, final String redundancyRecvHost, final ChannelHandlerContext rpcCtx){
+        private void createSendRedundancyClient(final RSCalcRequestHeader questHeader, final String calcHost, final String redundancyRecvHost, final ChannelHandlerContext rpcCtx){
             Bootstrap b = new Bootstrap();
             b.group(rpcCtx.channel().eventLoop())
                     .channel(NioSocketChannel.class)
