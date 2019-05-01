@@ -4,6 +4,7 @@ import com.linghang.proto.Block;
 import com.linghang.proto.BlockDetail;
 import com.linghang.io.FileWriter;
 import com.linghang.proto.RSCalcRequestHeader;
+import com.linghang.proto.RedundancyBlockHeader;
 import com.linghang.util.ConstantUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelHandlerContext;
@@ -11,6 +12,9 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,11 +33,18 @@ public class SendRedundancyHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
-        // 连接上冗余数据块接收服务器，启动计算请求客户端
+        System.out.println("======== CONNECT TO REDUNDANCY RECEIVE SERVER " +
+                ctx.channel().remoteAddress().toString() + " ========");
+
+        RedundancyBlockHeader redundancyBlockHeader = new RedundancyBlockHeader(questHeader.getFileName(), questHeader.getStartPos());
+
+        // 启动计算请求客户端
         startRSCalcClient(ctx);
 
         System.out.println("======== START RS CALC CLIENT TO " +
                 ctx.channel().remoteAddress().toString() + "========");
+
+        ctx.writeAndFlush(redundancyBlockHeader);
     }
 
     @Override
@@ -43,7 +54,11 @@ public class SendRedundancyHandler extends ChannelInboundHandlerAdapter {
 
         if (msg instanceof Integer){
             Integer res = (Integer) msg;
-
+            if (res.equals(ConstantUtil.SEND_ERROR_CODE)){
+                System.err.println("======== ERROR OCCUR IN REDUNDANT FILE BLOCK RECEIVE SERVER ========");
+                rpcCtx.writeAndFlush(res);
+                ctx.close();
+            }
         }
     }
 
@@ -62,6 +77,9 @@ public class SendRedundancyHandler extends ChannelInboundHandlerAdapter {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
                         socketChannel.pipeline()
+                                .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
+                                        .weakCachingConcurrentResolver(null)))
+                                .addLast(new ObjectEncoder())
                                 .addLast(new RSCalcClientHandler(questHeader, sendRedundancyCtx, rpcCtx));
                     }
                 });
@@ -70,27 +88,32 @@ public class SendRedundancyHandler extends ChannelInboundHandlerAdapter {
     private static class RSCalcClientHandler extends ChannelInboundHandlerAdapter{
 
         private long start;
+        private FileWriter fileWriter;
         private String questFileName;
+        private Block redundantBlock;
         private ChannelHandlerContext sendRedundancyCtx;
         private ChannelHandlerContext rpcContext;
-        private FileWriter fileWriter;
-        private RSCalcRequestHeader questHeader;
-        private BlockDetail redundantBlockDetail;
+        private RSCalcRequestHeader rsCalcRequestHeader;
+
         public static ConcurrentHashMap<String, Long> fileReadFlg = new ConcurrentHashMap<>();
 
         public RSCalcClientHandler(RSCalcRequestHeader questHeader, ChannelHandlerContext sendRedundancyCtx, ChannelHandlerContext rpcContext) {
-            this.questHeader = questHeader;
+            this.rsCalcRequestHeader = questHeader;
             this.start = questHeader.getStartPos();
             this.sendRedundancyCtx = sendRedundancyCtx;
             this.rpcContext = rpcContext;
             this.questFileName = questHeader.getFileName();
             this.fileWriter = new FileWriter(questFileName);
-            this.redundantBlockDetail = new BlockDetail(questFileName, true);
+            this.redundantBlock = new Block();
         }
 
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
-            ctx.writeAndFlush(questHeader);
+
+            System.out.println("======== CONNECT TO RS CALC SERVER " +
+                    ctx.channel().remoteAddress().toString() + " ========");
+
+            ctx.writeAndFlush(rsCalcRequestHeader);
 
             // 发送读取请求文件名
             System.out.println("======== RS CALC CLIENT SEND FILENAME " + "TO " +
@@ -102,20 +125,18 @@ public class SendRedundancyHandler extends ChannelInboundHandlerAdapter {
             if (msg instanceof Block){
                 Block fileBlock = (Block) msg;
                 int readByte = fileBlock.getReadByte();
-                // 第一次接收数据
                 byte[] buf = fileBlock.getBytes();
                 System.out.println("======== CLIENT RECEIVE BYTE LENGTH : " + fileBlock.getReadByte() + " ========");
 
                 // 将接收到的数据和本地数据进行异或相加,并将计算结果发送到接收结点
-                byte[] res = fileWriter.write(start, buf, readByte);
-                redundantBlockDetail.setBytes(res);
-                redundantBlockDetail.setReadByte(readByte);
-                redundantBlockDetail.setStartPos(start);
+                fileWriter.write(start, buf, readByte);
+//                redundantBlock.setBytes(calcResult);
+//                redundantBlock.setReadByte(readByte);
 
                 start = start + readByte;
 
                 // 发送计算结果至冗余块接收端
-                sendRedundancyCtx.writeAndFlush(redundantBlockDetail);
+                sendRedundancyCtx.writeAndFlush(redundantBlock);
 
                 // 发送接收进度至文件块发送端
                 ctx.writeAndFlush(start);

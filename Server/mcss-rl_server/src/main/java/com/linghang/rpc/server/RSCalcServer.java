@@ -19,13 +19,12 @@ public class RSCalcServer {
 
     // start server
     public void start() throws Exception{
-        int service_port = ConstantUtil.RS_CALC_SERVICE_PORT;
         NioEventLoopGroup group = new NioEventLoopGroup();
         try{
             ServerBootstrap b = new ServerBootstrap();
             b.group(group)
                     .channel(NioServerSocketChannel.class)
-                    .localAddress(service_port)
+                    .localAddress(ConstantUtil.RS_CALC_SERVICE_PORT)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {

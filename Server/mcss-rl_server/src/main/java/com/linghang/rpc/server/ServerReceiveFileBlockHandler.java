@@ -2,6 +2,7 @@ package com.linghang.rpc.server;
 
 import com.linghang.proto.Block;
 import com.linghang.proto.BlockDetail;
+import com.linghang.proto.RedundancyBlockHeader;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
 import com.linghang.util.Util;
@@ -9,6 +10,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 
 public class ServerReceiveFileBlockHandler extends ChannelInboundHandlerAdapter {
@@ -25,19 +27,55 @@ public class ServerReceiveFileBlockHandler extends ChannelInboundHandlerAdapter 
         this.test = test;
     }
 
-    // 作为客户端，接收客户端上传的文件块
+    // 接收客户端上传的文件块，保存至本地
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
-        // receive send header
+        // receive normal file block save request
         if (msg instanceof BlockDetail){
 
             BlockDetail header = (BlockDetail) msg;
+            String savePath;
 
-            // 接收新文件块，对相关数据进行初始化
-            boolean initSuccess = init(header);
-            if (!initSuccess){
+            // do init job
+            if (test){
+                savePath = propertiesUtil.getValue("service.local_part_save_path");
+            } else {
+                savePath = propertiesUtil.getValue("service.part_save_path");
+            }
+
+            if (savePath != null){
+
+                init(Util.genePartName(fileName), start, savePath);
+                write(header.getBytes(), header.getReadByte(), ctx);
+                System.out.println("======== SERVER RECEIVE NORMAL FILE BLOCK SAVE REQUEST FOR : " + header.getFileName() + " ========");
+
+                start = start + header.getReadByte();
+                ctx.writeAndFlush(start);
+            } else {
                 System.err.println("======== SERVER INIT RECEIVE JOB FAILED ========");
+                ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
+            }
+        }
+
+        // receive redundant file block save request
+        else if (msg instanceof RedundancyBlockHeader){
+            RedundancyBlockHeader header = (RedundancyBlockHeader) msg;
+            String savePath;
+            fileName = header.getFileName();
+            start = header.getStartPos();
+
+            // do init job
+            if (test){
+                savePath = propertiesUtil.getValue("service.local_redundant_save_path");
+            } else {
+                savePath = propertiesUtil.getValue("service.redundant_save_path");
+            }
+            if (savePath != null){
+                init(Util.geneRedundancyName(fileName), start, savePath);
+                System.out.println("======== SERVER RECEIVE REDUNDANT FILE BLOCK SAVE REQUEST FOR : " + header.getFileName() + " ========");
+            } else {
+                System.err.println("======== DO NOT SPECIFY SAVE PATH IN SERVER ========");
                 ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
             }
         }
@@ -45,14 +83,7 @@ public class ServerReceiveFileBlockHandler extends ChannelInboundHandlerAdapter 
         // receive file block
         else if (msg instanceof Block){
             Block fileBlock = (Block) msg;
-            try{
-                rf.write(fileBlock.getBytes(), 0, fileBlock.getReadByte());
-                System.out.println("======== SERVER RECEIVE " + fileBlock.getReadByte() + " BYTES FROM CLIENT =======");
-            } catch (Exception e){
-                handleError();
-                ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
-            }
-
+            write(fileBlock.getBytes(), fileBlock.getReadByte(), ctx);
             start = start + fileBlock.getReadByte();
             ctx.writeAndFlush(start);
         }
@@ -85,45 +116,34 @@ public class ServerReceiveFileBlockHandler extends ChannelInboundHandlerAdapter 
         ctx.close();
     }
 
-    private Boolean init(BlockDetail header) throws Exception{
-        fileName = header.getFileName();
-        start = header.getStartPos();
-
-        if (savePath == null){
-            System.err.println("======== PLEASE SPECIFY PART SAVE PATH IN PROPERTY ========");
-            return false;
+    private void write(byte[] bytes, int readByte, ChannelHandlerContext ctx){
+        try{
+            rf.write(bytes, 0, readByte);
+            System.out.println("======== SERVER RECEIVE " + readByte + " BYTES FROM CLIENT =======");
+        } catch (Exception e){
+            handleError();
+            ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
         }
+    }
 
-        // 判断接收的是否是计算生成的冗余块
-        File file;
-        if (header.isRedundant()){
-            if (test){
-                savePath = propertiesUtil.getValue("service.local_redundant_save_path");
-            } else {
-                savePath = propertiesUtil.getValue("service.redundant_save_path");
-            }
-            file = new File(savePath + Util.geneRedundancyName(fileName));
-        } else {
-            if (test){
-                savePath = propertiesUtil.getValue("service.local_part_save_path");
-            } else {
-                savePath = propertiesUtil.getValue("service.part_save_path");
-            }
+    private void init(String fileName, long start, String savePath) throws Exception{
+        this.fileName = fileName;
+        this.start = start;
+        this.savePath = savePath;
 
-            file = new File(savePath + Util.genePartName(fileName));
-        }
-
+        File file = new File(savePath + fileName);
         rf = new RandomAccessFile(file, "rw");
         rf.seek(start);
 
-        System.out.println("======== SERVER BEGIN RECEIVE FILE : " + header.getFileName() + " ========");
-
-        return true;
     }
 
-    private void handleError() throws Exception{
+    private void handleError() {
         if (rf != null){
-            rf.close();
+            try {
+                rf.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         boolean deleteSuccess = deleteFile();
         if (deleteSuccess){

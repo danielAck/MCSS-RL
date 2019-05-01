@@ -83,6 +83,7 @@ public class ClientSendHandler extends ChannelInboundHandlerAdapter {
                         byte[] redundantBytes = new byte[(int)remainByteCnt];
                         fileBlock.setBytes(redundantBytes);
                         fileBlock.setReadByte((int)remainByteCnt);
+                        System.out.println("======= CLIENT SEND " + remainByteCnt + " BYTES ========");
                         ctx.writeAndFlush(fileBlock);
                     } else {
                         System.err.println("======== SERVER SEND WORN READ BYTE COUNT ! =========");

@@ -17,14 +17,16 @@ public class FileWriter {
     private static ConcurrentHashMap<String, Long> fileReadFlg;
     private String questFileName;
     private byte[] readBuf;
+    private long originStartPos;
     private RandomAccessFile localReadRF;
     private RandomAccessFile writeRF;
     private PropertiesUtil propertiesUtil;
 
-    public FileWriter(String fileName) {
-        propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
-        readBuf = new byte[bufLength];
-        questFileName = fileName;
+    public FileWriter(String fileName, long originStartPos) {
+        this.propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
+        this.readBuf = new byte[bufLength];
+        this.questFileName = fileName;
+        this.originStartPos = originStartPos;
         initReadFile();
         initWriteFile();
         initFlg();
@@ -63,10 +65,10 @@ public class FileWriter {
         }
     }
 
-    // 将计算好的结果写到 redundant 目录下
+    // 将计算好的结果写到 calctemp 目录下
     private void initWriteFile() {
         String saveFileName = Util.geneRedundancyName(questFileName);
-        String path = propertiesUtil.getValue("service.local_redundant_save_path");
+        String path = propertiesUtil.getValue("service.local_calctemp_save_path");
         File file = new File(path + saveFileName);
         if (!file.exists()){
             try {
@@ -77,12 +79,13 @@ public class FileWriter {
         }
         try {
             writeRF = new RandomAccessFile(file, "rw");
-        } catch (FileNotFoundException e) {
+            writeRF.seek(0);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public byte[] write(long start, byte[] msg, int writeLength) throws Exception{
+    public void write(long start, byte[] msg, int writeLength) throws Exception{
 
         // flg = 下一个需要新写入的字节
         Long flg = fileReadFlg.get(questFileName);
@@ -96,16 +99,13 @@ public class FileWriter {
             fileReadFlg.put(questFileName, start + writeLength);
         } else {
             System.out.println("======== READ FROM WRITE FILE ========");
-            read(writeRF, start);
+            read(writeRF, (start - originStartPos));
         }
 
         add(msg, writeLength);
 
-        return readBuf;
-
-//        不写到本地
-//        writeRF.seek(start);
-//        writeRF.write(readBuf, 0, writeLength);
+        writeRF.seek(start - originStartPos);
+        writeRF.write(readBuf, 0, writeLength);
     }
 
     private void read(RandomAccessFile rf, long start) throws Exception{

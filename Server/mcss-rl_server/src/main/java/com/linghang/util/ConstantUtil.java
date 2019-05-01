@@ -6,9 +6,10 @@ public class ConstantUtil {
     public static final String CLIENT_PART_SAVE_PATH = "F:\\WUST\\program\\dsz\\part\\";
     public static final String CLIENT_REDUNDANCY_SAVE_PATH = "F:\\WUST\\program\\dsz\\redundancy\\";
     public static final String SERVER_PROPERTY_NAME = "server.properties";
+    public static final Integer SLAVE_CNT = 1;
     public static final Long FILE_READ_INIT_FLG = 0L;
-    public static final Integer SEND_FINISH_CODE = 200;
-    public static final Integer SEND_ERROR_CODE = 500;
+    public static final Integer SEND_FINISH_CODE = -200;
+    public static final Integer SEND_ERROR_CODE = -500;
     public static final Integer RS_CALC_RPC_PORT = 9700;
     public static final Integer RS_CALC_SERVICE_PORT = 9800;
     public static final Integer SEND_FILE_SERVICE_PORT = 9999;

@@ -68,7 +68,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
 
             for (String host : slaves){
 
-                // 从数据库中获取 host 对应的 id， 使用 id 进行计算 startPos
+                // TODO: 从数据库中获取 host 对应的 id， 使用 id 进行计算 startPos
                 long startPos = getCalcStartPos(host);
 
                 Thread t = new Thread(new RSCalcServiceJob(fileName, host, startPos, group, countDownLatch));
@@ -160,7 +160,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
             this.demon = demon;
             this.startPos = startPos;
             // 文件块请求 countDownLatch
-            countDownLatch = new CountDownLatch(2);
+            countDownLatch = new CountDownLatch(1);
         }
 
         @Override

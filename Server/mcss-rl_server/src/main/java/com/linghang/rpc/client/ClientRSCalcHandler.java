@@ -1,56 +1,65 @@
 package com.linghang.rpc.client;
 
+import com.linghang.proto.Block;
 import com.linghang.proto.BlockDetail;
 import com.linghang.io.FileWriter;
+import com.linghang.proto.RSCalcRequestHeader;
+import com.linghang.proto.RedundancyBlockHeader;
+import com.linghang.util.ConstantUtil;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 
 public class ClientRSCalcHandler extends ChannelInboundHandlerAdapter {
 
-    private boolean isFirstReceiveData;
-    private String questFileName;
     private long start;
+    private RSCalcRequestHeader rsCalcRequestHeader;
     private FileWriter fileWriter;
+    private CountDownLatch countDownLatch;
     private ChannelHandlerContext rpcContext;
     public static ConcurrentHashMap<String, Long> fileReadFlg = new ConcurrentHashMap<>();
 
-    public ClientRSCalcHandler(String questFileName, ChannelHandlerContext ctx) throws Exception{
-
+    public ClientRSCalcHandler(RSCalcRequestHeader questHeader, CountDownLatch sendRedundantCdl, ChannelHandlerContext ctx) throws Exception{
+        this.rsCalcRequestHeader = questHeader;
+        this.start = questHeader.getStartPos();
         this.rpcContext = ctx;
-        this.questFileName = questFileName;
-        this.isFirstReceiveData = true;
-        this.fileWriter = new FileWriter(questFileName);
-    }
-
-    public void setFileName(String fileName) {
-        this.questFileName = fileName;
+        this.fileWriter = new FileWriter(questHeader.getFileName(), questHeader.getStartPos());
+        this.countDownLatch = sendRedundantCdl;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
-        ctx.writeAndFlush(questFileName);
+        System.out.println("======== CONNECT TO RS CALC SERVER " +
+                ctx.channel().remoteAddress().toString() + " ========");
+
+        ctx.writeAndFlush(rsCalcRequestHeader);
 
         // 发送读取请求文件名
-        System.out.println("======== RS CALC CLIENT SEND FILENAME " + "TO " +
-                ctx.channel().remoteAddress().toString() + " " + questFileName + " ========");
+        System.out.println("======== RS CALC CLIENT SEND FILE BLOCK REQUEST FOR: " +
+                rsCalcRequestHeader.getFileName() +
+                "TO " + ctx.channel().remoteAddress().toString() + " ========");
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
-        if (msg instanceof BlockDetail){
-            BlockDetail blockDetail = (BlockDetail) msg;
-            int readByte = blockDetail.getReadByte();
-            // 第一次接收数据
-            if (isFirstReceiveData){
-                this.start = blockDetail.getStartPos();
-                isFirstReceiveData = false;
-            }
-            byte[] buf = blockDetail.getBytes();
-            System.out.println("======== CLIENT RECEIVE BYTE LENGTH : " + blockDetail.getReadByte() + " ========");
+        if (msg instanceof Block){
+            Block fileBlock = (Block) msg;
+            int readByte = fileBlock.getReadByte();
+            byte[] buf = fileBlock.getBytes();
+            System.out.println("======== CLIENT RECEIVE BYTE LENGTH : " + fileBlock.getReadByte() + " ========");
 
             // 将接收到的数据和本地数据进行异或相加
             fileWriter.write(start, buf, readByte);
@@ -67,6 +76,7 @@ public class ClientRSCalcHandler extends ChannelInboundHandlerAdapter {
             if (!closeSuccess){
                 System.out.println("======== " + ctx.channel().remoteAddress().toString() + " CLOSE RANDOM ACCESS FILE FAILED ========");
             }
+            countDownLatch.countDown();
             ctx.close();
         }
     }
