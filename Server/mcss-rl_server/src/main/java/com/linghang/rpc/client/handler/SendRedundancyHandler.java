@@ -1,4 +1,4 @@
-package com.linghang.rpc.client;
+package com.linghang.rpc.client.handler;
 
 import com.linghang.proto.Block;
 import com.linghang.proto.BlockDetail;
@@ -103,7 +103,7 @@ public class SendRedundancyHandler extends ChannelInboundHandlerAdapter {
             this.sendRedundancyCtx = sendRedundancyCtx;
             this.rpcContext = rpcContext;
             this.questFileName = questHeader.getFileName();
-            this.fileWriter = new FileWriter(questFileName);
+//            this.fileWriter = new FileWriter(questFileName);
             this.redundantBlock = new Block();
         }
 

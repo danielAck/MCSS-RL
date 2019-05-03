@@ -1,11 +1,13 @@
 package com.linghang.rpc.server;
 
-import com.linghang.proto.BlockDetail;
+import com.linghang.proto.Block;
 import com.linghang.proto.RSCalcRequestHeader;
 import com.linghang.proto.RedundancyBlockHeader;
-import com.linghang.rpc.client.ClientRSCalcHandler;
+import com.linghang.rpc.client.handler.ClientRSCalcHandler;
+import com.linghang.rpc.client.handler.SendRedundantBlockHandler;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
+import com.linghang.util.Util;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -19,11 +21,9 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
-
 import java.util.concurrent.CountDownLatch;
 
 public class RSCalcRPCServer {
-
 
     public RSCalcRPCServer() {
     }
@@ -72,6 +72,7 @@ public class RSCalcRPCServer {
                 CountDownLatch sendRedundancyCdl = new CountDownLatch(ConstantUtil.SLAVE_CNT);
                 RedundancyBlockHeader header = new RedundancyBlockHeader(questHeader.getFileName(), questHeader.getStartPos());
                 Thread t = new Thread(new SendRedundantBlockJob(redundantBlockRecvHost, sendRedundancyCdl, header));
+                t.start();
 
                 // start RS calculation request client
                 for (String calcHost : slaves){
@@ -83,6 +84,10 @@ public class RSCalcRPCServer {
                     createRSCalcQuestClient(questHeader, calcHost, sendRedundancyCdl, ctx);
                 }
             }
+            else{
+                System.err.println("======== RECEIVE WRONG DATA TYPE ========");
+                ctx.close();
+            }
         }
 
         @Override
@@ -90,7 +95,6 @@ public class RSCalcRPCServer {
             cause.printStackTrace();
             ctx.close();
         }
-
 
         /**
          * 开启请求文件块客户端，请求到数据后进行RS计算
@@ -168,32 +172,6 @@ public class RSCalcRPCServer {
                     f.channel().closeFuture().sync();
                 } finally {
                     group.shutdownGracefully();
-                }
-
-            }
-
-            private class SendRedundantBlockHandler extends ChannelInboundHandlerAdapter{
-
-                private RedundancyBlockHeader header;
-
-                public SendRedundantBlockHandler(RedundancyBlockHeader header) {
-                    this.header = header;
-                }
-
-                @Override
-                public void channelActive(ChannelHandlerContext ctx) throws Exception {
-                    ctx.writeAndFlush(header);
-                }
-
-                @Override
-                public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-
-                }
-
-                @Override
-                public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-                    cause.printStackTrace();
-                    ctx.close();
                 }
             }
         }

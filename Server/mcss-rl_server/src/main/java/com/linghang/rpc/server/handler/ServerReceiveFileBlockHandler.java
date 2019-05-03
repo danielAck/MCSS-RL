@@ -1,4 +1,4 @@
-package com.linghang.rpc.server;
+package com.linghang.rpc.server.handler;
 
 import com.linghang.proto.Block;
 import com.linghang.proto.BlockDetail;
@@ -35,6 +35,8 @@ public class ServerReceiveFileBlockHandler extends ChannelInboundHandlerAdapter 
         if (msg instanceof BlockDetail){
 
             BlockDetail header = (BlockDetail) msg;
+            this.fileName = header.getFileName();
+            this.start = header.getStartPos();
             String savePath;
 
             // do init job
@@ -43,7 +45,6 @@ public class ServerReceiveFileBlockHandler extends ChannelInboundHandlerAdapter 
             } else {
                 savePath = propertiesUtil.getValue("service.part_save_path");
             }
-
             if (savePath != null){
 
                 init(Util.genePartName(fileName), start, savePath);
@@ -74,6 +75,8 @@ public class ServerReceiveFileBlockHandler extends ChannelInboundHandlerAdapter 
             if (savePath != null){
                 init(Util.geneRedundancyName(fileName), start, savePath);
                 System.out.println("======== SERVER RECEIVE REDUNDANT FILE BLOCK SAVE REQUEST FOR : " + header.getFileName() + " ========");
+                long start = 0;
+                ctx.writeAndFlush(start);
             } else {
                 System.err.println("======== DO NOT SPECIFY SAVE PATH IN SERVER ========");
                 ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
@@ -93,7 +96,7 @@ public class ServerReceiveFileBlockHandler extends ChannelInboundHandlerAdapter 
             Integer res = (Integer) msg;
 
             if (res.equals(ConstantUtil.SEND_FINISH_CODE)){
-                System.out.println("======== SERVER SEND FINISH ========");
+                System.out.println("======== SERVER RECEIVE FILE BLOCK FINISH ========");
                 rf.close();
             }
 
@@ -103,9 +106,8 @@ public class ServerReceiveFileBlockHandler extends ChannelInboundHandlerAdapter 
             }
             ctx.close();
         }
-
         else {
-            System.err.println("======== SERVER RECEIVE ERROR TYPE OF DATA ! ========");
+            System.err.println("======== SERVER RECEIVE WRONG DATA TYPE ! ========");
             ctx.close();
         }
     }
@@ -127,10 +129,7 @@ public class ServerReceiveFileBlockHandler extends ChannelInboundHandlerAdapter 
     }
 
     private void init(String fileName, long start, String savePath) throws Exception{
-        this.fileName = fileName;
-        this.start = start;
         this.savePath = savePath;
-
         File file = new File(savePath + fileName);
         rf = new RandomAccessFile(file, "rw");
         rf.seek(start);

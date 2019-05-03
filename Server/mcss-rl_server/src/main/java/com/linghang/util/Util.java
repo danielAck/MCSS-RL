@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
 
 public class Util {
@@ -216,8 +217,12 @@ public class Util {
         return splitName + ".part";
     }
 
-    public static void main(String[] args) {
-        System.out.println(Arrays.toString(Util.generateRandomPartition(7, 3)));
+    public static String geneTempName(String fileName){
+        String splitName = fileName.split("\\.")[0];
+        return splitName + ".temp";
     }
 
+    public static void main(String[] args) {
+
+    }
 }

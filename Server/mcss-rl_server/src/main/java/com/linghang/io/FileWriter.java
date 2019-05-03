@@ -1,6 +1,6 @@
 package com.linghang.io;
 
-import com.linghang.rpc.client.ClientRSCalcHandler;
+import com.linghang.rpc.client.handler.ClientRSCalcHandler;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
 import com.linghang.util.Util;
@@ -67,8 +67,8 @@ public class FileWriter {
 
     // 将计算好的结果写到 calctemp 目录下
     private void initWriteFile() {
-        String saveFileName = Util.geneRedundancyName(questFileName);
-        String path = propertiesUtil.getValue("service.local_calctemp_save_path");
+        String saveFileName = Util.geneTempName(questFileName);
+        String path = propertiesUtil.getValue("service.local_calc_temp_save_path");
         File file = new File(path + saveFileName);
         if (!file.exists()){
             try {

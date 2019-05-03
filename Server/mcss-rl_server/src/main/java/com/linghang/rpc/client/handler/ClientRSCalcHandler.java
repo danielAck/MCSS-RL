@@ -1,4 +1,4 @@
-package com.linghang.rpc.client;
+package com.linghang.rpc.client.handler;
 
 import com.linghang.proto.Block;
 import com.linghang.proto.BlockDetail;
@@ -61,7 +61,7 @@ public class ClientRSCalcHandler extends ChannelInboundHandlerAdapter {
             byte[] buf = fileBlock.getBytes();
             System.out.println("======== CLIENT RECEIVE BYTE LENGTH : " + fileBlock.getReadByte() + " ========");
 
-            // 将接收到的数据和本地数据进行异或相加
+            // 将接收到的数据和本地数据进行异或相加，结果写入 calc_temp 目录下
             fileWriter.write(start, buf, readByte);
             start = start + readByte;
 

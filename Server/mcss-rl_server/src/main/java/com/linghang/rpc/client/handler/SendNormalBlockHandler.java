@@ -1,4 +1,4 @@
-package com.linghang.rpc.client;
+package com.linghang.rpc.client.handler;
 
 import com.linghang.pojo.SendFileJobDescription;
 import com.linghang.proto.Block;
@@ -9,7 +9,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.io.RandomAccessFile;
 
-public class ClientSendHandler extends ChannelInboundHandlerAdapter {
+public class SendNormalBlockHandler extends ChannelInboundHandlerAdapter {
 
     private SendFileJobDescription jobDescription;
     private long startPos;
@@ -19,7 +19,7 @@ public class ClientSendHandler extends ChannelInboundHandlerAdapter {
     private RandomAccessFile rf;
     private byte[] buf;
 
-    public ClientSendHandler(SendFileJobDescription jobDescription) {
+    public SendNormalBlockHandler(SendFileJobDescription jobDescription) {
         this.jobDescription = jobDescription;
         this.startPos = jobDescription.getSendPosition().getStartPos();
         this.endPos = jobDescription.getSendPosition().getEndPos();

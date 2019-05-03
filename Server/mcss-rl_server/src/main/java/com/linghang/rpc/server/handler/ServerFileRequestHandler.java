@@ -1,4 +1,4 @@
-package com.linghang.rpc.server;
+package com.linghang.rpc.server.handler;
 
 import com.linghang.proto.Block;
 import com.linghang.proto.BlockDetail;
@@ -31,12 +31,12 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
-        // 获取到获取文件请求
+        // receive calculation request
         if (msg instanceof RSCalcRequestHeader){
 
             RSCalcRequestHeader header = (RSCalcRequestHeader) msg;
             String fileName = header.getFileName();
-            System.out.println("======= RS CALC RECEIVE FILE NAME: " + fileName + " =======");
+            System.out.println("======= RS CALC SERVER CALC REQUEST FOR FILE: " + fileName + " =======");
 
             // 将文件分块发送到客户端
             fileBlock = new Block();
@@ -62,30 +62,32 @@ public class ServerFileRequestHandler extends ChannelInboundHandlerAdapter {
             ctx.writeAndFlush(fileBlock);
         }
 
-        // 收到客户端的读取情况
+        // receive client read process
         else if (msg instanceof Long){
 
             int readByte;
-            long start = (Long) msg;
-            rf.seek(start);
+            long readCnt = (Long) msg;
+            rf.seek(readCnt);
+            long remainByte = length - readCnt;
 
             if ((readByte = rf.read(buf)) != -1
-                    && (length - start) > 0){
+                    && remainByte > ConstantUtil.BUFLENGTH){
 
                 fileBlock.setBytes(buf);
                 fileBlock.setReadByte(readByte);
                 ctx.writeAndFlush(fileBlock);
-            } else {
+            }
+            else if(remainByte > 0 && remainByte < ConstantUtil.BUFLENGTH) {
+
+                fileBlock.setBytes(buf);
+                fileBlock.setReadByte((int)remainByte);
+                ctx.writeAndFlush(fileBlock);
+            }
+            else {
                 rf.close();
                 ctx.writeAndFlush(ConstantUtil.SEND_FINISH_CODE);
             }
         }
-
-        else if (msg instanceof Integer){
-            System.out.println("======== RS CALC SERVER RECEIVE WRONG DATA TYPE : Integer ========");
-            ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
-        }
-
         else{
             System.out.println("======== RS CALC SERVER RECEIVE WRONG DATA TYPE ========");
             ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
