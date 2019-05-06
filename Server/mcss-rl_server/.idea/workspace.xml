@@ -2,10 +2,26 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3cd609f4-65f6-4a0d-ae7c-9778a1cd05b4" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/linghang/proto/LagCalcRequestHeader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/handler/LagCalcRPCHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/LagCalcRPCServer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/linghang/service/LagCalcService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/core/Lagrange.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/linghang/core/Lagrange.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/util/CalcUitl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/linghang/util/CalcUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/rpc/RSCalcServiceProxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/linghang/rpc/RSCalcServiceProxy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/util/ConstantUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/linghang/util/ConstantUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/util/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/linghang/util/Util.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/server.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/server.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/core/Lagrange.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/core/Lagrange.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcRPCClientHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcRPCClientHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcServiceDemon.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcServiceDemon.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcServiceDemonTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcServiceDemonTest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcServiceJob$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcServiceJob$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcServiceJob.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcServiceJob.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/util/ConstantUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/util/ConstantUtil.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/util/Util.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/util/Util.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/server.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/server.properties" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -37,17 +53,17 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="dummy" value="167" />
-          <entry key="java" value="38213" />
-          <entry key="properties" value="571" />
+          <entry key="dummy" value="168" />
+          <entry key="java" value="43281" />
+          <entry key="properties" value="594" />
           <entry key="xml" value="4" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="38213" />
-          <entry key="PLAIN_TEXT" value="167" />
-          <entry key="Properties" value="571" />
+          <entry key="JAVA" value="43281" />
+          <entry key="PLAIN_TEXT" value="168" />
+          <entry key="Properties" value="594" />
           <entry key="XML" value="4" />
         </counts>
       </usages-collector>
@@ -55,8 +71,8 @@
         <counts>
           <entry key="class" value="5" />
           <entry key="iml" value="1" />
-          <entry key="java" value="699" />
-          <entry key="properties" value="21" />
+          <entry key="java" value="723" />
+          <entry key="properties" value="23" />
           <entry key="xml" value="3" />
         </counts>
       </usages-collector>
@@ -64,8 +80,8 @@
         <counts>
           <entry key="CLASS" value="5" />
           <entry key="IDEA_MODULE" value="1" />
-          <entry key="JAVA" value="699" />
-          <entry key="Properties" value="21" />
+          <entry key="JAVA" value="723" />
+          <entry key="Properties" value="23" />
           <entry key="XML" value="3" />
         </counts>
       </usages-collector>
@@ -73,13 +89,76 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/core/Lagrange.java">
           <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="157">
+              <caret line="15" column="11" selection-start-line="15" selection-start-column="11" selection-end-line="15" selection-end-column="11" />
+              <folding>
+                <element signature="e#737#738#0" expanded="true" />
+                <element signature="e#782#783#0" expanded="true" />
+                <element signature="e#884#885#0" expanded="true" />
+                <element signature="e#929#930#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/DataNode.java">
+          <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="306">
-              <caret line="21" column="5" lean-forward="true" selection-start-line="21" selection-start-column="5" selection-end-line="21" selection-end-column="5" />
+              <caret line="19" column="19" selection-start-line="19" selection-start-column="19" selection-end-line="19" selection-end-column="19" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/RSCalcServiceProxy.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="356">
+              <caret line="176" column="54" lean-forward="true" selection-start-line="176" selection-start-column="54" selection-end-line="176" selection-end-column="54" />
+              <folding>
+                <element signature="e#5085#5677#0" expanded="true" />
+                <element signature="e#5676#5677#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/handler/LagCalcRPCHandler.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="204">
+              <caret line="22" column="32" selection-start-line="22" selection-start-column="32" selection-end-line="22" selection-end-column="32" />
               <folding>
                 <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/LagCalcRPCServer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="164">
+              <caret line="46" column="45" lean-forward="true" selection-start-line="46" selection-start-column="45" selection-end-line="46" selection-end-column="45" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#652#940#0" expanded="true" />
+                <element signature="e#939#940#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/service/LagCalcService.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-273">
+              <caret line="40" column="28" selection-start-line="40" selection-start-column="25" selection-end-line="40" selection-end-column="28" />
+              <folding>
+                <element signature="method#main#0;class#LagCalcService#0" />
               </folding>
             </state>
           </provider>
@@ -125,6 +204,8 @@
       <find>unsigned</find>
       <find>Unsig</find>
       <find>c</find>
+      <find>getC</find>
+      <find>lagCountDownLatch</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -133,11 +214,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/com/linghang/service/RSCalcServerService.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/linghang/service/RSCalcServer.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/Server.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/ClientFileQuestHandler.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/linghang/service/RSCalcService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/service/Service.java" />
         <option value="$PROJECT_DIR$/src/test/java/com/linghang/MultiThreadTest/ServerMain.java" />
         <option value="$PROJECT_DIR$/src/test/java/com/linghang/MultiThreadTest/ClientMain.java" />
@@ -164,26 +240,31 @@
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/SendFileServer.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/NameNode.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/ClientSendHandler.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/RSCalcServiceProxy.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/RSCalcServer.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/proto/RedundancyBlockHeader.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/linghang/util/ConstantUtil.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/ClientRSCalcHandler.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/ServerFileRequestHandler.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/SendRedundancyHandler.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/ServerReceiveFileBlockHandler.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/io/FileWriter.java" />
-        <option value="$PROJECT_DIR$/src/main/resources/server.properties" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/RSCalcRPCServer.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/handler/ClientRSCalcHandler.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/handler/ServerReceiveFileBlockHandler.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/handler/SendRedundantBlockHandler.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/handler/ServerFileRequestHandler.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/linghang/util/Util.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/util/CalcUitl.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/util/CaocUtil.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/util/CalcUtil.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/server.properties" />
+        <option value="$PROJECT_DIR$/src/main/java/com/linghang/util/Util.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/core/Lagrange.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/linghang/util/ConstantUtil.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/RSCalcServiceProxy.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/linghang/proto/LagCalcReuqestHeader.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/linghang/proto/LagCalcRequestHeader.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/handler/LagCalcRPCHandler.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/LagCalcRPCServer.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/linghang/service/LagCalcService.java" />
       </list>
     </option>
   </component>
@@ -576,7 +657,7 @@
     <property name="SearchEverywhereHistoryKey" value="deletecal&#9;PSI&#9;JAVA://com.linghang.rpc.server.RSCalcRPCServer.RSCalcRPCServerHandler.SendRedundantBlockJob.SendRedundantBlockHandler#deleteCalcTempFile&#10;filew&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/io/FileWriter.java&#10;Filew&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/io/FileWriter.java&#10;getColsize&#9;PSI&#9;JAVA://com.linghang.NIO.Data#getColSize&#10;doRS&#9;PSI&#9;JAVA://com.linghang.rpc.DataNode#doRSCalc&#10;ClientRSCalcHandler&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/rpc/client/ClientRSCalcHandler.java&#10;CALCULATE_SERVICE_PORT&#9;PSI&#9;JAVA://com.linghang.util.ConstantUtil#CALCULATE_SERVICE_PORT&#10;ServerFileRequestHandler&#9;PSI&#9;JAVA://com.linghang.rpc.server.ServerFileRequestHandler" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1557034284321" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1557151545142" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../../Java/IDEA/JavaDemo" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -610,7 +691,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.Lagrange">
+  <component name="RunManager" selected="Application.LagCalcService">
     <configuration name="CalcUtil" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.linghang.util.CalcUtil" />
       <module name="mcss-rl_server" />
@@ -637,12 +718,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Lagrange" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.linghang.core.Lagrange" />
+    <configuration name="LagCalcService" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.linghang.service.LagCalcService" />
       <module name="mcss-rl_server" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.linghang.core.*" />
+          <option name="PATTERN" value="com.linghang.service.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -650,12 +731,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="RSCalcServerMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.linghang.MultiThreadTest.RSCalcServerMain" />
+    <configuration name="Lagrange" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.linghang.core.Lagrange" />
       <module name="mcss-rl_server" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.linghang.MultiThreadTest.*" />
+          <option name="PATTERN" value="com.linghang.core.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -678,18 +759,18 @@
     </configuration>
     <list>
       <item itemvalue="Application.DataNode" />
-      <item itemvalue="Application.RSCalcServerMain" />
       <item itemvalue="Application.Util" />
       <item itemvalue="Application.Lagrange" />
       <item itemvalue="Application.CalcUtil" />
+      <item itemvalue="Application.LagCalcService" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.LagCalcService" />
+        <item itemvalue="Application.Util" />
         <item itemvalue="Application.Lagrange" />
         <item itemvalue="Application.CalcUtil" />
-        <item itemvalue="Application.Util" />
         <item itemvalue="Application.DataNode" />
-        <item itemvalue="Application.RSCalcServerMain" />
       </list>
     </recent_temporary>
   </component>
@@ -723,12 +804,12 @@
       <workItem from="1556638814651" duration="361000" />
       <workItem from="1556681047659" duration="37045000" />
       <workItem from="1556891988060" duration="20285000" />
-      <workItem from="1557012270012" duration="7556000" />
+      <workItem from="1557012270012" duration="20250000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="236039000" />
+    <option name="totallyTimeSpent" value="248733000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -743,7 +824,7 @@
     <frame x="-7" y="-7" width="1550" height="846" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.27882037" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.27882037" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -753,7 +834,7 @@
       <window_info id="Alibaba Cloud Explorer" order="7" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info active="true" anchor="bottom" id="Find" order="1" visible="true" weight="0.32913166" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49865952" visible="true" weight="0.2647059" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49865952" visible="true" weight="0.16526611" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39915967" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -790,30 +871,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/service/RSCalcService.java" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/Call.java" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/service/Service.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="8" selection-start-line="4" selection-start-column="8" selection-end-line="4" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/NettyTest/Client.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-49">
-          <caret line="38" column="34" selection-start-line="38" selection-start-column="34" selection-end-line="38" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/netty/OutBoundHander2.java" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/netty/EchoServerHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="27" column="59" selection-start-line="27" selection-start-column="59" selection-end-line="27" selection-end-column="59" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/netty/EchoServer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
@@ -825,13 +882,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
           <caret line="15" column="12" selection-start-line="15" selection-start-column="12" selection-end-line="15" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_45/src.zip!/java/io/RandomAccessFile.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="552" column="16" selection-start-line="552" selection-start-column="16" selection-end-line="552" selection-end-column="16" />
         </state>
       </provider>
     </entry>
@@ -848,13 +898,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
           <caret line="11" column="11" selection-start-line="11" selection-start-column="11" selection-end-line="11" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/service/RSCalcServiceFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="17" column="17" selection-start-line="17" selection-start-column="17" selection-end-line="17" selection-end-column="17" />
         </state>
       </provider>
     </entry>
@@ -876,20 +919,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
           <caret line="40" column="54" selection-start-line="40" selection-start-column="54" selection-end-line="40" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/util/ConstantUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="37" lean-forward="true" selection-start-line="8" selection-start-column="37" selection-end-line="8" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/RSCalcServiceProxy.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1694">
-          <caret line="251" column="1" lean-forward="true" selection-start-line="251" selection-start-column="1" selection-end-line="251" selection-end-column="1" />
         </state>
       </provider>
     </entry>
@@ -939,13 +968,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-34">
           <caret line="20" column="13" selection-start-line="20" selection-start-column="13" selection-end-line="20" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/server.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="55" lean-forward="true" selection-start-line="7" selection-start-column="55" selection-end-line="7" selection-end-column="55" />
         </state>
       </provider>
     </entry>
@@ -1005,17 +1027,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/DataNode.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="12" column="23" lean-forward="true" selection-start-line="12" selection-start-column="23" selection-end-line="12" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/handler/SendRedundantBlockHandler.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="204">
           <caret line="37" column="27" selection-start-line="37" selection-start-column="16" selection-end-line="37" selection-end-column="27" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1033,27 +1051,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/SendFileClient.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="202">
-          <caret line="38" column="59" lean-forward="true" selection-start-line="38" selection-start-column="59" selection-end-line="38" selection-end-column="59" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/RSCalcRPCServer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1632">
-          <caret line="117" column="54" selection-start-line="117" selection-start-column="54" selection-end-line="117" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/handler/ClientRSCalcHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="64" column="49" selection-start-line="64" selection-start-column="41" selection-end-line="64" selection-end-column="49" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/handler/SendNormalBlockHandler.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1003">
@@ -1062,13 +1059,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/core.java" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/util/Util.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1320">
-          <caret line="228" lean-forward="true" selection-start-line="228" selection-end-line="228" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/handler/ServerFileRequestHandler.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="357">
@@ -1112,12 +1102,155 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/core/Lagrange.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/service/RSCalcServiceFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="17" column="19" lean-forward="true" selection-start-line="17" selection-start-column="19" selection-end-line="17" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/handler/ClientRSCalcHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="159">
+          <caret line="32" column="62" selection-start-line="32" selection-start-column="51" selection-end-line="32" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/SendFileClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="230">
+          <caret line="37" column="82" lean-forward="true" selection-start-line="35" selection-start-column="36" selection-end-line="37" selection-end-column="82" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/RSCalcRPCServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1377">
+          <caret line="105" column="44" selection-start-line="105" selection-start-column="21" selection-end-line="105" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_45/src.zip!/java/lang/Math.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="167">
+          <caret line="421" column="25" selection-start-line="421" selection-start-column="25" selection-end-line="421" selection-end-column="25" />
+          <folding>
+            <element signature="e#16338#16339#0" expanded="true" />
+            <element signature="e#16420#16421#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/DataNode.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
-          <caret line="21" column="5" lean-forward="true" selection-start-line="21" selection-start-column="5" selection-end-line="21" selection-end-column="5" />
+          <caret line="19" column="19" selection-start-line="19" selection-start-column="19" selection-end-line="19" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_45/src.zip!/java/io/RandomAccessFile.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="519" column="54" lean-forward="true" selection-start-line="519" selection-start-column="54" selection-end-line="519" selection-end-column="54" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/server.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="33" selection-start-line="7" selection-start-column="8" selection-end-line="7" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/core/Lagrange.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="157">
+          <caret line="15" column="11" selection-start-line="15" selection-start-column="11" selection-end-line="15" selection-end-column="11" />
+          <folding>
+            <element signature="e#737#738#0" expanded="true" />
+            <element signature="e#782#783#0" expanded="true" />
+            <element signature="e#884#885#0" expanded="true" />
+            <element signature="e#929#930#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/util/Util.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="169">
+          <caret line="219" column="52" lean-forward="true" selection-start-line="219" selection-start-column="52" selection-end-line="219" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/util/ConstantUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" column="4" selection-start-line="10" selection-start-column="4" selection-end-line="10" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/service/Service.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="9" selection-start-line="4" selection-start-column="9" selection-end-line="4" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/proto/LagCalcRequestHeader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="16" column="33" lean-forward="true" selection-start-line="16" selection-start-column="33" selection-end-line="16" selection-end-column="33" />
+          <folding>
+            <element signature="e#452#453#0" expanded="true" />
+            <element signature="e#500#501#0" expanded="true" />
+            <element signature="e#540#541#0" expanded="true" />
+            <element signature="e#573#574#0" expanded="true" />
+            <element signature="e#602#603#0" expanded="true" />
+            <element signature="e#647#648#0" expanded="true" />
+            <element signature="e#683#684#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/RSCalcServiceProxy.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="356">
+          <caret line="176" column="54" lean-forward="true" selection-start-line="176" selection-start-column="54" selection-end-line="176" selection-end-column="54" />
+          <folding>
+            <element signature="e#5085#5677#0" expanded="true" />
+            <element signature="e#5676#5677#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/handler/LagCalcRPCHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="22" column="32" selection-start-line="22" selection-start-column="32" selection-end-line="22" selection-end-column="32" />
           <folding>
             <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/LagCalcRPCServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="164">
+          <caret line="46" column="45" lean-forward="true" selection-start-line="46" selection-start-column="45" selection-end-line="46" selection-end-column="45" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#652#940#0" expanded="true" />
+            <element signature="e#939#940#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/service/LagCalcService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-273">
+          <caret line="40" column="28" selection-start-line="40" selection-start-column="25" selection-end-line="40" selection-end-column="28" />
+          <folding>
+            <element signature="method#main#0;class#LagCalcService#0" />
           </folding>
         </state>
       </provider>

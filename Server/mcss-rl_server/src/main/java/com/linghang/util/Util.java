@@ -168,26 +168,30 @@ public class Util {
     }
 
     /**
-     * 根据文件大小获取进行RS编码的缓冲区大小
-     * @param col_size = fileSize / 3
-     * @return  Buffer size
-     * @throws IOException
+     * 根据文件大小获取所需大小区间的合适的缓冲区大小
+     * @param fileSize 文件大小
+     * @param min 所需区间下限
+     * @param max 所需区间上限
+     * @return 缓冲区大小
      */
-    public static long getBufSize(long col_size) throws IOException{
-        double _2M = 2.0*1024*1024;
-        double _16M = 16.0*1024*1024;
-        long lowerBound = (long)Math.ceil(_2M / 3);
-        long upperBound = (long)Math.ceil(_16M / 3);
-        long mid = (long)Math.floor((lowerBound + upperBound) / 2.0);
+    public static int getBufSize(long fileSize, int min, int max){
 
-        for (long i = 0; i <= (mid - lowerBound); i++){
-            long low = mid - i;
-            long upper = mid + i;
-            if (col_size % low == 0)
+        if (fileSize < min)
+            return -1;
+
+        int lowerBound = (int)Math.ceil(min / 3.0);
+        int upperBound = (int)Math.ceil(max / 3.0);
+        int mid = (int)Math.floor((lowerBound + upperBound) / 2.0);
+
+        for (int i = 0; i <= (mid - lowerBound); i++){
+            int low = mid - i;
+            int upper = mid + i;
+            if ((fileSize % low)%3 == 0)
                 return low*3;
-            if (col_size % upper == 0)
+            if ((fileSize % upper)%3 == 0)
                 return upper*3;
         }
+
         return -1;
     }
 
@@ -223,6 +227,9 @@ public class Util {
     }
 
     public static void main(String[] args) {
-
+        PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
+        String path = propertiesUtil.getValue("service.local_redundant_save_path");
+        File file = new File(path + Util.geneRedundancyName("1M.pdf"));
+        System.out.println(getBufSize(file.length(), ConstantUtil._3K, ConstantUtil._5K));
     }
 }

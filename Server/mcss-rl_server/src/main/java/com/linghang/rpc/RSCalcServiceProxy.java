@@ -1,6 +1,7 @@
 package com.linghang.rpc;
 
 import com.linghang.proto.RSCalcRequestHeader;
+import com.linghang.rpc.client.handler.LagCalcRPCHandler;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
 import io.netty.bootstrap.Bootstrap;
@@ -45,6 +46,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
     private static class RSCalcServiceDemon implements Runnable{
 
         CountDownLatch countDownLatch;
+        CountDownLatch lagCountDownLatch;
         String fileName;
         NioEventLoopGroup group;
 
@@ -96,6 +98,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
 
     public static class RSCalcServiceDemonTest implements Runnable{
         CountDownLatch countDownLatch;
+        CountDownLatch lagCountDownLatch;
         String fileName;
         NioEventLoopGroup group;
 
@@ -103,6 +106,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
             this.fileName = fileName;
             // demon 线程 countDownLatch
             this.countDownLatch = new CountDownLatch(1);
+            this.lagCountDownLatch = new CountDownLatch(1);
             this.group = new NioEventLoopGroup(1);
         }
 
@@ -125,15 +129,30 @@ public class RSCalcServiceProxy implements InvocationHandler{
                 t.start();
             }
 
+            // 等待冗余块计算完毕
             try {
                 countDownLatch.await();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            System.out.println("======== ALL JOB FINISHED ========");
+            System.out.println("======== ALL RS CALC JOB FINISHED ========");
             group.shutdownGracefully();
 
+            // 冗余块计算完毕，开始依次调用远程Lag计算RPC接口, 使用同一个IO线程
+            // TODO: 可以选择在GUI中启动
+            NioEventLoopGroup lagGroup = new NioEventLoopGroup(1);
+            for (String host : slaves){
+                callLagCalcRPC(lagGroup, host, fileName);
+            }
+
+            // 等待Lag计算完毕
+            try {
+                lagCountDownLatch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("======== ALL LAG CALCULATION FINISH =========");
         }
 
         private long getCalcStartPos(String host){
@@ -141,6 +160,24 @@ public class RSCalcServiceProxy implements InvocationHandler{
             // TODO: 从数据库中获取host对应的id， 用 id 计算对应的 startPos
 
             return 0;
+        }
+
+        private void callLagCalcRPC(NioEventLoopGroup group, String host, final String fileName){
+            Bootstrap b = new Bootstrap();
+            b.group(group)
+                    .channel(NioSocketChannel.class)
+                    .remoteAddress(host, ConstantUtil.LAG_CALC_RPC_PORT)
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel socketChannel) throws Exception {
+                            socketChannel.pipeline()
+                                    .addLast(new ObjectEncoder())
+                                    .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
+                                            .weakCachingConcurrentResolver(null)))
+                                    .addLast(new LagCalcRPCHandler(fileName, lagCountDownLatch));
+                        }
+                    });
+            b.connect();
         }
     }
 

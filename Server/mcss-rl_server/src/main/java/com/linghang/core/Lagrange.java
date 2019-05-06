@@ -2,10 +2,6 @@ package com.linghang.core;
 
 import com.linghang.util.CalcUtil;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 
 public class Lagrange {
@@ -14,21 +10,36 @@ public class Lagrange {
     private static int[] gflog;
     private static final int AND_BASE_8 = CalcUtil.getAndBase8();
     private static final int MOD_BASE = CalcUtil.getModBase();
+    private  int[] alpha;
+    private  int[] x;
 
-    public Lagrange() {
+    public Lagrange(int[] alpha, int[] x) {
         CalcUtil calcUtil = new CalcUtil();
         gfilog = calcUtil.getGFILog();
         gflog = calcUtil.getGFLog();
+        this.alpha = alpha;
+        this.x = x;
     }
 
     /**
-     * 进行Lagrange插值法的计算
-     *
-     * @param x 提前指定好的自变量 (需要已经处理为无符号）
-     * @param alpha 带入Lagrange函数的值 (需要已经处理为无符号）
-     * @param y 需要隐藏的数据
+     * Lagrange interpolation
+     * @param d data
+     * @param off length of data needed to be encoded
      */
-    public void encode(int[] x, int[] alpha, byte[] y){
+    public void encode(byte[] d, int off){
+        this.encode(alpha, x, d, off);
+    }
+
+    /**
+     * Decode data
+     * @param d data
+     * @param off length of data needed to be decoded
+     */
+    public void decode(byte[] d, int off){
+        this.encode(x, alpha, d, off);
+    }
+
+    private void encode(int[] alpha, int[] x, byte[] y, int off){
 
         // 将需要进行计算的数据转为无符号型
         convertUnsigned(x);
@@ -36,10 +47,11 @@ public class Lagrange {
 
         if (y.length % 3 != 0){
             System.err.println("======== The length of the data to be encoded needs to be a multiple of 3 ========");
+            return;
         }
 
         int[] temp = new int[3];
-        for (int m = 0; m < y.length; m+=3){
+        for (int m = 0; m < off; m+=3){
 
             // 计算三个数据
             for (int i = 0; i < 3; i++){
@@ -71,14 +83,6 @@ public class Lagrange {
         }
     }
 
-    private byte mul(byte a, byte b){
-        return (byte) gfilog[gflog[a] ^ gflog[b]];
-    }
-
-    private byte dev(byte a, byte b){
-        return (byte) gfilog[gflog[a] ^ gflog[b]];
-    }
-
     public static void main(String[] args) throws Exception{
 
         CalcUtil calcUtil = new CalcUtil();
@@ -89,15 +93,15 @@ public class Lagrange {
         int[] alpha = {-6, 5, 4};
         byte[] y = {-105, 79, 84, 33, -90, 45, 23, 11, -8};
 
-        Lagrange lag = new Lagrange();
+        Lagrange lag = new Lagrange(x, alpha);
         System.out.println("Before encode : ");
         System.out.println(Arrays.toString(y));
 
-        lag.encode(x, alpha, y);
+        lag.encode(y, y.length);
         System.out.println("After encode : ");
         System.out.println(Arrays.toString(y));
 
-        lag.encode(alpha, x, y);
+        lag.encode(y, y.length);
         System.out.println("After encode : ");
         System.out.println(Arrays.toString(y));
     }
