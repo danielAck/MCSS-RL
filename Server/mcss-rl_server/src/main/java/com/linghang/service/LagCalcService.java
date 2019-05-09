@@ -10,6 +10,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 
 public class LagCalcService implements Service {
@@ -25,14 +26,13 @@ public class LagCalcService implements Service {
     @Override
     public void call() {
 
-        if (header.isEncode()){
-            Thread calcJobExecutor = new Thread(new LagCalcJob(header.getFileName(), header.isEncode(), rpcCtx));
-            calcJobExecutor.setName(header.getFileName() + "-LagCalcJob");
-            calcJobExecutor.start();
-            System.out.println("======== " + calcJobExecutor.getName() + " START RUNNING ========");
-        } else {
-
-        }
+        Thread calcJobExecutor = new Thread(new LagCalcJob(header.getFileName(), header.isEncode(), rpcCtx));
+        if (header.isEncode())
+            calcJobExecutor.setName(header.getFileName() + "-LagEncodeJob");
+        else
+            calcJobExecutor.setName(header.getFileName() + "-LagDecodeJob");
+        calcJobExecutor.start();
+        System.out.println("======== " + calcJobExecutor.getName() + " START RUNNING ========");
 
     }
 
@@ -85,13 +85,11 @@ public class LagCalcService implements Service {
             try {
                 rf.seek(start);
                 while((readByte = rf.read(buf)) != -1){
-                    lag.encode(buf, readByte);
-
-                    block.setBytes(buf);
-                    block.setReadByte(readByte);
-                    rpcCtx.writeAndFlush(block);    // send decode result
-
+                    lag.decode(buf, readByte);
+                    rf.seek(start);
+                    rf.write(buf, 0, readByte);
                     start += readByte;
+                    System.out.println("======== LAC CALC HANDEL " + readByte + " BYTES ========");
                     rf.seek(start);
                 }
             } catch (Exception e) {
@@ -99,7 +97,7 @@ public class LagCalcService implements Service {
                 return false;
             }
 
-            return true;
+            return closeRF();
         }
 
         private boolean doLagEncode(){
@@ -115,15 +113,19 @@ public class LagCalcService implements Service {
                 rf.seek(start);
                 while((readByte = rf.read(buf)) != -1){
                     lag.encode(buf, readByte);
-                    rf.write(buf, 0, buf.length);
+                    rf.seek(start);
+                    rf.write(buf, 0, readByte);
                     start += readByte;
+                    System.out.println("======== LAC CALC HANDEL " + readByte + " BYTES ========");
                     rf.seek(start);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
             }
-            return true;
+
+            // 关闭文件
+            return closeRF();
         }
 
         private boolean init(){
@@ -135,23 +137,41 @@ public class LagCalcService implements Service {
 
             // init file
             PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
-            String path = propertiesUtil.getValue("service.local_redundant_save_path");
-            File file = new File(path + Util.geneRedundancyName(fileName));
-            try {
-                rf = new RandomAccessFile(file, "rw");
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+            String path = propertiesUtil.getValue("service.local_part_save_path");
+            File file = new File(path + Util.genePartName(fileName));
+            if (!file.exists()){
+                System.out.println("========= " + path + Util.genePartName(fileName) + " DO NOT EXIST ========");
                 return false;
+            } else {
+                try {
+                    rf = new RandomAccessFile(file, "rw");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    return false;
+                }
             }
 
             // init calc buf
             int bufSize = Util.getBufSize(file.length(), ConstantUtil._1K, ConstantUtil._5K);
             bufSize = bufSize == -1? 3 : bufSize;
+            System.out.println("========= LAG CALC GENE BUF SIZE = " + bufSize);
             buf = new byte[bufSize];
 
             return true;
         }
+
+
+        public boolean closeRF(){
+            try {
+                rf.close();
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
     }
+
 
     public static void main(String[] args) {
         PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);

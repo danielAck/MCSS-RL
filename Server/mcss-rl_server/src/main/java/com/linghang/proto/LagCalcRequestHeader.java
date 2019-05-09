@@ -8,6 +8,7 @@ public class LagCalcRequestHeader implements Serializable {
 
     private String fileName;
     private boolean encode;
+    private String sendHost;
 
     public LagCalcRequestHeader(String fileName, boolean encode) {
         this.fileName = fileName;

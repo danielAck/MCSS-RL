@@ -5,6 +5,7 @@ import com.linghang.service.LagCalcService;
 import com.linghang.service.Service;
 import com.linghang.util.ConstantUtil;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
@@ -15,9 +16,11 @@ import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 
+import java.util.Date;
+
 public class LagCalcRPCServer {
 
-    public void start(){
+    public void start() throws Exception{
 
         NioEventLoopGroup group = new NioEventLoopGroup(1);
         ServerBootstrap b = new ServerBootstrap();
@@ -34,6 +37,9 @@ public class LagCalcRPCServer {
                                 .addLast(new LagCalcRPCServerHandler());
                     }
                 });
+        ChannelFuture f = b.bind().sync();
+        System.out.println("Lag Calc Server Bind finished... " + new Date());
+        f.channel().closeFuture().sync();
     }
 
     private class LagCalcRPCServerHandler extends ChannelInboundHandlerAdapter{
@@ -58,6 +64,15 @@ public class LagCalcRPCServer {
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
             cause.printStackTrace();
             ctx.close();
+        }
+    }
+
+    public static void main(String[] args) {
+        LagCalcRPCServer server = new LagCalcRPCServer();
+        try {
+            server.start();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

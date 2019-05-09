@@ -1,5 +1,6 @@
 package com.linghang.rpc;
 
+import com.linghang.proto.LagCalcRequestHeader;
 import com.linghang.proto.RSCalcRequestHeader;
 import com.linghang.rpc.client.handler.LagCalcRPCHandler;
 import com.linghang.util.ConstantUtil;
@@ -18,14 +19,21 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class RSCalcServiceProxy implements InvocationHandler{
 
     private String fileName;
+    private String[] hosts;
+    private String redundantBlockRecvHost;
 
-    public RSCalcServiceProxy(String fileName) {
+    public RSCalcServiceProxy(String fileName, String[] hosts, String redundantBlockRecvHost) {
         this.fileName = fileName;
+        this.hosts = hosts;
+        this.redundantBlockRecvHost = redundantBlockRecvHost;
     }
 
     @Override
@@ -36,7 +44,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
 //        demonThread.setName(fileName + "-demon");
 //        demonThread.start();
 
-        Thread demonThread  = new Thread(new RSCalcServiceDemonTest(fileName));
+        Thread demonThread  = new Thread(new RSCalcServiceDemonTest(fileName, hosts, redundantBlockRecvHost));
         demonThread.setName(fileName + "-demon");
         demonThread.start();
 
@@ -45,13 +53,16 @@ public class RSCalcServiceProxy implements InvocationHandler{
 
     private static class RSCalcServiceDemon implements Runnable{
 
-        CountDownLatch countDownLatch;
-        CountDownLatch lagCountDownLatch;
+        private CountDownLatch countDownLatch;
+        private CountDownLatch lagCountDownLatch;
+        private String redundantBlockRecvHost;
+        private NioEventLoopGroup group;
+        private String[] slaves;
         String fileName;
-        NioEventLoopGroup group;
 
-        public RSCalcServiceDemon(String fileName) {
+        public RSCalcServiceDemon(String fileName, String[] slaves) {
             this.fileName = fileName;
+            this.slaves = slaves;
             this.countDownLatch = new CountDownLatch(3);
             this.group = new NioEventLoopGroup(1);
         }
@@ -62,18 +73,14 @@ public class RSCalcServiceProxy implements InvocationHandler{
             System.out.println("======== " + fileName + "-demon" + " THREAD BEGIN ========");
             PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
 
-            // 获取 Slave 结点IP
-            String[] slaves = new String[3];
-            slaves[0] = propertiesUtil.getValue("host.slave1");
-            slaves[1] = propertiesUtil.getValue("host.slave2");
-            slaves[2] = propertiesUtil.getValue("host.slave3");
-
             for (String host : slaves){
 
                 // TODO: 从数据库中获取 host 对应的 id， 使用 id 进行计算 startPos
                 long startPos = getCalcStartPos(host);
+                HashSet<String> calcHosts = new HashSet<>(Arrays.asList(slaves));
+                calcHosts.add(host);
 
-                Thread t = new Thread(new RSCalcServiceJob(fileName, host, startPos, group, countDownLatch));
+                Thread t = new Thread(new RSCalcServiceJob(fileName, host, calcHosts, startPos, redundantBlockRecvHost, group, countDownLatch));
                 t.setName(fileName + "-thread");
                 t.start();
             }
@@ -100,10 +107,14 @@ public class RSCalcServiceProxy implements InvocationHandler{
         CountDownLatch countDownLatch;
         CountDownLatch lagCountDownLatch;
         String fileName;
+        String redundantBlockRecvHost;
+        String[] slaves;
         NioEventLoopGroup group;
 
-        public RSCalcServiceDemonTest(String fileName) {
+        public RSCalcServiceDemonTest(String fileName, String[] slaves, String redundantBlockRecvHost) {
             this.fileName = fileName;
+            this.slaves = slaves;
+            this.redundantBlockRecvHost = redundantBlockRecvHost;
             // demon 线程 countDownLatch
             this.countDownLatch = new CountDownLatch(1);
             this.lagCountDownLatch = new CountDownLatch(1);
@@ -117,14 +128,16 @@ public class RSCalcServiceProxy implements InvocationHandler{
             PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
 
             // 获取 RPC 结点IP, call RPC
-            String[] slaves = new String[1];
-            slaves[0] = "127.0.0.1";
+//            String[] slaves = new String[1];
+//            slaves[0] = "127.0.0.1";
 
             for (String host : slaves){
 
                 long startPos = getCalcStartPos(host);
+                HashSet<String> calcHosts = new HashSet<>(Arrays.asList(slaves));
+                calcHosts.add(host);
 
-                Thread t = new Thread(new RSCalcServiceJob(fileName, host, startPos, group, countDownLatch));
+                Thread t = new Thread(new RSCalcServiceJob(fileName, host, calcHosts, startPos, redundantBlockRecvHost, group, countDownLatch));
                 t.setName(fileName + "-thread");
                 t.start();
             }
@@ -139,20 +152,22 @@ public class RSCalcServiceProxy implements InvocationHandler{
             System.out.println("======== ALL RS CALC JOB FINISHED ========");
             group.shutdownGracefully();
 
-            // 冗余块计算完毕，开始依次调用远程Lag计算RPC接口, 使用同一个IO线程
-            // TODO: 可以选择在GUI中启动
-            NioEventLoopGroup lagGroup = new NioEventLoopGroup(1);
-            for (String host : slaves){
-                callLagCalcRPC(lagGroup, host, fileName);
-            }
+//            // 冗余块计算完毕，开始依次调用远程Lag计算RPC接口, 使用同一个IO线程
+//            // TODO: 可以选择在GUI中启动
+//            NioEventLoopGroup lagGroup = new NioEventLoopGroup(1);
+//            for (String host : slaves){
+//                LagCalcRequestHeader header = new LagCalcRequestHeader(fileName, true);
+//                callLagCalcRPC(lagGroup, host, header);
+//            }
+//
+//            // 等待Lag计算完毕
+//            try {
+//                lagCountDownLatch.await();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            System.out.println("======== ALL LAG CALCULATION FINISH =========");
 
-            // 等待Lag计算完毕
-            try {
-                lagCountDownLatch.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("======== ALL LAG CALCULATION FINISH =========");
         }
 
         private long getCalcStartPos(String host){
@@ -162,7 +177,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
             return 0;
         }
 
-        private void callLagCalcRPC(NioEventLoopGroup group, String host, final String fileName){
+        private void callLagCalcRPC(NioEventLoopGroup group, String host, final LagCalcRequestHeader header){
             Bootstrap b = new Bootstrap();
             b.group(group)
                     .channel(NioSocketChannel.class)
@@ -174,7 +189,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
                                     .addLast(new ObjectEncoder())
                                     .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
                                             .weakCachingConcurrentResolver(null)))
-                                    .addLast(new LagCalcRPCHandler(fileName, lagCountDownLatch));
+                                    .addLast(new LagCalcRPCHandler(header, lagCountDownLatch));
                         }
                     });
             b.connect();
@@ -183,17 +198,21 @@ public class RSCalcServiceProxy implements InvocationHandler{
 
     private static class RSCalcServiceJob implements Runnable{
 
-        CountDownLatch countDownLatch;
-        CountDownLatch demon;
-        NioEventLoopGroup group;
-        String fileName;
-        long startPos;
-        String host;
+        private CountDownLatch countDownLatch;
+        private CountDownLatch demon;
+        private NioEventLoopGroup group;
+        private String fileName;
+        private String redundantBlockRecvHost;  // 接收RS计算结果的结点IP
+        private long startPos;
+        private HashSet calcHosts;
+        private String host;    // 进行RS计算的结点IP
 
-        public RSCalcServiceJob(String fileName, String host, long startPos, NioEventLoopGroup group, CountDownLatch demon) {
+        public RSCalcServiceJob(String fileName, String host, HashSet calcHosts, long startPos,String redundantBlockRecvHost, NioEventLoopGroup group, CountDownLatch demon) {
             this.group = group;
             this.fileName = fileName;
             this.host = host;
+            this.calcHosts = calcHosts;
+            this.redundantBlockRecvHost = redundantBlockRecvHost;
             this.demon = demon;
             this.startPos = startPos;
             // 文件块请求 countDownLatch
@@ -202,10 +221,9 @@ public class RSCalcServiceProxy implements InvocationHandler{
 
         @Override
         public void run() {
-
             System.out.println("======== " + fileName + "-" + host + "-job" + " JOB BEGIN ========");
 
-            startClient(group);
+            startClient(group, calcHosts, redundantBlockRecvHost);
             try {
                 countDownLatch.await();
             } catch (InterruptedException e) {
@@ -218,9 +236,9 @@ public class RSCalcServiceProxy implements InvocationHandler{
         }
 
         // 启动RPC调用客户端
-        public void startClient(NioEventLoopGroup group){
+        public void startClient(NioEventLoopGroup group,HashSet calcHosts, String redundantBlockRecvHost){
 
-            final RSCalcRequestHeader rsCalcRequestHeader = new RSCalcRequestHeader(fileName, startPos);
+            final RSCalcRequestHeader rsCalcRequestHeader = new RSCalcRequestHeader(fileName, calcHosts, redundantBlockRecvHost, startPos);
 
             Bootstrap b = new Bootstrap();
             b.group(group)

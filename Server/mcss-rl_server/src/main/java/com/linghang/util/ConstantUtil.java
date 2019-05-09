@@ -17,6 +17,6 @@ public class ConstantUtil {
     public static final Integer SEND_ERROR_CODE = -500;
     public static final Integer LAG_CALC_RPC_PORT = 9600;
     public static final Integer RS_CALC_RPC_PORT = 9700;
-    public static final Integer RS_CALC_SERVICE_PORT = 9800;
+    public static final Integer GET_DATA_SERVICE_PORT = 9800;
     public static final Integer SEND_FILE_SERVICE_PORT = 9999;
 }

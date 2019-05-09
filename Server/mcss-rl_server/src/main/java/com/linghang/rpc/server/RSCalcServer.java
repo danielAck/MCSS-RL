@@ -24,7 +24,7 @@ public class RSCalcServer {
             ServerBootstrap b = new ServerBootstrap();
             b.group(group)
                     .channel(NioServerSocketChannel.class)
-                    .localAddress(ConstantUtil.RS_CALC_SERVICE_PORT)
+                    .localAddress(ConstantUtil.GET_DATA_SERVICE_PORT)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {

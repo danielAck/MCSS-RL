@@ -21,6 +21,9 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
 
 public class RSCalcRPCServer {
@@ -61,12 +64,9 @@ public class RSCalcRPCServer {
 
                 System.out.println("======== RPC SERVER RECEIVE RPC CALL FOR FILE : " + fileName + " ========");
 
-                String[] slaves = new String[1];
-                PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
-                slaves[0] = "127.0.0.1";
-//                slaves[1] = "192.168.31.120";
-
-                String redundantBlockRecvHost = "127.0.0.1";
+                HashSet<String> calcHosts = questHeader.getCalcHosts();
+                // 获取冗余计算结果接受节点IP
+                String redundantBlockRecvHost = questHeader.getRedundantBlockRecvHost();
 
                 // start send redundancy job
                 CountDownLatch sendRedundancyCdl = new CountDownLatch(ConstantUtil.SLAVE_CNT);
@@ -75,7 +75,7 @@ public class RSCalcRPCServer {
                 t.start();
 
                 // start RS calculation request client
-                for (String calcHost : slaves){
+                for (String calcHost : calcHosts){
                     // 创建的文件传输客户端与当前rpc服务端共用同一个I/O线程
                     // TODO：当调用当前服务端多个文件的传输服务时同一个IO线程需要为2*rpc连接数个连接服务，响应变慢？
                     // TODO: 随机确定冗余块接收主机
@@ -107,7 +107,7 @@ public class RSCalcRPCServer {
             Bootstrap b = new Bootstrap();
             b.group(rpcCtx.channel().eventLoop())
                     .channel(NioSocketChannel.class)
-                    .remoteAddress(host, ConstantUtil.RS_CALC_SERVICE_PORT)
+                    .remoteAddress(host, ConstantUtil.GET_DATA_SERVICE_PORT)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {

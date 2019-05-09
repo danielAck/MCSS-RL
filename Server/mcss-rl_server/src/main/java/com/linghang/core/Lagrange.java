@@ -91,7 +91,7 @@ public class Lagrange {
 
         int[] x = {1, 2, -3};
         int[] alpha = {-6, 5, 4};
-        byte[] y = {-105, 79, 84, 33, -90, 45, 23, 11, -8};
+        byte[] y = {0b1010011, 79, 84, 33, -90, 45, 23, 11, -8};
 
         Lagrange lag = new Lagrange(x, alpha);
         System.out.println("Before encode : ");

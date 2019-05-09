@@ -6,6 +6,8 @@ import com.linghang.pojo.Job;
 import com.linghang.pojo.JobFactory;
 import com.linghang.pojo.SendFileJob;
 import com.linghang.pojo.SendFileJobFactory;
+import com.linghang.service.DownLoadService;
+import com.linghang.service.Service;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
 import com.linghang.util.Util;
@@ -34,7 +36,7 @@ public class NameNode {
     }
 
     /**
-     * 将文件分块传输给三个DataNode
+     * 将文件分块传输给三个云
      * @param filePath 需要上传的文件的路径
      * @param fileName 需要上传的文件的文件名
      */
@@ -47,6 +49,20 @@ public class NameNode {
     }
 
     /**
+     * 从选择的云中下载文件
+     * @param fileName 下载文件名
+     * @param slaveIds 选择的云ID
+     */
+    public void download(String fileName, int[] slaveIds){
+        String[] hosts = new String[slaveIds.length];
+        for (int i = 0; i < slaveIds.length; i++){
+            hosts[i] = slaves.get(i);
+        }
+        Service downloadService = new DownLoadService(fileName, hosts);
+        downloadService.call();
+    }
+
+    /**
      * 创建可执行任务列表
      * @param filePath 需要上传的文件的路径
      * @param fileName 需要上传的文件的文件名
@@ -55,6 +71,9 @@ public class NameNode {
     private Job[] createJobs(String filePath, String fileName){
         SendFileJobFactory sendFileJobFactory = new SendFileJobFactory(filePath, fileName, slaves);
         Job[] jobs = new Job[3];
+
+        // TODO: 随机确定冗余数据接收结点，剩下的接收正常数据
+
         for (int i = 0; i < 3; i++){
 
             // TODO: 将文件块号和对应的slave编号写入数据库
@@ -64,7 +83,6 @@ public class NameNode {
         }
         return jobs;
     }
-
 
     // ===================  Test Function ====================
 
