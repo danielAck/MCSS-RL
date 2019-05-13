@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-public class ServerReceiveFileBlockHandler extends ChannelInboundHandlerAdapter {
+public class ServerReceiveBlockHandler extends ChannelInboundHandlerAdapter {
 
     private RandomAccessFile rf;
     private String fileName;
@@ -22,7 +22,7 @@ public class ServerReceiveFileBlockHandler extends ChannelInboundHandlerAdapter 
     private String savePath;
     private boolean test;
 
-    public ServerReceiveFileBlockHandler(boolean test) {
+    public ServerReceiveBlockHandler(boolean test) {
         this.propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
         this.test = test;
     }
@@ -68,12 +68,12 @@ public class ServerReceiveFileBlockHandler extends ChannelInboundHandlerAdapter 
 
             // do init job
             if (test){
-                savePath = propertiesUtil.getValue("service.local_redundant_save_path");
+                savePath = propertiesUtil.getValue("service.local_part_save_path");
             } else {
-                savePath = propertiesUtil.getValue("service.redundant_save_path");
+                savePath = propertiesUtil.getValue("service.part_save_path");
             }
             if (savePath != null){
-                init(Util.geneRedundancyName(fileName), start, savePath);
+                init(Util.genePartName(fileName), start, savePath);
                 System.out.println("======== SERVER RECEIVE REDUNDANT FILE BLOCK SAVE REQUEST FOR : " + header.getFileName() + " ========");
                 long start = 0;
                 ctx.writeAndFlush(start);
@@ -133,7 +133,6 @@ public class ServerReceiveFileBlockHandler extends ChannelInboundHandlerAdapter 
         File file = new File(savePath + fileName);
         rf = new RandomAccessFile(file, "rw");
         rf.seek(start);
-
     }
 
     private void handleError() {

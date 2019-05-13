@@ -1,14 +1,15 @@
 package com.linghang.rpc;
 
+import com.linghang.service.LagCalcService;
 import com.linghang.service.RSCalcServiceFactory;
 import com.linghang.service.Service;
 
 public class DataNode {
 
     public static void main(String[] args) {
-        String[] calcHost = new String[]{"127.0.0.1"};
+        String[] calcHosts = new String[]{"127.0.0.1"};
         DataNode datanode = new DataNode();
-        datanode.doRSCalc("1M.pdf", calcHost);
+        datanode.doRSCalc("1M.pdf", calcHosts);
     }
 
     public DataNode() {
@@ -23,7 +24,13 @@ public class DataNode {
         service.call();
     }
 
-    public void doLagCalc(){
+    public void doLagEncode(String fileName, String[] hosts){
+        Service lagService = new LagCalcService(fileName, hosts, true);
+        lagService.call();
+    }
 
+    public void doLagDecode(String fileName, String[] hosts){
+        Service lagService = new LagCalcService(fileName, hosts, false);
+        lagService.call();
     }
 }

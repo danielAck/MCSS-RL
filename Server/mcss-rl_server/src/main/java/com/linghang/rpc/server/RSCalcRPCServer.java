@@ -1,6 +1,7 @@
 package com.linghang.rpc.server;
 
 import com.linghang.proto.Block;
+import com.linghang.proto.GetBlockHeader;
 import com.linghang.proto.RSCalcRequestHeader;
 import com.linghang.proto.RedundancyBlockHeader;
 import com.linghang.rpc.client.handler.ClientRSCalcHandler;
@@ -22,11 +23,15 @@ import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
 
 public class RSCalcRPCServer {
+
+    PropertiesUtil util = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
 
     public RSCalcRPCServer() {
     }
@@ -64,7 +69,7 @@ public class RSCalcRPCServer {
 
                 System.out.println("======== RPC SERVER RECEIVE RPC CALL FOR FILE : " + fileName + " ========");
 
-                HashSet<String> calcHosts = questHeader.getCalcHosts();
+                ArrayList<String> calcHosts = questHeader.getCalcHosts();
                 // 获取冗余计算结果接受节点IP
                 String redundantBlockRecvHost = questHeader.getRedundantBlockRecvHost();
 
@@ -74,14 +79,15 @@ public class RSCalcRPCServer {
                 Thread t = new Thread(new SendRedundantBlockJob(redundantBlockRecvHost, sendRedundancyCdl, header));
                 t.start();
 
-                // start RS calculation request client
+                // start get block client
+                GetBlockHeader getBlockHeader = createGetBlockHeader(questHeader.getFileName(), questHeader.getStartPos());
                 for (String calcHost : calcHosts){
                     // 创建的文件传输客户端与当前rpc服务端共用同一个I/O线程
                     // TODO：当调用当前服务端多个文件的传输服务时同一个IO线程需要为2*rpc连接数个连接服务，响应变慢？
                     // TODO: 随机确定冗余块接收主机
 
                     System.out.println("======== RPC SERVER START RS CALC REQUEST CLIENT TO " + calcHost +"========");
-                    createRSCalcQuestClient(questHeader, calcHost, sendRedundancyCdl, ctx);
+                    createGetDataClient(getBlockHeader, calcHost, sendRedundancyCdl, ctx);
                 }
             }
             else{
@@ -103,7 +109,7 @@ public class RSCalcRPCServer {
          * @param sendRedundancyCdl 发送冗余计算结果线程所依赖的CountDownLatch
          * @param rpcCtx rpc连接
          */
-        private void createRSCalcQuestClient(final RSCalcRequestHeader questHeader, final String host, final CountDownLatch sendRedundancyCdl, final ChannelHandlerContext rpcCtx){
+        private void createGetDataClient(final GetBlockHeader questHeader, final String host, final CountDownLatch sendRedundancyCdl, final ChannelHandlerContext rpcCtx){
             Bootstrap b = new Bootstrap();
             b.group(rpcCtx.channel().eventLoop())
                     .channel(NioSocketChannel.class)
@@ -119,6 +125,23 @@ public class RSCalcRPCServer {
                         }
                     });
             b.connect();
+        }
+
+        /**
+         * 生成文件块请求头
+         * @param fileName 文件名
+         * @param startPos 请求起始位置
+         * @return 请求头
+         */
+        private GetBlockHeader createGetBlockHeader(String fileName, long startPos){
+            String path = util.getValue("service.local_part_save_path");
+            File file = new File(path + fileName);
+            if (!file.exists()){
+                return null;
+            }
+            // TODO: 看怎么处理这个 length 好一些
+            return new GetBlockHeader(fileName, startPos, file.length()/3);
+
         }
 
         private class SendRedundantBlockJob implements Runnable{

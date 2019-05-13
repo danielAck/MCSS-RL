@@ -1,6 +1,6 @@
 package com.linghang.rpc.server;
 
-import com.linghang.rpc.server.handler.ServerFileRequestHandler;
+import com.linghang.rpc.server.handler.GetBlockRequestHandler;
 import com.linghang.util.ConstantUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -12,9 +12,9 @@ import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 
-public class RSCalcServer {
+public class GetBlockServer {
 
-    public RSCalcServer() {
+    public GetBlockServer() {
     }
 
     // start server
@@ -32,14 +32,23 @@ public class RSCalcServer {
                                     .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
                                             .weakCachingConcurrentResolver(null)))
                                     .addLast(new ObjectEncoder())
-                                    .addLast(new ServerFileRequestHandler());
+                                    .addLast(new GetBlockRequestHandler());
                         }
                     });
             ChannelFuture f = b.bind().sync();
-            System.out.println("======== RS CALCULATE SERVER START ========");
+            System.out.println("======== GET BLOCK SERVER START ========");
             f.channel().closeFuture().sync();
         } finally {
             group.shutdownGracefully();
+        }
+    }
+
+    public static void main(String[] args) {
+        GetBlockServer server = new GetBlockServer();
+        try {
+            server.start();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

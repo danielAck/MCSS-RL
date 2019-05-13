@@ -1,6 +1,6 @@
 package com.linghang.rpc.server;
 
-import com.linghang.rpc.server.handler.ServerReceiveFileBlockHandler;
+import com.linghang.rpc.server.handler.ServerReceiveBlockHandler;
 import com.linghang.util.ConstantUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -42,7 +42,7 @@ public class SendFileServer {
                                     .addLast(new ObjectEncoder())
                                     .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
                                             .weakCachingConcurrentResolver(null)))
-                                    .addLast(new ServerReceiveFileBlockHandler(test));
+                                    .addLast(new ServerReceiveBlockHandler(test));
                         }
                     });
             ChannelFuture f = b.bind().sync();

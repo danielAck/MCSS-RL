@@ -55,6 +55,12 @@ public class NameNode {
      */
     public void download(String fileName, int[] slaveIds){
         String[] hosts = new String[slaveIds.length];
+
+        // ========== Test =========
+        HashMap<Integer, String> slaves = new HashMap<Integer,String>();
+        slaves.put(0, "127.0.0.1");
+        // =========================
+
         for (int i = 0; i < slaveIds.length; i++){
             hosts[i] = slaves.get(i);
         }
@@ -85,7 +91,6 @@ public class NameNode {
     }
 
     // ===================  Test Function ====================
-
     public void sendDataTest(String filePath, String fileName){
         Job job = createJobsTest(filePath, fileName);
         if (job != null)

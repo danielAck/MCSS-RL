@@ -1,7 +1,6 @@
 package com.linghang.MultiThreadTest;
 
 import com.linghang.rpc.server.RSCalcRPCServer;
-import com.linghang.rpc.server.RSCalcServer;
 
 public class RSCalcRPCServerMain {
 

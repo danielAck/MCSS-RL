@@ -1,10 +1,7 @@
 package com.linghang.rpc.client.handler;
 
-import com.linghang.proto.Block;
-import com.linghang.proto.BlockDetail;
+import com.linghang.proto.*;
 import com.linghang.io.FileWriter;
-import com.linghang.proto.RSCalcRequestHeader;
-import com.linghang.proto.RedundancyBlockHeader;
 import com.linghang.util.ConstantUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
@@ -24,14 +21,14 @@ import java.util.concurrent.CountDownLatch;
 public class ClientRSCalcHandler extends ChannelInboundHandlerAdapter {
 
     private long start;
-    private RSCalcRequestHeader rsCalcRequestHeader;
+    private GetBlockHeader blockRequestHeader;
     private FileWriter fileWriter;
     private CountDownLatch countDownLatch;
     private ChannelHandlerContext rpcContext;
     public static ConcurrentHashMap<String, Long> fileReadFlg = new ConcurrentHashMap<>();
 
-    public ClientRSCalcHandler(RSCalcRequestHeader questHeader, CountDownLatch sendRedundantCdl, ChannelHandlerContext ctx) throws Exception{
-        this.rsCalcRequestHeader = questHeader;
+    public ClientRSCalcHandler(GetBlockHeader questHeader, CountDownLatch sendRedundantCdl, ChannelHandlerContext ctx) throws Exception{
+        this.blockRequestHeader = questHeader;
         this.start = questHeader.getStartPos();
         this.rpcContext = ctx;
         this.fileWriter = new FileWriter(questHeader.getFileName(), questHeader.getStartPos());
@@ -44,11 +41,11 @@ public class ClientRSCalcHandler extends ChannelInboundHandlerAdapter {
         System.out.println("======== CONNECT TO RS CALC SERVER " +
                 ctx.channel().remoteAddress().toString() + " ========");
 
-        ctx.writeAndFlush(rsCalcRequestHeader);
+        ctx.writeAndFlush(blockRequestHeader);
 
         // 发送读取请求文件名
         System.out.println("======== RS CALC CLIENT SEND FILE BLOCK REQUEST FOR: " +
-                rsCalcRequestHeader.getFileName() +
+                blockRequestHeader.getFileName() +
                 "TO " + ctx.channel().remoteAddress().toString() + " ========");
     }
 

@@ -1,18 +1,18 @@
 package com.linghang.proto;
 
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.ArrayList;
 
 public class RSCalcRequestHeader implements Serializable {
 
     private static final long serialVersionUID = 388993274649025442L;
 
     private String fileName;
-    private HashSet<String> calcHosts;
+    private ArrayList<String> calcHosts;
     private String redundantBlockRecvHost;
     private long startPos;
 
-    public RSCalcRequestHeader(String fileName, HashSet<String> calcHosts, String redundantBlockRecvHost, long startPos) {
+    public RSCalcRequestHeader(String fileName, ArrayList<String> calcHosts, String redundantBlockRecvHost, long startPos) {
         this.fileName = fileName;
         this.calcHosts = calcHosts;
         this.redundantBlockRecvHost = redundantBlockRecvHost;
@@ -27,11 +27,11 @@ public class RSCalcRequestHeader implements Serializable {
         this.fileName = fileName;
     }
 
-    public HashSet<String> getCalcHosts() {
+    public ArrayList<String> getCalcHosts() {
         return calcHosts;
     }
 
-    public void setCalcHosts(HashSet<String> calcHosts) {
+    public void setCalcHosts(ArrayList<String> calcHosts) {
         this.calcHosts = calcHosts;
     }
 

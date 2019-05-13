@@ -1,7 +1,7 @@
 package com.linghang.rpc.server;
 
 import com.linghang.proto.LagCalcRequestHeader;
-import com.linghang.service.LagCalcService;
+import com.linghang.rpc.server.service.LagCalcServerService;
 import com.linghang.service.Service;
 import com.linghang.util.ConstantUtil;
 import io.netty.bootstrap.ServerBootstrap;
@@ -50,7 +50,7 @@ public class LagCalcRPCServer {
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             if (msg instanceof LagCalcRequestHeader){
                 LagCalcRequestHeader header = (LagCalcRequestHeader) msg;
-                lagCalcService = new LagCalcService(header, ctx);
+                lagCalcService = new LagCalcServerService(header, ctx);
                 System.out.println("======== SERVER RECEIVE LAG CALC REQUEST FOR FILE " + header.getFileName() + " ========");
                 lagCalcService.call();
             }
