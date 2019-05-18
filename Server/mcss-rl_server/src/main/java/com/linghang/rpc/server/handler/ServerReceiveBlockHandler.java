@@ -66,6 +66,9 @@ public class ServerReceiveBlockHandler extends ChannelInboundHandlerAdapter {
             fileName = header.getFileName();
             start = header.getStartPos();
 
+            System.out.println("======== SERVER RECEIVE REDUNDANCY BLOCK HEADER FROM "
+                    + ctx.channel().remoteAddress() + " FOR FILE :" + fileName + " ========");
+
             // do init job
             if (test){
                 savePath = propertiesUtil.getValue("service.local_part_save_path");
@@ -74,11 +77,10 @@ public class ServerReceiveBlockHandler extends ChannelInboundHandlerAdapter {
             }
             if (savePath != null){
                 init(Util.genePartName(fileName), start, savePath);
-                System.out.println("======== SERVER RECEIVE REDUNDANT FILE BLOCK SAVE REQUEST FOR : " + header.getFileName() + " ========");
                 long start = 0;
                 ctx.writeAndFlush(start);
             } else {
-                System.err.println("======== DO NOT SPECIFY SAVE PATH IN SERVER ========");
+                System.err.println("======== YOU HAVE NOT SPECIFY THE SAVE PATH IN SERVER ========");
                 ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
             }
         }

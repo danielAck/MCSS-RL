@@ -6,7 +6,7 @@ public class SendFileTestMain {
 
     public static void main(String[] args) {
         SendFileTestMain testMain = new SendFileTestMain();
-        testMain.standaloneTest();
+        testMain.clusterTest();
     }
 
     public void standaloneTest(){

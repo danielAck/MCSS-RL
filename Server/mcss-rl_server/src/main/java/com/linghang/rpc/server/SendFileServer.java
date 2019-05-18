@@ -22,7 +22,6 @@ public class SendFileServer {
     }
 
     public static void main(String[] args) throws Exception {
-        int port = 9999;
         SendFileServer server = new SendFileServer();
         boolean isTest = true;
         server.start(isTest);

@@ -66,7 +66,7 @@ public class LagCalcServerService implements Service {
             if (!calcSuccess){
                 rpcCtx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
             } else {
-                rpcCtx.writeAndFlush(ConstantUtil.CALC_FINISH_CODE);
+                rpcCtx.writeAndFlush(ConstantUtil.LAG_CALC_FINISH_CODE);
             }
 
             System.out.println("======== SERVER LAG CALCULATION JOB FOR FILE " + fileName + " FINISH ========");

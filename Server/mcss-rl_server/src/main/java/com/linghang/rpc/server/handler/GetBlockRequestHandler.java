@@ -19,6 +19,7 @@ public class GetBlockRequestHandler extends ChannelInboundHandlerAdapter {
     private Block fileBlock;
     private RandomAccessFile rf;
     private PropertiesUtil propertiesUtil;
+    private long startPos;
     private long length;
     private byte[] buf;
 
@@ -37,7 +38,8 @@ public class GetBlockRequestHandler extends ChannelInboundHandlerAdapter {
 
             GetBlockHeader header = (GetBlockHeader) msg;
             String fileName = header.getFileName();
-            System.out.println("======= GET DATA SERVER CALC REQUEST FOR FILE: " + fileName + " =======");
+            System.out.println("======= RECEIVE BLOCK REQUEST FROM " +
+                    ctx.channel().remoteAddress().toString() +  ": " + header.toString() + " =======");
 
             // 将文件分块发送到客户端
             fileBlock = new Block();
@@ -52,6 +54,7 @@ public class GetBlockRequestHandler extends ChannelInboundHandlerAdapter {
 
             rf = new RandomAccessFile(file, "r");
             rf.seek(header.getStartPos());
+            this.startPos = header.getStartPos();
             this.length = (header.getLength() == -1 ? rf.length() : header.getLength());
 
             int readByte = rf.read(buf);
@@ -67,7 +70,7 @@ public class GetBlockRequestHandler extends ChannelInboundHandlerAdapter {
             int readByte;
             long readCnt = (Long) msg;
             rf.seek(readCnt);
-            long remainByte = length - readCnt;
+            long remainByte = (startPos + length) - readCnt;
 
             if ((readByte = rf.read(buf)) != -1
                     && remainByte > ConstantUtil.BUFLENGTH){

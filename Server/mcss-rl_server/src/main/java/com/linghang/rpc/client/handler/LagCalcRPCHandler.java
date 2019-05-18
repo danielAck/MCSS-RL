@@ -27,7 +27,7 @@ public class LagCalcRPCHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof Integer){
             Integer res = (Integer) msg;
-            if (res.equals(ConstantUtil.CALC_FINISH_CODE)){
+            if (res.equals(ConstantUtil.LAG_CALC_FINISH_CODE)){
                 System.out.println("======== " + ctx.channel().remoteAddress().toString() + " CALC JOB FINISHING ========");
                 countDownLatch.countDown();
                 ctx.close();

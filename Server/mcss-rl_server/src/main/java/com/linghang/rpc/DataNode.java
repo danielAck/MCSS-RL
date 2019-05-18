@@ -7,7 +7,7 @@ import com.linghang.service.Service;
 public class DataNode {
 
     public static void main(String[] args) {
-        String[] calcHosts = new String[]{"127.0.0.1"};
+        String[] calcHosts = new String[]{"192.168.31.120", "192.168.31.121", "192.168.31.122"};
         DataNode datanode = new DataNode();
         datanode.doRSCalc("1M.pdf", calcHosts);
     }
@@ -18,7 +18,7 @@ public class DataNode {
     public void doRSCalc(String fileName, String[] hosts){
         // TODO: 先从数据库中查询是否已经上传
 
-        String redundantBlockRecvHost = "127.0.0.1";
+        String redundantBlockRecvHost = "192.168.31.235";
         RSCalcServiceFactory factory = new RSCalcServiceFactory(fileName, hosts, redundantBlockRecvHost);
         Service service = factory.createService();
         service.call();

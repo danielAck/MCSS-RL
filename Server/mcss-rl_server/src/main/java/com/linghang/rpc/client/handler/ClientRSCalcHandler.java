@@ -38,7 +38,7 @@ public class ClientRSCalcHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
-        System.out.println("======== CONNECT TO RS CALC SERVER " +
+        System.out.println("======== CONNECT TO GET DATA SERVER " +
                 ctx.channel().remoteAddress().toString() + " ========");
 
         ctx.writeAndFlush(blockRequestHeader);
@@ -46,7 +46,7 @@ public class ClientRSCalcHandler extends ChannelInboundHandlerAdapter {
         // 发送读取请求文件名
         System.out.println("======== RS CALC CLIENT SEND FILE BLOCK REQUEST FOR: " +
                 blockRequestHeader.getFileName() +
-                "TO " + ctx.channel().remoteAddress().toString() + " ========");
+                " TO " + ctx.channel().remoteAddress().toString() + " ========");
     }
 
     @Override
@@ -71,7 +71,7 @@ public class ClientRSCalcHandler extends ChannelInboundHandlerAdapter {
             rpcContext.writeAndFlush(res);
             boolean closeSuccess = fileWriter.closeRF();
             if (!closeSuccess){
-                System.out.println("======== " + ctx.channel().remoteAddress().toString() + " CLOSE RANDOM ACCESS FILE FAILED ========");
+                System.err.println("======== " + ctx.channel().remoteAddress().toString() + " CLOSE RANDOM ACCESS FILE FAILED ========");
             }
             countDownLatch.countDown();
             ctx.close();

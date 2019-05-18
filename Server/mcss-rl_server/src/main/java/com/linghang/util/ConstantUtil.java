@@ -10,10 +10,9 @@ public class ConstantUtil {
     public static final int _5K = 5120;
 
     public static final String SERVER_PROPERTY_NAME = "server.properties";
-    public static final Integer SLAVE_CNT = 1;
     public static final Long FILE_READ_INIT_FLG = 0L;
     public static final Integer SEND_FINISH_CODE = -200;
-    public static final Integer CALC_FINISH_CODE = -300;
+    public static final Integer LAG_CALC_FINISH_CODE = -300;
     public static final Integer SEND_ERROR_CODE = -500;
     public static final Integer LAG_CALC_RPC_PORT = 9600;
     public static final Integer RS_CALC_RPC_PORT = 9700;

@@ -37,7 +37,8 @@ public class SendRedundantBlockHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof Long){
-            Long readCnt = (Long) msg;
+            Long data = (Long) msg;
+            long readCnt = (data == 0 ? 0 : (data - header.getStartPos()));
             int readByte;
             rf.seek(readCnt);
             if ((readByte = rf.read(buf)) != -1){

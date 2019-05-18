@@ -39,4 +39,14 @@ public class GetBlockHeader implements Serializable {
     public void setLength(long length) {
         this.length = length;
     }
+
+    @Override
+    public String
+    toString() {
+        return "GetBlockHeader{" +
+                "fileName='" + fileName + '\'' +
+                ", startPos=" + startPos +
+                ", length=" + length +
+                '}';
+    }
 }

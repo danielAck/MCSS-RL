@@ -103,8 +103,6 @@ public class RSCalcServiceProxy implements InvocationHandler{
         }
 
         private long getCalcStartPos(String host){
-
-
             return 0;
         }
     }
@@ -122,7 +120,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
             this.slaves = slaves;
             this.redundantBlockRecvHost = redundantBlockRecvHost;
             // demon 线程 countDownLatch
-            this.demon = new CountDownLatch(1);
+            this.demon = new CountDownLatch(slaves.length);
             this.group = new NioEventLoopGroup(1);
         }
 
@@ -140,7 +138,6 @@ public class RSCalcServiceProxy implements InvocationHandler{
                 for (String t : slaves){
                     if (!t.equals(host))
                         calcHosts.add(t);
-
                 }
                 RSCalcRequestHeader header = new RSCalcRequestHeader(fileName, calcHosts, redundantBlockRecvHost, startPos);
 
@@ -179,9 +176,15 @@ public class RSCalcServiceProxy implements InvocationHandler{
 
         private long getCalcStartPos(String host){
 
-            // TODO: 从数据库中获取host对应的id， 用 id 计算对应的 startPos
+            // TODO: 从数据库查询host对应的startPos
 
-            return 0;
+            if(host.equals("192.168.31.120")){
+                return 0;
+            } else if (host.equals("192.168.31.121")){
+                return 125816;
+            } else {
+                return 251632;
+            }
         }
 
     }
@@ -199,7 +202,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
             this.demon = demon;
             this.host = host;
             this.rsCalcRequestHeader = rsCalcRequestHeader;
-            // 文件块请求 countDownLatch
+            // host RS calc countDownLatch
             countDownLatch = new CountDownLatch(1);
         }
 
@@ -265,6 +268,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
                 }
                 else{
                     System.out.println("======== ERROR RESPONSE CODE ========");
+                    ctx.close();
                 }
             }
 
@@ -274,7 +278,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
 
             countDownLatch.countDown();
 
-            // 单个结点计算任务结束，关闭单个结点的rpc连接
+            // 结点计算任务结束，关闭rpc连接
             if (countDownLatch.getCount() == 0){
                 ctx.close();
             }
