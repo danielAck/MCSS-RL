@@ -4,6 +4,7 @@ import com.linghang.proto.Block;
 import com.linghang.proto.GetBlockHeader;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
+import com.linghang.util.Util;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -23,12 +24,20 @@ public class DownLoadService implements Service{
 
     private String fileName;
     private String[] hosts;
+    private String redundantBlockRecvHost;
     private Service rsCalcService;
 
-    public DownLoadService(String fileName, String[] hosts) {
+    public DownLoadService(String fileName, String[] hosts, String redundantBlockRecvHost) {
         this.fileName = fileName;
         this.hosts = hosts;
-        rsCalcService = new RSCalcServiceFactory(fileName, hosts, getLocalHost()).createService();
+        this.redundantBlockRecvHost = redundantBlockRecvHost;
+        initRSCalcService();
+    }
+
+    private void initRSCalcService(){
+        String remoteFileName = Util.geneTempName(fileName);
+        String remoteFilePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.lag_decode_temp_path");
+        this.rsCalcService = new RSCalcServiceFactory(remoteFileName, remoteFilePath, hosts, redundantBlockRecvHost).createService();
     }
 
     @Override
@@ -43,13 +52,12 @@ public class DownLoadService implements Service{
 
     // TODO: 利用数据库，判断选择的结点中是否含有冗余块存储结点
     private boolean checkNeedRSCalc(String[] hosts){
-
+        for (String host : hosts){
+            if (host.equals("127.0.0.1")){
+                return true;
+            }
+        }
         return false;
-    }
-
-    private String getLocalHost(){
-        PropertiesUtil util = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
-        return util.getValue("host.local");
     }
 
     // get block from hosts
@@ -63,14 +71,17 @@ public class DownLoadService implements Service{
     private String[] getDownloadHosts(String[] hosts){
         // TODO: 从数据库中依次判断hosts中只需直接下载的结点
 
-        return new String[]{"127.0.0.1"};
+        return new String[]{"192.168.31.120", "192.168.31.121"};
     }
 
     private void createGetBlockClient(final String host, String fileName, NioEventLoopGroup group){
 
         long startPos = 0;
         long length = -1;
-        final GetBlockHeader getBlockHeader = new GetBlockHeader(fileName, startPos, length);
+        PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
+        String remoteFileName = Util.genePartName(fileName);
+        String remoteFilePath = propertiesUtil.getValue("service.local_part_save_path");
+        final GetBlockHeader getBlockHeader = new GetBlockHeader(remoteFileName, remoteFilePath, startPos, length);
 
         Bootstrap b = new Bootstrap();
         b.group(group)
@@ -152,6 +163,7 @@ public class DownLoadService implements Service{
             ctx.close();
         }
 
+        // 初始化保存文件
         private boolean initWrite(String host){
             String path = util.getValue("service.local_download_path");
             start = getStartPos(host);

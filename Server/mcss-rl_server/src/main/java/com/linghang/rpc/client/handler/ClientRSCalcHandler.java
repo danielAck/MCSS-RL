@@ -31,7 +31,7 @@ public class ClientRSCalcHandler extends ChannelInboundHandlerAdapter {
         this.blockRequestHeader = questHeader;
         this.start = questHeader.getStartPos();
         this.rpcContext = ctx;
-        this.fileWriter = new FileWriter(questHeader.getFileName(), questHeader.getStartPos());
+        this.fileWriter = new FileWriter(questHeader.getRemoteFileName(), questHeader.getStartPos());
         this.countDownLatch = sendRedundantCdl;
     }
 
@@ -45,7 +45,7 @@ public class ClientRSCalcHandler extends ChannelInboundHandlerAdapter {
 
         // 发送读取请求文件名
         System.out.println("======== RS CALC CLIENT SEND FILE BLOCK REQUEST FOR: " +
-                blockRequestHeader.getFileName() +
+                blockRequestHeader.getRemoteFileName() +
                 " TO " + ctx.channel().remoteAddress().toString() + " ========");
     }
 

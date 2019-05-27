@@ -6,13 +6,15 @@ public class SendFileJobDescription extends JobDescription{
 
     private String filePath;
     private String fileName;
-    private SendPosition sendPosition;
+    private SendPosition localSendPos;
+    private SendPosition remoteSendPos;
     private String host;
 
-    public SendFileJobDescription(String filePath, String fileName, SendPosition sendPosition, String host) {
+    public SendFileJobDescription(String filePath, String fileName, SendPosition localSendPos, SendPosition remoteSendPos, String host) {
         this.filePath = filePath;
         this.fileName = fileName;
-        this.sendPosition = sendPosition;
+        this.localSendPos = localSendPos;
+        this.remoteSendPos = remoteSendPos;
         this.host = host;
     }
 
@@ -32,12 +34,20 @@ public class SendFileJobDescription extends JobDescription{
         this.fileName = fileName;
     }
 
-    public SendPosition getSendPosition() {
-        return sendPosition;
+    public SendPosition getLocalSendPos() {
+        return localSendPos;
     }
 
-    public void setSendPosition(SendPosition sendPosition) {
-        this.sendPosition = sendPosition;
+    public void setLocalSendPos(SendPosition localSendPos) {
+        this.localSendPos = localSendPos;
+    }
+
+    public SendPosition getRemoteSendPos() {
+        return remoteSendPos;
+    }
+
+    public void setRemoteSendPos(SendPosition remoteSendPos) {
+        this.remoteSendPos = remoteSendPos;
     }
 
     public String getHost() {
@@ -47,5 +57,4 @@ public class SendFileJobDescription extends JobDescription{
     public void setHost(String host) {
         this.host = host;
     }
-
 }

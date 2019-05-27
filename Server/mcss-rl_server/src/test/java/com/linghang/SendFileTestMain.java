@@ -12,14 +12,14 @@ public class SendFileTestMain {
     public void standaloneTest(){
         String filePath = "F:\\WUST\\program\\dsz\\";
         String fileName = "1M.pdf";
-        NameNode nameNode = new NameNode();
-        nameNode.sendDataTest(filePath, fileName);
+        NameNode nameNode = new NameNode(true);
+        nameNode.sendData(filePath, fileName, true);
     }
 
     public void clusterTest(){
         String filePath = "F:\\WUST\\program\\dsz\\";
         String fileName = "1M.pdf";
-        NameNode nameNode = new NameNode();
-        nameNode.sendData(filePath, fileName);
+        NameNode nameNode = new NameNode(false);
+        nameNode.sendData(filePath, fileName, false);
     }
 }

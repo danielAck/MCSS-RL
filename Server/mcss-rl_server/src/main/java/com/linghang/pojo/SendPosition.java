@@ -1,6 +1,10 @@
 package com.linghang.pojo;
 
-public class SendPosition {
+import java.io.Serializable;
+
+public class SendPosition implements Serializable {
+
+    private static final long serialVersionUID = 4172141707802971001L;
 
     public long getStartPos() {
         return startPos;

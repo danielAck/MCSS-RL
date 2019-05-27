@@ -3,6 +3,8 @@ package com.linghang.service;
 import com.linghang.proto.LagCalcRequestHeader;
 import com.linghang.rpc.client.handler.LagCalcRPCHandler;
 import com.linghang.util.ConstantUtil;
+import com.linghang.util.PropertiesUtil;
+import com.linghang.util.Util;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -18,13 +20,29 @@ public class LagCalcService implements Service{
 
     private String fileName;
     private CountDownLatch lagCountDownLatch;
+    private CountDownLatch downloadCdl;
     private String[] slaves;
+    private int[] x;
+    private int[] alpha;
     private boolean encode;
 
-    public LagCalcService(String fileName, String[] slaves, boolean encode) {
+    public LagCalcService(String fileName, String[] slaves, int[] x, int[] alpha, boolean encode) {
         this.fileName = fileName;
         this.lagCountDownLatch = new CountDownLatch(slaves.length);
         this.slaves = slaves;
+        this.x = x;
+        this.alpha = alpha;
+        this.downloadCdl = null;
+        this.encode = encode;
+    }
+
+    public LagCalcService(String fileName, String[] slaves, int[] x, int[] alpha, CountDownLatch downloadCdl, boolean encode) {
+        this.fileName = fileName;
+        this.lagCountDownLatch = new CountDownLatch(slaves.length);
+        this.slaves = slaves;
+        this.x = x;
+        this.alpha = alpha;
+        this.downloadCdl = downloadCdl;
         this.encode = encode;
     }
 
@@ -56,7 +74,7 @@ public class LagCalcService implements Service{
 
             NioEventLoopGroup lagGroup = new NioEventLoopGroup(1);
             for (String host : slaves){
-                LagCalcRequestHeader header = new LagCalcRequestHeader(fileName, encode);
+                LagCalcRequestHeader header = new LagCalcRequestHeader(fileName, x, alpha, encode);
                 callLagCalcRPC(lagGroup, host, header);
             }
 
@@ -68,6 +86,10 @@ public class LagCalcService implements Service{
             }
             System.out.println("======== " + fileName + " LAG CALCULATION JOB FINISH =========");
             lagGroup.shutdownGracefully();
+
+            if (downloadCdl != null){
+                downloadCdl.countDown();
+            }
         }
     }
 

@@ -1,48 +1,48 @@
 package com.linghang.rpc.client;
 
 import com.linghang.pojo.SendFileJobDescription;
-import com.linghang.rpc.client.handler.SendNormalBlockHandler;
+import com.linghang.service.SendDataService;
+import com.linghang.service.Service;
 import com.linghang.util.ConstantUtil;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
+import com.linghang.util.PropertiesUtil;
+import com.linghang.util.Util;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
+
+import java.io.File;
+import java.util.concurrent.CountDownLatch;
 
 public class SendFileClient {
 
     private SendFileJobDescription jobDescription;
+    private Service sendService;
+    private CountDownLatch sendCdl;
+    private NioEventLoopGroup group;
+    private boolean test;
 
-    public SendFileClient(SendFileJobDescription jobDescription) {
+    public SendFileClient(SendFileJobDescription jobDescription, CountDownLatch sendCdl, NioEventLoopGroup group, boolean test) {
         this.jobDescription = jobDescription;
+        this.test = test;
+        this.sendCdl = sendCdl;
+        this.group = group;
+        initSendDataService();
+    }
+
+    private void initSendDataService(){
+        File file = new File(jobDescription.getFilePath() + jobDescription.getFileName());
+        String remoteFileName = Util.genePartName(jobDescription.getFileName());
+        String remoteFilePath;
+        if (test){
+            remoteFilePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.local_part_save_path");
+        } else {
+            remoteFilePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.part_save_path");
+        }
+
+        String[] hosts = new String[] {jobDescription.getHost()};
+        this.sendService = new SendDataService(file, jobDescription.getLocalSendPos(), jobDescription.getRemoteSendPos(),
+                remoteFileName, remoteFilePath, hosts, sendCdl, group);
     }
 
     public void start() throws Exception{
-
-        NioEventLoopGroup group = new NioEventLoopGroup(1);
-        try{
-            Bootstrap b = new Bootstrap();
-            b.group(group)
-                    .channel(NioSocketChannel.class)
-                    .remoteAddress(jobDescription.getHost(), ConstantUtil.SEND_FILE_SERVICE_PORT)
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline()
-                                    .addLast(new ObjectEncoder())
-                                    .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
-                                            .weakCachingConcurrentResolver(null)))
-                                    .addLast(new SendNormalBlockHandler(jobDescription));
-                        }
-                    });
-            ChannelFuture f = b.connect().sync();
-            f.channel().closeFuture().sync();
-        } finally {
-            group.shutdownGracefully();
-        }
+        sendService.call();
     }
 }

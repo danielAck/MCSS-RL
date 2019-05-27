@@ -11,6 +11,7 @@ public class ConstantUtil {
 
     public static final String SERVER_PROPERTY_NAME = "server.properties";
     public static final Long FILE_READ_INIT_FLG = 0L;
+    public static final Integer START_SEND_CODE = -100;
     public static final Integer SEND_FINISH_CODE = -200;
     public static final Integer LAG_CALC_FINISH_CODE = -300;
     public static final Integer SEND_ERROR_CODE = -500;

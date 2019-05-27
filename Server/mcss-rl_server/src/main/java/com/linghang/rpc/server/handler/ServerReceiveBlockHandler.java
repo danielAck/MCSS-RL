@@ -2,6 +2,7 @@ package com.linghang.rpc.server.handler;
 
 import com.linghang.proto.Block;
 import com.linghang.proto.BlockDetail;
+import com.linghang.proto.BlockHeader;
 import com.linghang.proto.RedundancyBlockHeader;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
@@ -17,72 +18,81 @@ public class ServerReceiveBlockHandler extends ChannelInboundHandlerAdapter {
 
     private RandomAccessFile rf;
     private String fileName;
+    private String filePath;
     private long start;
-    private PropertiesUtil propertiesUtil;
     private String savePath;
-    private boolean test;
 
-    public ServerReceiveBlockHandler(boolean test) {
-        this.propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
-        this.test = test;
+    public ServerReceiveBlockHandler() {
     }
 
     // 接收客户端上传的文件块，保存至本地
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
-        // receive normal file block save request
-        if (msg instanceof BlockDetail){
 
-            BlockDetail header = (BlockDetail) msg;
-            this.fileName = header.getFileName();
-            this.start = header.getStartPos();
-            String savePath;
-
-            // do init job
-            if (test){
-                savePath = propertiesUtil.getValue("service.local_part_save_path");
-            } else {
-                savePath = propertiesUtil.getValue("service.part_save_path");
-            }
-            if (savePath != null){
-
-                init(Util.genePartName(fileName), start, savePath);
-                write(header.getBytes(), header.getReadByte(), ctx);
-                System.out.println("======== SERVER RECEIVE NORMAL FILE BLOCK SAVE REQUEST FOR : " + header.getFileName() + " ========");
-
-                start = start + header.getReadByte();
-                ctx.writeAndFlush(start);
-            } else {
-                System.err.println("======== SERVER INIT RECEIVE JOB FAILED ========");
-                ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
-            }
-        }
+//        if (msg instanceof BlockDetail){
+//
+//            BlockDetail header = (BlockDetail) msg;
+//            this.fileName = header.getFileName();
+//            this.start = header.getStartPos();
+//            String savePath;
+//
+//            // do init job
+//            if (test){
+//                savePath = propertiesUtil.getValue("service.local_part_save_path");
+//            } else {
+//                savePath = propertiesUtil.getValue("service.part_save_path");
+//            }
+//            if (savePath != null){
+//
+//                init(Util.genePartName(fileName), savePath, start);
+//                write(header.getBytes(), header.getReadByte(), ctx);
+//                System.out.println("======== SERVER RECEIVE NORMAL FILE BLOCK SAVE REQUEST FOR : " + header.getFileName() + " ========");
+//
+//                start = start + header.getReadByte();
+//                ctx.writeAndFlush(start);
+//            } else {
+//                System.err.println("======== SERVER INIT RECEIVE JOB FAILED ========");
+//                ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
+//            }
+//        }
 
         // receive redundant file block save request
-        else if (msg instanceof RedundancyBlockHeader){
+        if (msg instanceof RedundancyBlockHeader){
             RedundancyBlockHeader header = (RedundancyBlockHeader) msg;
-            String savePath;
-            fileName = header.getFileName();
+            fileName = header.getRemoteFileName();
+            filePath = header.getRemoteFilePath();
             start = header.getStartPos();
 
             System.out.println("======== SERVER RECEIVE REDUNDANCY BLOCK HEADER FROM "
                     + ctx.channel().remoteAddress() + " FOR FILE :" + fileName + " ========");
 
             // do init job
-            if (test){
-                savePath = propertiesUtil.getValue("service.local_part_save_path");
-            } else {
-                savePath = propertiesUtil.getValue("service.part_save_path");
-            }
-            if (savePath != null){
-                init(Util.genePartName(fileName), start, savePath);
-                long start = 0;
-                ctx.writeAndFlush(start);
-            } else {
-                System.err.println("======== YOU HAVE NOT SPECIFY THE SAVE PATH IN SERVER ========");
-                ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
-            }
+            init(fileName, filePath, start);
+            long start = 0;
+            ctx.writeAndFlush(start);
+//            if (test){
+//                savePath = propertiesUtil.getValue("service.local_part_save_path");
+//            } else {
+//                savePath = propertiesUtil.getValue("service.part_save_path");
+//            }
+//            if (savePath != null){
+//                init(fileName, start, savePath);
+//                long start = 0;
+//                ctx.writeAndFlush(start);
+//            } else {
+//                System.err.println("======== YOU HAVE NOT SPECIFY THE SAVE PATH IN SERVER ========");
+//                ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
+//            }
+        }
+
+        // receive normal file block save request
+        else if (msg instanceof BlockHeader){
+            BlockHeader header = (BlockHeader) msg;
+            System.out.println("======== SERVER RECEIVE NORMAL FILE BLOCK SAVE REQUEST FOR : " + header.getRemoteFileName() + " ========");
+            start = header.getSendPosition().getStartPos();
+            init(header.getRemoteFileName(), header.getRemoteFilePath(), header.getSendPosition().getStartPos());
+            ctx.writeAndFlush(header.getSendPosition().getStartPos());
         }
 
         // receive file block
@@ -130,7 +140,7 @@ public class ServerReceiveBlockHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void init(String fileName, long start, String savePath) throws Exception{
+    private void init(String fileName, String savePath, long start) throws Exception{
         this.savePath = savePath;
         File file = new File(savePath + fileName);
         rf = new RandomAccessFile(file, "rw");

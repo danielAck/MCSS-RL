@@ -53,7 +53,7 @@ public class FileWriter {
 
     // 将接收到的文件块存储在 temp 目录下
     private void initReadFile() {
-        String readFileName = Util.genePartName(questFileName);
+        String readFileName = questFileName;
 
         String path = propertiesUtil.getValue("service.local_part_save_path");
         File file = new File(path + readFileName);
@@ -67,7 +67,7 @@ public class FileWriter {
 
     // 将计算好的结果写到 calctemp 目录下
     private void initWriteFile() {
-        String saveFileName = Util.geneTempName(questFileName);
+        String saveFileName = questFileName;
         String path = propertiesUtil.getValue("service.local_calc_temp_save_path");
         File file = new File(path + saveFileName);
         if (!file.exists()){

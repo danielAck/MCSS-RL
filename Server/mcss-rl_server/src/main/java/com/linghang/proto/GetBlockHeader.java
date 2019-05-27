@@ -6,22 +6,32 @@ public class GetBlockHeader implements Serializable {
 
     private static final long serialVersionUID = 7822926292703803465L;
 
-    private String fileName;
+    private String remoteFileName;
+    private String remoteFilePath;
     private long startPos;
     private long length;
 
-    public GetBlockHeader(String fileName, long startPos, long length) {
-        this.fileName = fileName;
+    public GetBlockHeader(String remoteFileName, String remoteFilePath, long startPos, long length) {
+        this.remoteFileName = remoteFileName;
+        this.remoteFilePath = remoteFilePath;
         this.startPos = startPos;
         this.length = length;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getRemoteFileName() {
+        return remoteFileName;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setRemoteFileName(String remoteFileName) {
+        this.remoteFileName = remoteFileName;
+    }
+
+    public String getRemoteFilePath() {
+        return remoteFilePath;
+    }
+
+    public void setRemoteFilePath(String remoteFilePath) {
+        this.remoteFilePath = remoteFilePath;
     }
 
     public long getStartPos() {
@@ -41,10 +51,10 @@ public class GetBlockHeader implements Serializable {
     }
 
     @Override
-    public String
-    toString() {
+    public String toString() {
         return "GetBlockHeader{" +
-                "fileName='" + fileName + '\'' +
+                "remoteFileName='" + remoteFileName + '\'' +
+                ", remoteFilePath='" + remoteFilePath + '\'' +
                 ", startPos=" + startPos +
                 ", length=" + length +
                 '}';

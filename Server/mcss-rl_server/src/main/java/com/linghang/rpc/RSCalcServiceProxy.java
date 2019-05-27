@@ -5,6 +5,7 @@ import com.linghang.proto.RSCalcRequestHeader;
 import com.linghang.rpc.client.handler.LagCalcRPCHandler;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
+import com.linghang.util.Util;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -27,12 +28,14 @@ import java.util.concurrent.CountDownLatch;
 
 public class RSCalcServiceProxy implements InvocationHandler{
 
-    private String fileName;
+    private String remoteFileName;
+    private String remoteFilePath;
     private String[] hosts;
     private String redundantBlockRecvHost;
 
-    public RSCalcServiceProxy(String fileName, String[] hosts, String redundantBlockRecvHost) {
-        this.fileName = fileName;
+    public RSCalcServiceProxy(String remoteFileName, String remoteFilePath, String[] hosts, String redundantBlockRecvHost) {
+        this.remoteFileName = remoteFileName;
+        this.remoteFilePath = remoteFilePath;
         this.hosts = hosts;
         this.redundantBlockRecvHost = redundantBlockRecvHost;
     }
@@ -45,78 +48,25 @@ public class RSCalcServiceProxy implements InvocationHandler{
 //        demonThread.setName(fileName + "-demon");
 //        demonThread.start();
 
-        Thread demonThread  = new Thread(new RSCalcServiceDemonTest(fileName, hosts, redundantBlockRecvHost));
-        demonThread.setName(fileName + "-demon");
+        Thread demonThread  = new Thread(new RSCalcServiceDemonTest(remoteFileName, remoteFilePath, hosts, redundantBlockRecvHost));
+        demonThread.setName(remoteFileName + "-demon");
         demonThread.start();
 
         return new Object();
     }
 
-    private static class RSCalcServiceDemon implements Runnable{
-
-        private CountDownLatch demon;
-        private CountDownLatch lagCountDownLatch;
-        private String redundantBlockRecvHost;
-        private NioEventLoopGroup group;
-        private String[] slaves;
-        String fileName;
-
-        public RSCalcServiceDemon(String fileName, String[] slaves) {
-            this.fileName = fileName;
-            this.slaves = slaves;
-            this.demon = new CountDownLatch(3);
-            this.group = new NioEventLoopGroup(1);
-        }
-
-        @Override
-        public void run() {
-
-            System.out.println("======== " + fileName + "-demon" + " THREAD BEGIN ========");
-            PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
-
-            for (String host : slaves){
-
-                // TODO: 从数据库中获取 host 对应的 id， 使用 id 进行计算 startPos
-                long startPos = getCalcStartPos(host);
-                ArrayList<String> calcHosts = new ArrayList<>();
-                for (String t : slaves){
-                    if (!t.equals(host))
-                        calcHosts.add(t);
-
-                }
-
-                RSCalcRequestHeader header = new RSCalcRequestHeader(fileName, calcHosts, redundantBlockRecvHost, startPos);
-                Thread t = new Thread(new RSCalcServiceJob(host, header, group, demon));
-                t.setName(fileName + "-thread");
-                t.start();
-            }
-
-            try {
-                demon.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            System.out.println("======== ALL JOB FINISHED ========");
-            group.shutdownGracefully();
-
-        }
-
-        private long getCalcStartPos(String host){
-            return 0;
-        }
-    }
-
     public static class RSCalcServiceDemonTest implements Runnable{
         CountDownLatch demon;
 
-        String fileName;
+        String remoteFileName;
+        String remoteFilePath;
         String redundantBlockRecvHost;
         String[] slaves;
         NioEventLoopGroup group;
 
-        public RSCalcServiceDemonTest(String fileName, String[] slaves, String redundantBlockRecvHost) {
-            this.fileName = fileName;
+        public RSCalcServiceDemonTest(String remoteFileName, String remoteFilePath, String[] slaves, String redundantBlockRecvHost) {
+            this.remoteFileName = remoteFileName;
+            this.remoteFilePath = remoteFilePath;
             this.slaves = slaves;
             this.redundantBlockRecvHost = redundantBlockRecvHost;
             // demon 线程 countDownLatch
@@ -127,7 +77,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
         @Override
         public void run() {
 
-            System.out.println("======== " + fileName + "-demon" + " THREAD BEGIN ========");
+            System.out.println("======== " + remoteFileName + "-demon" + " THREAD BEGIN ========");
             PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
 
             // 获取 RPC 结点IP, call RPC
@@ -139,10 +89,10 @@ public class RSCalcServiceProxy implements InvocationHandler{
                     if (!t.equals(host))
                         calcHosts.add(t);
                 }
-                RSCalcRequestHeader header = new RSCalcRequestHeader(fileName, calcHosts, redundantBlockRecvHost, startPos);
 
+                RSCalcRequestHeader header = new RSCalcRequestHeader(remoteFileName, remoteFilePath, calcHosts, redundantBlockRecvHost, startPos);
                 Thread t = new Thread(new RSCalcServiceJob(host, header, group, demon));
-                t.setName(fileName + "-thread");
+                t.setName(remoteFileName + "-thread");
                 t.start();
             }
 
@@ -208,7 +158,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
 
         @Override
         public void run() {
-            System.out.println("======== " + rsCalcRequestHeader.getFileName() + "-" + host + "-job" + " JOB BEGIN ========");
+            System.out.println("======== " + rsCalcRequestHeader.getRemoteFileName() + "-" + host + "-job" + " JOB BEGIN ========");
 
             startClient(group, rsCalcRequestHeader);
             try {
@@ -218,7 +168,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
             }
 
             // Job finished
-            System.out.println("======== " + rsCalcRequestHeader.getFileName() + "-" + host + "-job" + " JOB FINISHED ========");
+            System.out.println("======== " + rsCalcRequestHeader.getRemoteFileName() + "-" + host + "-job" + " JOB FINISHED ========");
             demon.countDown();
         }
 

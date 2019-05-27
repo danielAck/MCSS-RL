@@ -76,7 +76,7 @@ public class SendRedundantBlockHandler extends ChannelInboundHandlerAdapter {
 
     private void init(){
         String path = propertiesUtil.getValue("service.local_calc_temp_save_path");
-        File file = new File(path + Util.geneTempName(header.getFileName()));
+        File file = new File(path + header.getRemoteFileName());
         try {
             rf = new RandomAccessFile(file, "r");
         } catch (FileNotFoundException e) {
@@ -94,7 +94,7 @@ public class SendRedundantBlockHandler extends ChannelInboundHandlerAdapter {
 
     private boolean deleteCalcTempFile(){
         String path = propertiesUtil.getValue("service.local_calc_temp_save_path");
-        File file = new File(path + Util.geneTempName(header.getFileName()));
+        File file = new File(path + header.getRemoteFileName());
         if (file.exists()){
             return file.delete();
         }

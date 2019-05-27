@@ -6,12 +6,14 @@ import java.lang.reflect.Proxy;
 
 public class RSCalcServiceFactory implements ServiceFactory {
 
-    private String fileName;
+    private String remoteFileName;
+    private String remoteFilePath;
     private String[] hosts;
     private String redundantBlockRecvHost;
 
-    public RSCalcServiceFactory(String fileName, String[] hosts, String redundantBlockRecvHost) {
-        this.fileName = fileName;
+    public RSCalcServiceFactory(String remoteFileName, String remoteFilePath, String[] hosts, String redundantBlockRecvHost) {
+        this.remoteFileName = remoteFileName;
+        this.remoteFilePath = remoteFilePath;
         this.hosts = hosts;
         this.redundantBlockRecvHost = redundantBlockRecvHost;
     }
@@ -19,13 +21,9 @@ public class RSCalcServiceFactory implements ServiceFactory {
     @Override
     public Service createService() {
 
-        RSCalcServiceProxy proxy = new RSCalcServiceProxy(fileName, hosts, redundantBlockRecvHost);
+        RSCalcServiceProxy proxy = new RSCalcServiceProxy(remoteFileName, remoteFilePath, hosts, redundantBlockRecvHost);
         return (Service)Proxy.newProxyInstance(Service.class.getClassLoader(),
                 new Class[]{Service.class},
                 proxy);
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
     }
 }

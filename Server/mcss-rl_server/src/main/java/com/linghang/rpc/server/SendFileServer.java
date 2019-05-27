@@ -17,17 +17,15 @@ import java.util.Date;
 
 public class SendFileServer {
 
-
     public SendFileServer() {
     }
 
     public static void main(String[] args) throws Exception {
         SendFileServer server = new SendFileServer();
-        boolean isTest = true;
-        server.start(isTest);
+        server.start();
     }
 
-    public void start(final boolean test) throws Exception{
+    public void start() throws Exception{
         NioEventLoopGroup group = new NioEventLoopGroup();
         try{
             ServerBootstrap b = new ServerBootstrap();
@@ -41,7 +39,7 @@ public class SendFileServer {
                                     .addLast(new ObjectEncoder())
                                     .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
                                             .weakCachingConcurrentResolver(null)))
-                                    .addLast(new ServerReceiveBlockHandler(test));
+                                    .addLast(new ServerReceiveBlockHandler());
                         }
                     });
             ChannelFuture f = b.bind().sync();

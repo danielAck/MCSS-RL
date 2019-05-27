@@ -1,7 +1,6 @@
 package com.linghang.rpc.server.handler;
 
 import com.linghang.proto.Block;
-import com.linghang.proto.BlockDetail;
 import com.linghang.proto.GetBlockHeader;
 import com.linghang.proto.RSCalcRequestHeader;
 import com.linghang.util.ConstantUtil;
@@ -18,7 +17,6 @@ public class GetBlockRequestHandler extends ChannelInboundHandlerAdapter {
     private static final int bufLength = ConstantUtil.BUFLENGTH;
     private Block fileBlock;
     private RandomAccessFile rf;
-    private PropertiesUtil propertiesUtil;
     private long startPos;
     private long length;
     private byte[] buf;
@@ -26,7 +24,6 @@ public class GetBlockRequestHandler extends ChannelInboundHandlerAdapter {
     public GetBlockRequestHandler() {
         fileBlock = null;
         rf = null;
-        propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
         buf = new byte[bufLength];
     }
 
@@ -37,16 +34,15 @@ public class GetBlockRequestHandler extends ChannelInboundHandlerAdapter {
         if (msg instanceof GetBlockHeader){
 
             GetBlockHeader header = (GetBlockHeader) msg;
-            String fileName = header.getFileName();
+            String remoteFileName = header.getRemoteFileName();
+            String remoteFilePath = header.getRemoteFilePath();
             System.out.println("======= RECEIVE BLOCK REQUEST FROM " +
                     ctx.channel().remoteAddress().toString() +  ": " + header.toString() + " =======");
 
             // 将文件分块发送到客户端
             fileBlock = new Block();
 
-            String partName = Util.genePartName(fileName);
-            String path = propertiesUtil.getValue("service.local_part_save_path");
-            File file = new File(path + partName);
+            File file = new File(remoteFilePath + remoteFileName);
             if (!file.exists()){
                 System.out.println("======= ERROR : QUEST FILE DOESN'T EXIST IN SERVER ========");
                 ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);

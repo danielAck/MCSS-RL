@@ -1,19 +1,21 @@
 package com.linghang.proto;
 
+import com.linghang.pojo.SendPosition;
+
 import java.io.Serializable;
 
-public class RedundancyBlockHeader implements Serializable {
+public class BlockHeader implements Serializable {
 
-    private static final long serialVersionUID = 4723869160317851740L;
+    private static final long serialVersionUID = 6917782500338669141L;
 
     private String remoteFileName;
     private String remoteFilePath;
-    private long startPos;
+    private SendPosition sendPosition;
 
-    public RedundancyBlockHeader(String remoteFileName, String remoteFilePath, long startPos) {
+    public BlockHeader(String remoteFileName, String remoteFilePath, SendPosition sendPosition) {
         this.remoteFileName = remoteFileName;
         this.remoteFilePath = remoteFilePath;
-        this.startPos = startPos;
+        this.sendPosition = sendPosition;
     }
 
     public String getRemoteFileName() {
@@ -32,11 +34,11 @@ public class RedundancyBlockHeader implements Serializable {
         this.remoteFilePath = remoteFilePath;
     }
 
-    public long getStartPos() {
-        return startPos;
+    public SendPosition getSendPosition() {
+        return sendPosition;
     }
 
-    public void setStartPos(long startPos) {
-        this.startPos = startPos;
+    public void setSendPosition(SendPosition sendPosition) {
+        this.sendPosition = sendPosition;
     }
 }

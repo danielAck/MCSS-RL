@@ -41,7 +41,8 @@ public class LagCalcServerService implements Service {
         private String fileName;
         private ChannelHandlerContext rpcCtx;
         private Lagrange lag;
-        private RandomAccessFile rf;
+        private RandomAccessFile readRF;
+        private RandomAccessFile writeRF;
         private byte[] buf;
         private boolean isEncode;
 
@@ -72,10 +73,9 @@ public class LagCalcServerService implements Service {
             System.out.println("======== SERVER LAG CALCULATION JOB FOR FILE " + fileName + " FINISH ========");
         }
 
-        // 边解码边发送到服务请求方
+        // 解码结果临时存储在本地
         private boolean doLagDecode(){
             boolean initSuccess = init();
-            Block block = new Block();
             int start = 0;
             if (!initSuccess){
                 System.err.println("========= LAG CALC SERVER INIT FAILED ========");
@@ -84,23 +84,25 @@ public class LagCalcServerService implements Service {
 
             int readByte;
             try {
-                rf.seek(start);
-                while((readByte = rf.read(buf)) != -1){
+                readRF.seek(start);
+                writeRF.seek(start);
+                while((readByte = readRF.read(buf)) != -1){
                     lag.decode(buf, readByte);
-                    rf.seek(start);
-                    rf.write(buf, 0, readByte);
+                    writeRF.write(buf, 0, readByte);
                     start += readByte;
                     System.out.println("======== LAC CALC HANDEL " + readByte + " BYTES ========");
-                    rf.seek(start);
+                    readRF.seek(start);
+                    writeRF.seek(start);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
             }
 
-            return closeRF();
+            return closeRF(readRF) && closeRF(writeRF);
         }
 
+        // 直接在原文件上加密
         private boolean doLagEncode(){
             boolean initSuccess = init();
             int start = 0;
@@ -111,14 +113,14 @@ public class LagCalcServerService implements Service {
 
             int readByte;
             try {
-                rf.seek(start);
-                while((readByte = rf.read(buf)) != -1){
+                readRF.seek(start);
+                while((readByte = readRF.read(buf)) != -1){
                     lag.encode(buf, readByte);
-                    rf.seek(start);
-                    rf.write(buf, 0, readByte);
+                    readRF.seek(start);
+                    readRF.write(buf, 0, readByte);
                     start += readByte;
                     System.out.println("======== LAC CALC HANDEL " + readByte + " BYTES ========");
-                    rf.seek(start);
+                    readRF.seek(start);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -126,34 +128,48 @@ public class LagCalcServerService implements Service {
             }
 
             // 关闭文件
-            return closeRF();
+            return closeRF(readRF);
         }
 
         private boolean init(){
 
             // init lagrange calculator
-            int[] x = new int[]{1, 2, -3};
-            int[] alpha = new int[]{-6, 5, 4};
+            int[] x = header.getX();
+            int[] alpha = header.getAlpha();
             lag = new Lagrange(alpha, x);
+            File readFile, writeFile;
 
             // init file
             PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
-            String path = propertiesUtil.getValue("service.local_part_save_path");
-            File file = new File(path + Util.genePartName(fileName));
-            if (!file.exists()){
-                System.out.println("========= " + path + Util.genePartName(fileName) + " DO NOT EXIST ========");
+
+            String readPath = propertiesUtil.getValue("service.local_part_save_path");
+            readFile = new File(readPath + Util.genePartName(fileName));
+            readRF = createRF(readFile);
+            if (readRF == null){
+                System.err.println("======== CREATE RANDOM ACCESS FILE FAILED =========");
                 return false;
-            } else {
+            }
+
+            // decode, create lag calc temp file
+            if (!isEncode){
+                String writePath = propertiesUtil.getValue("service.local_lag_decode_temp_path");
+                writeFile = new File(writePath + Util.geneTempName(fileName));
                 try {
-                    rf = new RandomAccessFile(file, "rw");
-                } catch (FileNotFoundException e) {
+                    boolean res = writeFile.createNewFile();
+                } catch (IOException e) {
                     e.printStackTrace();
+                    System.err.println("======== CREATE LAG CAL TEMP FILE FAILED =========");
+                    return false;
+                }
+                writeRF = createRF(writeFile);
+                if (writeRF == null){
+                    System.err.println("======== CREATE LAG CALC TEMP RANDOM ACCESS FILE FAILED =========");
                     return false;
                 }
             }
 
             // init calc buf
-            int bufSize = Util.getBufSize(file.length(), ConstantUtil._1K, ConstantUtil._5K);
+            int bufSize = Util.getBufSize(readFile.length(), ConstantUtil._1K, ConstantUtil._5K);
             bufSize = bufSize == -1? 3 : bufSize;
             System.out.println("========= LAG CALC GENE BUF SIZE = " + bufSize);
             buf = new byte[bufSize];
@@ -161,8 +177,7 @@ public class LagCalcServerService implements Service {
             return true;
         }
 
-
-        public boolean closeRF(){
+        private boolean closeRF(RandomAccessFile rf){
             try {
                 rf.close();
                 return true;
@@ -170,6 +185,18 @@ public class LagCalcServerService implements Service {
                 e.printStackTrace();
                 return false;
             }
+        }
+
+        private RandomAccessFile createRF(File file){
+            RandomAccessFile rf;
+            try {
+                rf = new RandomAccessFile(file, "rw");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                System.out.println("========= " + file.getPath() + Util.genePartName(fileName) + " DO NOT EXIST ========");
+                return null;
+            }
+            return rf;
         }
     }
 

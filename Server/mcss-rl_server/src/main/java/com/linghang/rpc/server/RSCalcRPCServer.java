@@ -63,7 +63,7 @@ public class RSCalcRPCServer {
             // receive RS calculation request header
             if (msg instanceof RSCalcRequestHeader){
                 RSCalcRequestHeader questHeader = (RSCalcRequestHeader) msg;
-                String fileName = questHeader.getFileName();
+                String fileName = questHeader.getRemoteFileName();
 
                 System.out.println("======== RPC SERVER RECEIVE RPC CALL FOR FILE : " + fileName + " ========");
                 ArrayList<String> calcHosts = questHeader.getCalcHosts();
@@ -72,12 +72,13 @@ public class RSCalcRPCServer {
 
                 // start send redundancy block job
                 CountDownLatch sendRedundancyCdl = new CountDownLatch(calcHosts.size());
-                RedundancyBlockHeader header = new RedundancyBlockHeader(questHeader.getFileName(), questHeader.getStartPos());
+                String remoteFilepath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.local_part_save_path");
+                RedundancyBlockHeader header = new RedundancyBlockHeader(questHeader.getRemoteFileName(), remoteFilepath, questHeader.getStartPos());
                 Thread t = new Thread(new SendRedundantBlockJob(redundantBlockRecvHost, sendRedundancyCdl, header));
                 t.start();
 
                 // start get block client
-                GetBlockHeader getBlockHeader = createGetBlockHeader(questHeader.getFileName(), questHeader.getStartPos());
+                GetBlockHeader getBlockHeader = createGetBlockHeader(questHeader.getRemoteFileName(), questHeader.getRemoteFilePath(), questHeader.getStartPos());
                 if (getBlockHeader == null){
                     ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
                     return;
@@ -130,19 +131,19 @@ public class RSCalcRPCServer {
 
         /**
          * 生成文件块请求头
-         * @param fileName 文件名
+         * @param remoteFileName 远程文件名
+         * @param remoteFilePath 远程文件路径
          * @param startPos 请求起始位置
          * @return 请求头
          */
-        private GetBlockHeader createGetBlockHeader(String fileName, long startPos){
-            String path = util.getValue("service.local_part_save_path");
-            File file = new File(path + Util.genePartName(fileName));
+        private GetBlockHeader createGetBlockHeader(String remoteFileName, String remoteFilePath, long startPos){
+            File file = new File(remoteFilePath + remoteFileName);
             if (!file.exists()){
-                System.err.println("======== " + Util.genePartName(fileName) + " FILE DON'T EXIST ! ========");
+                System.err.println("======== " + remoteFileName + " FILE DON'T EXIST ! ========");
                 return null;
             }
             // TODO: 看怎么处理这个 length 好一些
-            return new GetBlockHeader(fileName, startPos, file.length()/3);
+            return new GetBlockHeader(remoteFileName, remoteFilePath, startPos, file.length()/3);
         }
 
         private class SendRedundantBlockJob implements Runnable{
