@@ -31,7 +31,7 @@ public class ClientRSCalcHandler extends ChannelInboundHandlerAdapter {
         this.blockRequestHeader = questHeader;
         this.start = questHeader.getStartPos();
         this.rpcContext = ctx;
-        this.fileWriter = new FileWriter(questHeader.getRemoteFileName(), questHeader.getStartPos());
+        this.fileWriter = new FileWriter(questHeader.getRemoteFileName(), questHeader.getRemoteFilePath(), questHeader.getStartPos());
         this.countDownLatch = sendRedundantCdl;
     }
 

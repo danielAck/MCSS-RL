@@ -75,7 +75,7 @@ public class SendRedundantBlockHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void init(){
-        String path = propertiesUtil.getValue("service.local_calc_temp_save_path");
+        String path = propertiesUtil.getValue("service.calc_temp_save_path");
         File file = new File(path + header.getRemoteFileName());
         try {
             rf = new RandomAccessFile(file, "r");

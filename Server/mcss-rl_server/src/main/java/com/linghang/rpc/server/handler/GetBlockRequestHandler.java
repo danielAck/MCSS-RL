@@ -2,10 +2,7 @@ package com.linghang.rpc.server.handler;
 
 import com.linghang.proto.Block;
 import com.linghang.proto.GetBlockHeader;
-import com.linghang.proto.RSCalcRequestHeader;
 import com.linghang.util.ConstantUtil;
-import com.linghang.util.PropertiesUtil;
-import com.linghang.util.Util;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 

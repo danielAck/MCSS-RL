@@ -16,18 +16,20 @@ public class FileWriter {
     private static final int bufLength = ConstantUtil.BUFLENGTH;
     private static ConcurrentHashMap<String, Long> fileReadFlg;
     private String questFileName;
+    private String questFilePath;
     private byte[] readBuf;
     private long originStartPos;
     private RandomAccessFile localReadRF;
     private RandomAccessFile writeRF;
     private PropertiesUtil propertiesUtil;
 
-    public FileWriter(String fileName, long originStartPos) {
+    public FileWriter(String fileName, String filePath, long originStartPos) {
         this.propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
         this.readBuf = new byte[bufLength];
         this.questFileName = fileName;
+        this.questFilePath = filePath;
         this.originStartPos = originStartPos;
-        initReadFile();
+        initLocalReadFile();
         initWriteFile();
         initFlg();
     }
@@ -51,12 +53,9 @@ public class FileWriter {
         }
     }
 
-    // 将接收到的文件块存储在 temp 目录下
-    private void initReadFile() {
-        String readFileName = questFileName;
-
-        String path = propertiesUtil.getValue("service.local_part_save_path");
-        File file = new File(path + readFileName);
+    // 读取本地存储的分块文件内容
+    private void initLocalReadFile() {
+        File file = new File(questFilePath + questFileName);
         try {
             localReadRF = new RandomAccessFile(file, "r");
         } catch (FileNotFoundException e) {
@@ -68,7 +67,7 @@ public class FileWriter {
     // 将计算好的结果写到 calctemp 目录下
     private void initWriteFile() {
         String saveFileName = questFileName;
-        String path = propertiesUtil.getValue("service.local_calc_temp_save_path");
+        String path = propertiesUtil.getValue("service.calc_temp_save_path");
         File file = new File(path + saveFileName);
         if (!file.exists()){
             try {

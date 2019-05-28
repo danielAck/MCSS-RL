@@ -80,7 +80,7 @@ public class RSCalcServiceProxy implements InvocationHandler{
             System.out.println("======== " + remoteFileName + "-demon" + " THREAD BEGIN ========");
             PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
 
-            // 获取 RPC 结点IP, call RPC
+            // 获取 RPC 结点IP, 拉起 3 个 RPC 连接
             for (String host : slaves){
 
                 long startPos = getCalcStartPos(host);

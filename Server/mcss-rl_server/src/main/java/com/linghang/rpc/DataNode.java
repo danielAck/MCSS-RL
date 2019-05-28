@@ -12,22 +12,22 @@ public class DataNode {
     public static void main(String[] args) {
         String[] calcHosts = new String[]{"192.168.31.120", "192.168.31.121", "192.168.31.122"};
         String[] lagCalcHosts = new String[]{"127.0.0.1"};
+        String redundantBlockRecvHost = "192.168.31.123";
         DataNode datanode = new DataNode();
         int[] x = new int[]{1, 2, -3};
         int[] alpha = new int[]{-6, 5, 4};
-//        datanode.doRSCalc("1M.pdf", calcHosts);
-        datanode.doLagDecode("1M.pdf", x, alpha, lagCalcHosts);
+        datanode.doRSCalc("1M.pdf", redundantBlockRecvHost, calcHosts);
+//        datanode.doLagDecode("1M.pdf", x, alpha, lagCalcHosts);
     }
 
     public DataNode() {
     }
 
-    public void doRSCalc(String fileName, String[] hosts){
+    public void doRSCalc(String fileName, String redundantBlockRecvHost, String[] hosts){
         // TODO: 先从数据库中查询是否已经上传
 
-        String redundantBlockRecvHost = "127.0.0.1";
         String remoteFileName = Util.genePartName(fileName);
-        String remoteFilePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.local_part_save_path");
+        String remoteFilePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.part_save_path");
         RSCalcServiceFactory factory = new RSCalcServiceFactory(remoteFileName, remoteFilePath, hosts, redundantBlockRecvHost);
         Service service = factory.createService();
         service.call();

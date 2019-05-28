@@ -72,7 +72,7 @@ public class RSCalcRPCServer {
 
                 // start send redundancy block job
                 CountDownLatch sendRedundancyCdl = new CountDownLatch(calcHosts.size());
-                String remoteFilepath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.local_part_save_path");
+                String remoteFilepath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.part_save_path");
                 RedundancyBlockHeader header = new RedundancyBlockHeader(questHeader.getRemoteFileName(), remoteFilepath, questHeader.getStartPos());
                 Thread t = new Thread(new SendRedundantBlockJob(redundantBlockRecvHost, sendRedundancyCdl, header));
                 t.start();
