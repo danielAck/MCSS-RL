@@ -30,5 +30,11 @@ public class SendPosition implements Serializable {
         this.endPos = endPos;
     }
 
-
+    @Override
+    public String toString() {
+        return "SendPosition{" +
+                "startPos=" + startPos +
+                ", endPos=" + endPos +
+                '}';
+    }
 }

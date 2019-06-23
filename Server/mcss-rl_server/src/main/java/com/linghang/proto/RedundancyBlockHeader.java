@@ -39,4 +39,13 @@ public class RedundancyBlockHeader implements Serializable {
     public void setStartPos(long startPos) {
         this.startPos = startPos;
     }
+
+    @Override
+    public String toString() {
+        return "RedundancyBlockHeader{" +
+                "remoteFileName='" + remoteFileName + '\'' +
+                ", remoteFilePath='" + remoteFilePath + '\'' +
+                ", startPos=" + startPos +
+                '}';
+    }
 }

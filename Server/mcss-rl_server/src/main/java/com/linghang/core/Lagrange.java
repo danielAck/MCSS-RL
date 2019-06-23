@@ -10,8 +10,8 @@ public class Lagrange {
     private static int[] gflog;
     private static final int AND_BASE_8 = CalcUtil.getAndBase8();
     private static final int MOD_BASE = CalcUtil.getModBase();
-    private  int[] alpha;
-    private  int[] x;
+    private int[] alpha;
+    private int[] x;
 
     public Lagrange(int[] alpha, int[] x) {
         CalcUtil calcUtil = new CalcUtil();
@@ -46,7 +46,7 @@ public class Lagrange {
         convertUnsigned(alpha);
 
         if (y.length % 3 != 0){
-            System.err.println("======== The length of the data to be encoded needs to be a multiple of 3 ========");
+            System.err.println("======== The length of the data : " + y.length + " isn't multiple of 3 ========");
             return;
         }
 
@@ -57,6 +57,8 @@ public class Lagrange {
             for (int i = 0; i < 3; i++){
                 int res = 0;
                 for (int j = 0; j < 3; j++){
+                    if (y[m+j] == 0)    // 判断含有0的情况
+                        continue;
                     int t = 1;
                     for (int k = 0; k < 3; k++){
                         if (k != j){
@@ -91,9 +93,9 @@ public class Lagrange {
 
         int[] x = {1, 2, -3};
         int[] alpha = {-6, 5, 4};
-        byte[] y = {0b1010011, 79, 84, 33, -90, 45, 23, 11, -8};
+        byte[] y = {101, 110, 100};
 
-        Lagrange lag = new Lagrange(x, alpha);
+        Lagrange lag = new Lagrange(alpha, x);
         System.out.println("Before encode : ");
         System.out.println(Arrays.toString(y));
 
@@ -101,7 +103,7 @@ public class Lagrange {
         System.out.println("After encode : ");
         System.out.println(Arrays.toString(y));
 
-        lag.encode(y, y.length);
+        lag.decode(y, y.length);
         System.out.println("After encode : ");
         System.out.println(Arrays.toString(y));
     }

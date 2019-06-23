@@ -90,22 +90,22 @@ public class NameNode {
      * @param fileName 下载文件名
      * @param slaveIds 选择的云ID
      */
-    public void download(String fileName, int[] slaveIds){
+    public void download(String fileName, String filePath, int[] slaveIds){
         String[] hosts = new String[slaveIds.length];
 
         // ========== Test =========
-        HashMap<Integer, String> slaves = new HashMap<Integer,String>();
-        slaves.put(0, "127.0.0.1");
-        slaves.put(1, "192.168.31.120");
-        slaves.put(2, "192.168.31.121");
-        slaves.put(3, "192.168.31.122");
+        HashMap<Integer, String> slaves = new HashMap<>();
+        slaves.put(0, "192.168.0.120");
+        slaves.put(1, "192.168.0.121");
+        slaves.put(2, "192.168.0.122");
+        slaves.put(3, "192.168.0.123");
         // =========================
 
         for (int i = 0; i < slaveIds.length; i++){
-            hosts[i] = slaves.get(i);
+            hosts[i] = slaves.get(slaveIds[i]);
         }
 
-        Job job = new DownloadFileJob(fileName, hosts);
+        Job job = new DownloadFileJob(fileName, filePath, hosts);
         job.start();
     }
 }

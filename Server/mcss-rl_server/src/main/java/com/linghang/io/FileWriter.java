@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FileWriter {
 
     private static final int bufLength = ConstantUtil.BUFLENGTH;
+
     private static ConcurrentHashMap<String, Long> fileReadFlg;
     private String questFileName;
     private String questFilePath;
@@ -66,7 +67,7 @@ public class FileWriter {
 
     // 将计算好的结果写到 calctemp 目录下
     private void initWriteFile() {
-        String saveFileName = questFileName;
+        String saveFileName = Util.geneTempName(questFileName);
         String path = propertiesUtil.getValue("service.calc_temp_save_path");
         File file = new File(path + saveFileName);
         if (!file.exists()){
@@ -89,20 +90,21 @@ public class FileWriter {
         // flg = 下一个需要新写入的字节
         Long flg = fileReadFlg.get(questFileName);
 
-        // 单线程不用考虑并发
+        // 还未处理过的数据
         if (start >= flg){
-            System.out.println("======== READ FROM LOCAL FILE ========");
+            System.out.println("======== READ FROM LOCAL FILE : {start=" + start + ", flg=" + flg + "} ========");
             read(localReadRF, start);
 
             // 更新读取下标
             fileReadFlg.put(questFileName, start + writeLength);
         } else {
-            System.out.println("======== READ FROM WRITE FILE ========");
+            System.out.println("======== READ FROM WRITE FILE : {start=" + start + ", flg=" + flg + "} ========");
             read(writeRF, (start - originStartPos));
         }
 
         add(msg, writeLength);
 
+        // 如果读过，需要将指针再移回来，覆盖写上计算结果
         writeRF.seek(start - originStartPos);
         writeRF.write(readBuf, 0, writeLength);
     }

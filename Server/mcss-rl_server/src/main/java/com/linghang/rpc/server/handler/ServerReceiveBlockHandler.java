@@ -29,34 +29,6 @@ public class ServerReceiveBlockHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
-
-//        if (msg instanceof BlockDetail){
-//
-//            BlockDetail header = (BlockDetail) msg;
-//            this.fileName = header.getFileName();
-//            this.start = header.getStartPos();
-//            String savePath;
-//
-//            // do init job
-//            if (test){
-//                savePath = propertiesUtil.getValue("service.local_part_save_path");
-//            } else {
-//                savePath = propertiesUtil.getValue("service.part_save_path");
-//            }
-//            if (savePath != null){
-//
-//                init(Util.genePartName(fileName), savePath, start);
-//                write(header.getBytes(), header.getReadByte(), ctx);
-//                System.out.println("======== SERVER RECEIVE NORMAL FILE BLOCK SAVE REQUEST FOR : " + header.getFileName() + " ========");
-//
-//                start = start + header.getReadByte();
-//                ctx.writeAndFlush(start);
-//            } else {
-//                System.err.println("======== SERVER INIT RECEIVE JOB FAILED ========");
-//                ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
-//            }
-//        }
-
         // receive redundant file block save request
         if (msg instanceof RedundancyBlockHeader){
             RedundancyBlockHeader header = (RedundancyBlockHeader) msg;
@@ -65,34 +37,21 @@ public class ServerReceiveBlockHandler extends ChannelInboundHandlerAdapter {
             start = header.getStartPos();
 
             System.out.println("======== SERVER RECEIVE REDUNDANCY BLOCK HEADER FROM "
-                    + ctx.channel().remoteAddress() + " FOR FILE :" + fileName + " ========");
+                    + ctx.channel().remoteAddress() + " ========\n" + " ======== " +header.toString() + " ========");
 
             // do init job
             init(fileName, filePath, start);
             long start = 0;
             ctx.writeAndFlush(start);
-//            if (test){
-//                savePath = propertiesUtil.getValue("service.local_part_save_path");
-//            } else {
-//                savePath = propertiesUtil.getValue("service.part_save_path");
-//            }
-//            if (savePath != null){
-//                init(fileName, start, savePath);
-//                long start = 0;
-//                ctx.writeAndFlush(start);
-//            } else {
-//                System.err.println("======== YOU HAVE NOT SPECIFY THE SAVE PATH IN SERVER ========");
-//                ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
-//            }
         }
 
         // receive normal file block save request
         else if (msg instanceof BlockHeader){
             BlockHeader header = (BlockHeader) msg;
-            System.out.println("======== SERVER RECEIVE NORMAL FILE BLOCK SAVE REQUEST FOR : " + header.getRemoteFileName() + " ========");
+            System.out.println("======== SERVER RECEIVE FILE BLOCK SAVE REQUEST : " + header.toString() + " ========");
             start = header.getSendPosition().getStartPos();
             init(header.getRemoteFileName(), header.getRemoteFilePath(), header.getSendPosition().getStartPos());
-            ctx.writeAndFlush(header.getSendPosition().getStartPos());
+            ctx.writeAndFlush(ConstantUtil.START_SEND_CODE);
         }
 
         // receive file block
@@ -133,7 +92,7 @@ public class ServerReceiveBlockHandler extends ChannelInboundHandlerAdapter {
     private void write(byte[] bytes, int readByte, ChannelHandlerContext ctx){
         try{
             rf.write(bytes, 0, readByte);
-            System.out.println("======== SERVER RECEIVE " + readByte + " BYTES FROM CLIENT =======");
+            System.out.println("======== SERVER RECEIVE " + readByte + " BYTES FROM " + ctx.channel().remoteAddress() + " =======");
         } catch (Exception e){
             handleError();
             ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);

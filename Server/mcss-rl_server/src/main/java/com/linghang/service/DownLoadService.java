@@ -19,25 +19,31 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
+import java.util.concurrent.CountDownLatch;
 
 public class DownLoadService implements Service{
 
     private String fileName;
+    private String fileSavePath;
     private String[] hosts;
     private String redundantBlockRecvHost;
     private Service rsCalcService;
 
-    public DownLoadService(String fileName, String[] hosts, String redundantBlockRecvHost) {
+    public DownLoadService(String fileName, String fileSavePath, String[] hosts, String redundantBlockRecvHost) {
         this.fileName = fileName;
+        this.fileSavePath = fileSavePath;
         this.hosts = hosts;
         this.redundantBlockRecvHost = redundantBlockRecvHost;
         initRSCalcService();
     }
 
     private void initRSCalcService(){
-        String remoteFileName = Util.geneTempName(fileName);
-        String remoteFilePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.lag_decode_temp_path");
-        this.rsCalcService = new RSCalcServiceFactory(remoteFileName, remoteFilePath, hosts, redundantBlockRecvHost).createService();
+        String calcFileName = Util.geneTempName(fileName);
+        String calcFilePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.lag_decode_temp_path");
+        String redundancySaveFileName = fileName;
+        String redundancySaveFilePath = fileSavePath;
+        this.rsCalcService = new RSCalcServiceFactory(calcFileName, calcFilePath, redundancySaveFileName, redundancySaveFilePath,
+                hosts, redundantBlockRecvHost, true).createService();
     }
 
     @Override
@@ -53,7 +59,7 @@ public class DownLoadService implements Service{
     // TODO: 利用数据库，判断选择的结点中是否含有冗余块存储结点
     private boolean checkNeedRSCalc(String[] hosts){
         for (String host : hosts){
-            if (host.equals("127.0.0.1")){
+            if (host.equals("192.168.0.123")){
                 return true;
             }
         }
@@ -62,25 +68,54 @@ public class DownLoadService implements Service{
 
     // get block from hosts
     private void getBlock(String[] hosts){
-        NioEventLoopGroup group = new NioEventLoopGroup(1);
-        for (String host : hosts){
-            createGetBlockClient(host, fileName, group);
-        }
+        Thread getBlockJob = new Thread(new GetBlockJob(hosts, fileName));
+        getBlockJob.setName(fileName + "-get_block-job");
+        getBlockJob.start();
     }
 
     private String[] getDownloadHosts(String[] hosts){
         // TODO: 从数据库中依次判断hosts中只需直接下载的结点
 
-        return new String[]{"192.168.31.120", "192.168.31.121"};
+        return new String[]{"192.168.0.120", "192.168.0.121"};
     }
 
-    private void createGetBlockClient(final String host, String fileName, NioEventLoopGroup group){
+    private class GetBlockJob implements Runnable{
+
+        private String[] hosts;
+        private String fileName;
+        private NioEventLoopGroup group;
+        private CountDownLatch getBlockFinishCdl;
+
+        public GetBlockJob(String[] hosts, String fileName) {
+            this.hosts = hosts;
+            this.fileName = fileName;
+            this.group = new NioEventLoopGroup(1);
+            this.getBlockFinishCdl = new CountDownLatch(hosts.length);
+        }
+
+        @Override
+        public void run() {
+
+            for (String host : hosts){
+                createGetBlockClient(host, fileName, group, getBlockFinishCdl);
+            }
+            try {
+                getBlockFinishCdl.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("========= GET BLOCK JOB FINISH =========");
+            group.shutdownGracefully();
+        }
+    }
+
+    private void createGetBlockClient(final String host, String fileName, NioEventLoopGroup group, final CountDownLatch getBlockFinishCdl){
 
         long startPos = 0;
         long length = -1;
         PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
-        String remoteFileName = Util.genePartName(fileName);
-        String remoteFilePath = propertiesUtil.getValue("service.local_part_save_path");
+        String remoteFileName = Util.geneTempName(fileName);
+        String remoteFilePath = propertiesUtil.getValue("service.lag_decode_temp_path");
         final GetBlockHeader getBlockHeader = new GetBlockHeader(remoteFileName, remoteFilePath, startPos, length);
 
         Bootstrap b = new Bootstrap();
@@ -94,7 +129,7 @@ public class DownLoadService implements Service{
                                 .addLast(new ObjectEncoder())
                                 .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
                                         .weakCachingConcurrentResolver(null)))
-                                .addLast(new GetBlockHandler(getBlockHeader, host));
+                                .addLast(new GetBlockHandler(getBlockHeader, host, getBlockFinishCdl));
                     }
                 });
         b.connect();
@@ -103,8 +138,16 @@ public class DownLoadService implements Service{
     // TODO：从数据库中根据IP获取需要下载文件对应的起始下标
     private long getStartPos(String host){
 
-
-        return 0;
+        switch (host){
+            case "192.168.0.120":
+                return 0;
+            case "192.168.0.121":
+                return 377448;
+            case "192.168.0.122":
+                return 754896;
+            default:
+                return 0;
+        }
     }
 
     private class GetBlockHandler extends ChannelInboundHandlerAdapter{
@@ -114,12 +157,15 @@ public class DownLoadService implements Service{
         private String host;
         private byte[] buf;
         private long start;
+        private long flag;
         private RandomAccessFile rf;
+        private CountDownLatch waitGetBlockFinishCdl;
 
-        public GetBlockHandler(GetBlockHeader header, String host) {
+        public GetBlockHandler(GetBlockHeader header, String host, CountDownLatch waitGetBlockFinishCdl) {
             util = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
             this.host = host;
             this.header = header;
+            this.waitGetBlockFinishCdl = waitGetBlockFinishCdl;
         }
 
         @Override
@@ -141,7 +187,7 @@ public class DownLoadService implements Service{
                 buf = block.getBytes();
                 rf.write(buf, 0, block.getReadByte());
                 start += block.getReadByte();
-                ctx.writeAndFlush(start);
+                ctx.writeAndFlush(start - flag);
             }
             else if (msg instanceof Integer){
                 Integer resCode = (Integer) msg;
@@ -153,7 +199,7 @@ public class DownLoadService implements Service{
                             ctx.channel().remoteAddress().toString() + " DATA FAILED =========");
                 }
                 ctx.close();
-                ctx.channel().eventLoop().shutdownGracefully();
+                waitGetBlockFinishCdl.countDown();
             }
         }
 
@@ -167,6 +213,7 @@ public class DownLoadService implements Service{
         private boolean initWrite(String host){
             String path = util.getValue("service.local_download_path");
             start = getStartPos(host);
+            flag = start;
             try {
                 rf = new RandomAccessFile(path + fileName, "rw");
                 rf.seek(start);

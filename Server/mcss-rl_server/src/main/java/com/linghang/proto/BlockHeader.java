@@ -41,4 +41,13 @@ public class BlockHeader implements Serializable {
     public void setSendPosition(SendPosition sendPosition) {
         this.sendPosition = sendPosition;
     }
+
+    @Override
+    public String toString() {
+        return "BlockHeader{" +
+                "remoteFileName='" + remoteFileName + '\'' +
+                ", remoteFilePath='" + remoteFilePath + '\'' +
+                ", sendPosition=" + sendPosition.toString() +
+                '}';
+    }
 }

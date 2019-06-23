@@ -102,7 +102,7 @@ public class LagCalcServerService implements Service {
             return closeRF(readRF) && closeRF(writeRF);
         }
 
-        // 直接在原文件上加密
+        // 直接在源分块文件上加密
         private boolean doLagEncode(){
             boolean initSuccess = init();
             int start = 0;
@@ -142,7 +142,7 @@ public class LagCalcServerService implements Service {
             // init file
             PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
 
-            String readPath = propertiesUtil.getValue("service.local_part_save_path");
+            String readPath = propertiesUtil.getValue("service.part_save_path");
             readFile = new File(readPath + Util.genePartName(fileName));
             readRF = createRF(readFile);
             if (readRF == null){
@@ -152,7 +152,7 @@ public class LagCalcServerService implements Service {
 
             // decode, create lag calc temp file
             if (!isEncode){
-                String writePath = propertiesUtil.getValue("service.local_lag_decode_temp_path");
+                String writePath = propertiesUtil.getValue("service.lag_decode_temp_path");
                 writeFile = new File(writePath + Util.geneTempName(fileName));
                 try {
                     boolean res = writeFile.createNewFile();

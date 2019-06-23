@@ -15,13 +15,15 @@ import java.io.RandomAccessFile;
 
 public class SendRedundantBlockHandler extends ChannelInboundHandlerAdapter {
 
+    private String localFileName;
     private RedundancyBlockHeader header;
     private PropertiesUtil propertiesUtil;
     private Block block;
     private byte[] buf;
     private RandomAccessFile rf;
 
-    public SendRedundantBlockHandler(RedundancyBlockHeader header) {
+    public SendRedundantBlockHandler(String localFileName, RedundancyBlockHeader header) {
+        this.localFileName = localFileName;
         this.header = header;
         this.block = new Block();
         propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
@@ -51,11 +53,11 @@ public class SendRedundantBlockHandler extends ChannelInboundHandlerAdapter {
                 ctx.writeAndFlush(ConstantUtil.SEND_FINISH_CODE);
                 closeRF();
 
-                // delete calculate temp file
-//                            boolean deleteSuccess = deleteCalcTempFile();
-//                            if (!deleteSuccess){
-//                                System.err.println("======== DELETE CALC TEMP FILE FAILED ========");
-//                            }
+//              delete calculate temp file
+                boolean deleteSuccess = deleteCalcTempFile();
+                if (!deleteSuccess){
+                    System.err.println("======== DELETE CALC TEMP FILE FAILED ========");
+                }
             }
         }
         if (msg instanceof Integer){
@@ -76,7 +78,7 @@ public class SendRedundantBlockHandler extends ChannelInboundHandlerAdapter {
 
     private void init(){
         String path = propertiesUtil.getValue("service.calc_temp_save_path");
-        File file = new File(path + header.getRemoteFileName());
+        File file = new File(path + localFileName);
         try {
             rf = new RandomAccessFile(file, "r");
         } catch (FileNotFoundException e) {
@@ -93,7 +95,7 @@ public class SendRedundantBlockHandler extends ChannelInboundHandlerAdapter {
     }
 
     private boolean deleteCalcTempFile(){
-        String path = propertiesUtil.getValue("service.local_calc_temp_save_path");
+        String path = propertiesUtil.getValue("service.calc_temp_save_path");
         File file = new File(path + header.getRemoteFileName());
         if (file.exists()){
             return file.delete();

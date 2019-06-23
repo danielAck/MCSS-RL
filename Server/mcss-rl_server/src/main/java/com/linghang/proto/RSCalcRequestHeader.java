@@ -7,34 +7,57 @@ public class RSCalcRequestHeader implements Serializable {
 
     private static final long serialVersionUID = 388993274649025442L;
 
-    private String remoteFileName;
-    private String remoteFilePath;
+    private String calcFileName;
+    private String calcFilePath;
+    private String redundancySaveFileName;
+    private String redundancySaveFilePath;
     private ArrayList<String> calcHosts;
     private String redundantBlockRecvHost;
-    private long startPos;
+    private int blockIdx;
+    private boolean isDownLoad;
 
-    public RSCalcRequestHeader(String remoteFileName, String remoteFilePath, ArrayList<String> calcHosts, String redundantBlockRecvHost, long startPos) {
-        this.remoteFileName = remoteFileName;
-        this.remoteFilePath = remoteFilePath;
+    public RSCalcRequestHeader(String calcFileName, String calcFilePath, String redundancySaveFileName, String redundancySaveFilePath,
+                               ArrayList<String> calcHosts, String redundantBlockRecvHost, int blockIdx, boolean isDownLoad) {
+        this.calcFileName = calcFileName;
+        this.calcFilePath = calcFilePath;
+        this.redundancySaveFileName = redundancySaveFileName;
+        this.redundancySaveFilePath = redundancySaveFilePath;
         this.calcHosts = calcHosts;
         this.redundantBlockRecvHost = redundantBlockRecvHost;
-        this.startPos = startPos;
+        this.blockIdx = blockIdx;
+        this.isDownLoad = isDownLoad;
     }
 
-    public String getRemoteFileName() {
-        return remoteFileName;
+    public String getCalcFileName() {
+        return calcFileName;
     }
 
-    public void setRemoteFileName(String remoteFileName) {
-        this.remoteFileName = remoteFileName;
+    public void setCalcFileName(String calcFileName) {
+        this.calcFileName = calcFileName;
     }
 
-    public String getRemoteFilePath() {
-        return remoteFilePath;
+    public String getCalcFilePath() {
+        return calcFilePath;
     }
 
-    public void setRemoteFilePath(String remoteFilePath) {
-        this.remoteFilePath = remoteFilePath;
+    public void setCalcFilePath(String calcFilePath) {
+        this.calcFilePath = calcFilePath;
+    }
+
+    public String getRedundancySaveFileName() {
+        return redundancySaveFileName;
+    }
+
+    public void setRedundancySaveFileName(String redundancySaveFileName) {
+        this.redundancySaveFileName = redundancySaveFileName;
+    }
+
+    public String getRedundancySaveFilePath() {
+        return redundancySaveFilePath;
+    }
+
+    public void setRedundancySaveFilePath(String redundancySaveFilePath) {
+        this.redundancySaveFilePath = redundancySaveFilePath;
     }
 
     public ArrayList<String> getCalcHosts() {
@@ -53,11 +76,19 @@ public class RSCalcRequestHeader implements Serializable {
         this.redundantBlockRecvHost = redundantBlockRecvHost;
     }
 
-    public long getStartPos() {
-        return startPos;
+    public int getBlockIdx() {
+        return blockIdx;
     }
 
-    public void setStartPos(long startPos) {
-        this.startPos = startPos;
+    public void setBlockIdx(int blockIdx) {
+        this.blockIdx = blockIdx;
+    }
+
+    public boolean isDownLoad() {
+        return isDownLoad;
+    }
+
+    public void setDownLoad(boolean downLoad) {
+        isDownLoad = downLoad;
     }
 }

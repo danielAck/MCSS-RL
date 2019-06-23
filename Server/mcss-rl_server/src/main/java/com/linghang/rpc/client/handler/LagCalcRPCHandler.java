@@ -13,13 +13,14 @@ public class LagCalcRPCHandler extends ChannelInboundHandlerAdapter {
     private CountDownLatch countDownLatch;
     private LagCalcRequestHeader header;
 
-    public LagCalcRPCHandler(LagCalcRequestHeader header, CountDownLatch countDownLatch) {
+    public  LagCalcRPCHandler(LagCalcRequestHeader header, CountDownLatch countDownLatch) {
         this.header = header;
         this.countDownLatch = countDownLatch;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("========= " + ctx.channel().remoteAddress() + " BEGIN CALL LAG CALC ========");
         ctx.writeAndFlush(header);
     }
 

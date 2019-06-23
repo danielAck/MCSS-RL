@@ -32,11 +32,11 @@ public class SendDataService implements Service {
     private CountDownLatch sendCdl;
     private NioEventLoopGroup group;
 
-    public SendDataService(File file, SendPosition localSendPos, SendPosition remoteSendPos,
+    public SendDataService(File sendFile, SendPosition localSendPos, SendPosition remoteSendPos,
                            String remoteFileName, String remoteFilePath, String[] hosts, CountDownLatch sendCdl, NioEventLoopGroup group) {
         this.localSendPos = localSendPos;
         this.remoteSendPos = remoteSendPos;
-        this.file = file;
+        this.file = sendFile;
         this.remoteFileName = remoteFileName;
         this.remoteFilePath = remoteFilePath;
         this.hosts = hosts;

@@ -11,12 +11,14 @@ import java.util.concurrent.CountDownLatch;
 public class DownloadFileJob implements Job {
 
     private String fileName;
+    private String filePath;
     private String[] hosts;
     private CountDownLatch lagCalcCdl;
     private PropertiesUtil propertiesUtil;
 
-    public DownloadFileJob(String fileName, String[] hosts) {
+    public DownloadFileJob(String fileName, String filePath, String[] hosts) {
         this.fileName = fileName;
+        this.filePath = filePath;
         this.hosts = hosts;
         this.lagCalcCdl = new CountDownLatch(1);
         this.propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
@@ -35,9 +37,9 @@ public class DownloadFileJob implements Job {
         public void run() {
 
             // TODO: 从数据库中获取 x 和 alpha
-            int[] x = new int[]{1, 2, -3};
-            int[] alpha = new int[]{-6, 5, 4};
-            Service lagCalcService = new LagCalcService(fileName, hosts, x, alpha, false);
+            int[] x = {1, 2, -3};
+            int[] alpha = {-6, 5, 4};
+            Service lagCalcService = new LagCalcService(fileName, hosts, x, alpha, lagCalcCdl, false);
             lagCalcService.call();
             try {
                 lagCalcCdl.await();
@@ -46,7 +48,7 @@ public class DownloadFileJob implements Job {
             }
 
             String localHost = propertiesUtil.getValue("host.local");
-            Service downloadService = new DownLoadService(fileName, hosts, localHost);
+            Service downloadService = new DownLoadService(fileName, filePath, hosts, localHost);
             downloadService.call();
 
         }

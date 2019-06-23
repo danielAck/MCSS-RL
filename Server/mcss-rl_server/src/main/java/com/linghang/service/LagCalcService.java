@@ -36,6 +36,7 @@ public class LagCalcService implements Service{
         this.encode = encode;
     }
 
+    // download case
     public LagCalcService(String fileName, String[] slaves, int[] x, int[] alpha, CountDownLatch downloadCdl, boolean encode) {
         this.fileName = fileName;
         this.lagCountDownLatch = new CountDownLatch(slaves.length);
@@ -74,6 +75,7 @@ public class LagCalcService implements Service{
 
             NioEventLoopGroup lagGroup = new NioEventLoopGroup(1);
             for (String host : slaves){
+                System.out.println("======== CALL LAG RPC FOR " + host + " ========");
                 LagCalcRequestHeader header = new LagCalcRequestHeader(fileName, x, alpha, encode);
                 callLagCalcRPC(lagGroup, host, header);
             }

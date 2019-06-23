@@ -44,10 +44,10 @@ public class GetBlockRequestHandler extends ChannelInboundHandlerAdapter {
                 System.out.println("======= ERROR : QUEST FILE DOESN'T EXIST IN SERVER ========");
                 ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
             }
-
             rf = new RandomAccessFile(file, "r");
-            rf.seek(header.getStartPos());
+
             this.startPos = header.getStartPos();
+            rf.seek(startPos);
             this.length = (header.getLength() == -1 ? rf.length() : header.getLength());
 
             int readByte = rf.read(buf);

@@ -1,11 +1,13 @@
 package com.linghang.rpc.server;
 
+import com.linghang.pojo.SendPosition;
 import com.linghang.proto.Block;
 import com.linghang.proto.GetBlockHeader;
 import com.linghang.proto.RSCalcRequestHeader;
 import com.linghang.proto.RedundancyBlockHeader;
 import com.linghang.rpc.client.handler.ClientRSCalcHandler;
 import com.linghang.rpc.client.handler.SendRedundantBlockHandler;
+import com.linghang.service.SendDataService;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
 import com.linghang.util.Util;
@@ -28,8 +30,6 @@ import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
 public class RSCalcRPCServer {
-
-    PropertiesUtil util = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
 
     public RSCalcRPCServer() {
     }
@@ -63,22 +63,28 @@ public class RSCalcRPCServer {
             // receive RS calculation request header
             if (msg instanceof RSCalcRequestHeader){
                 RSCalcRequestHeader questHeader = (RSCalcRequestHeader) msg;
-                String fileName = questHeader.getRemoteFileName();
+                String calcFileName = questHeader.getCalcFileName();
+                String calcFilePath = questHeader.getCalcFilePath();
+                String redundancySaveFilePath = questHeader.getRedundancySaveFilePath();
+                String redundancySaveFileName = questHeader.getRedundancySaveFileName();
 
-                System.out.println("======== RPC SERVER RECEIVE RPC CALL FOR FILE : " + fileName + " ========");
+                System.out.println("======== RPC SERVER RECEIVE RPC CALL FOR FILE : " + calcFileName + " ========");
                 ArrayList<String> calcHosts = questHeader.getCalcHosts();
                 // 获取冗余计算结果接受节点IP
                 String redundantBlockRecvHost = questHeader.getRedundantBlockRecvHost();
 
+
                 // start send redundancy block job
-                CountDownLatch sendRedundancyCdl = new CountDownLatch(calcHosts.size());
-                String remoteFilepath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.part_save_path");
-                RedundancyBlockHeader header = new RedundancyBlockHeader(questHeader.getRemoteFileName(), remoteFilepath, questHeader.getStartPos());
-                Thread t = new Thread(new SendRedundantBlockJob(redundantBlockRecvHost, sendRedundancyCdl, header));
+                CountDownLatch sendWaitCdl = new CountDownLatch(calcHosts.size());
+                String sendFileName = Util.geneTempName(calcFileName);
+                String sendFilePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.calc_temp_save_path");
+                Thread t = new Thread(new SendRedundantBlockJob(redundantBlockRecvHost, sendWaitCdl,
+                        sendFileName, sendFilePath, redundancySaveFileName, redundancySaveFilePath,
+                        questHeader.getBlockIdx(), questHeader.isDownLoad()));
                 t.start();
 
                 // start get block client
-                GetBlockHeader getBlockHeader = createGetBlockHeader(questHeader.getRemoteFileName(), questHeader.getRemoteFilePath(), questHeader.getStartPos());
+                GetBlockHeader getBlockHeader = createGetBlockHeader(calcFileName, calcFilePath, questHeader.getBlockIdx());
                 if (getBlockHeader == null){
                     ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
                     return;
@@ -89,7 +95,7 @@ public class RSCalcRPCServer {
                     // TODO: 随机确定冗余块接收主机
 
                     System.out.println("======== RPC SERVER START GET DATA REQUEST CLIENT TO " + calcHost +"========");
-                    createGetDataClient(getBlockHeader, calcHost, sendRedundancyCdl, ctx);
+                    createGetDataClient(getBlockHeader, calcHost, sendWaitCdl, ctx);
                 }
             }
             else{
@@ -102,6 +108,19 @@ public class RSCalcRPCServer {
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
             cause.printStackTrace();
             ctx.close();
+        }
+
+        private long getRemoteSendStartPos(String sendFilePath, String sendFileName, long idx, boolean isDownload){
+            File file = new File(sendFilePath + sendFileName);
+            if (isDownload){
+                long startPos = 2*file.length()*3 + idx*file.length();
+                System.out.println("{ File :" + file.toString() + "file length = " + file.length() + " idx = " + idx + " startPos = " + startPos +" }");
+                return startPos;
+            } else {
+                long startPos = idx*file.length();
+                System.out.println("{ File :" + file.toString() + "file length = " + file.length() + " idx = " + idx + " startPos = " + startPos +" }");
+                return startPos;
+            }
         }
 
         /**
@@ -131,37 +150,53 @@ public class RSCalcRPCServer {
 
         /**
          * 生成文件块请求头
-         * @param remoteFileName 远程文件名
-         * @param remoteFilePath 远程文件路径
-         * @param startPos 请求起始位置
+         * @param calcFileName 本地文件块名
+         * @param calcFilePath 本地文件块路径
          * @return 请求头
          */
-        private GetBlockHeader createGetBlockHeader(String remoteFileName, String remoteFilePath, long startPos){
-            File file = new File(remoteFilePath + remoteFileName);
+        private GetBlockHeader createGetBlockHeader(String calcFileName, String calcFilePath, int blockIdx){
+            File file = new File(calcFilePath + calcFileName);
+            long blockLength = file.length() / 3;
             if (!file.exists()){
-                System.err.println("======== " + remoteFileName + " FILE DON'T EXIST ! ========");
+                System.err.println("======== " + calcFilePath + calcFileName + " FILE DON'T EXIST ! ========");
                 return null;
             }
-            // TODO: 看怎么处理这个 length 好一些
-            return new GetBlockHeader(remoteFileName, remoteFilePath, startPos, file.length()/3);
+            long startPos = blockLength * blockIdx;
+
+            // TODO: 看怎么处理这个 blockLength 好一些
+            return new GetBlockHeader(calcFileName, calcFilePath, startPos, blockLength);
         }
 
         private class SendRedundantBlockJob implements Runnable{
 
             private String host;
-            private CountDownLatch countDownLatch;
-            private RedundancyBlockHeader header;
+            private CountDownLatch sendWaitCdl;
+            private CountDownLatch waitSendFinishCdl;
+            private String sendFileName;
+            private String sendFilePath;
+            private String remoteFileName;
+            private String remoteFilePath;
+            private int idx;
+            private boolean isDownload;
+            private long remoteSendStartPos;
 
-            public SendRedundantBlockJob(String host, CountDownLatch countDownLatch, RedundancyBlockHeader header) {
+            public SendRedundantBlockJob(String host, CountDownLatch sendWaitCdl, String sendFileName, String sendFilePath,
+                                         String remoteFileName, String remoteFilePath, int idx, boolean isDownload) {
                 this.host = host;
-                this.countDownLatch = countDownLatch;
-                this.header = header;
+                this.sendWaitCdl = sendWaitCdl;
+                this.waitSendFinishCdl = new CountDownLatch(1);
+                this.sendFileName = sendFileName;
+                this.sendFilePath = sendFilePath;
+                this.remoteFileName = remoteFileName;
+                this.remoteFilePath = remoteFilePath;
+                this.idx = idx;
+                this.isDownload = isDownload;
             }
 
             @Override
             public void run() {
                 try {
-                    this.countDownLatch.await();
+                    this.sendWaitCdl.await();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -169,14 +204,39 @@ public class RSCalcRPCServer {
                 // waiting for calc job finish, then send redundant file block
                 System.out.println("======== RS CALC CLIENT BEGIN SENDING REDUNDANT FILE BLOCK TO : " +
                         host + " ========");
+
+                // ======== Test ========
+                File sendFile = new File(sendFilePath + sendFileName);
+                remoteSendStartPos = getRemoteSendStartPos(sendFilePath, sendFileName, idx, isDownload);
+
+                // TODO: 解决发送位置问题
+                SendPosition localSendPos = new SendPosition(0, sendFile.length());
+                SendPosition remoteSendPos = new SendPosition(remoteSendStartPos, 0);
+                String[] sendHost = new String[]{host};
+                NioEventLoopGroup group = new NioEventLoopGroup(1);
+                SendDataService sendDataService = new SendDataService(sendFile, localSendPos, remoteSendPos,
+                        remoteFileName, remoteFilePath, sendHost, waitSendFinishCdl, group);
+                sendDataService.call();
+
+                // wait send redundant data
                 try {
-                    startSendRedundantBlockClient(header);
-                } catch (Exception e) {
+                    waitSendFinishCdl.await();
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+
+                System.out.println("======== SEND REDUNDANT DATA TO " + host + " FINISH ========");
+                group.shutdownGracefully();
+
+                // ======== Test ========
+//                try {
+//                    startSendRedundantBlockClient(localFileName, header);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
             }
 
-            private void startSendRedundantBlockClient(final RedundancyBlockHeader header) throws Exception{
+            private void startSendRedundantBlockClient(final String localFileName, final RedundancyBlockHeader header) throws Exception{
                 NioEventLoopGroup group = new NioEventLoopGroup(1);
                 try{
                     Bootstrap b = new Bootstrap();
@@ -190,7 +250,7 @@ public class RSCalcRPCServer {
                                             .addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers
                                                     .weakCachingConcurrentResolver(null)))
                                             .addLast(new ObjectEncoder())
-                                            .addLast(new SendRedundantBlockHandler(header));
+                                            .addLast(new SendRedundantBlockHandler(localFileName, header));
                                 }
                             });
                     ChannelFuture f = b.connect().sync();
