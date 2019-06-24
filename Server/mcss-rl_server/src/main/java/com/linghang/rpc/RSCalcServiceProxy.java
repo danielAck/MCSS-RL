@@ -1,5 +1,7 @@
 package com.linghang.rpc;
 
+import com.linghang.dao.UploadFileManageable;
+import com.linghang.dao.impl.UploadFileManageImpl;
 import com.linghang.proto.LagCalcRequestHeader;
 import com.linghang.proto.RSCalcRequestHeader;
 import com.linghang.rpc.client.handler.LagCalcRPCHandler;
@@ -97,8 +99,13 @@ public class RSCalcServiceProxy implements InvocationHandler{
             PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
 
             // 获取 RPC 结点IP, 拉起 3 个 RPC 连接
+            int[] blockIds = getCalcBlockIdx(slaves, isDownload);
             for (int i = 0; i < slaves.length; i++){
-                int blockIdx = getCalcBlockIdx(slaves[i]);
+                int blockIdx = blockIds[i];
+                if (blockIdx < 0){
+                    System.err.println("========= ERROR OCCUR IN DB CONNECTION =========");
+                    return;
+                }
                 ArrayList<String> calcHosts = new ArrayList<>();
                 for (String t : slaves){
                     if (!t.equals(slaves[i]))
@@ -124,15 +131,19 @@ public class RSCalcServiceProxy implements InvocationHandler{
 
         }
 
-        // TODO: 随机确定计算任务（负载均衡）
-        private int getCalcBlockIdx(String host){
+        // TODO: 根据数据库 cloudId 确定计算任务
+        private int[] getCalcBlockIdx(String[] hosts, boolean isDownload){
+            UploadFileManageable uploadFileService = new UploadFileManageImpl();
+            String uploadFileName = Util.getFileUploadName(calcFileName);
+            int[] res = new int[hosts.length];
 
-            if(host.equals("192.168.0.120")){
-                return 0;
-            } else if (host.equals("192.168.0.121")){
-                return 1;
+            if (!isDownload){
+                for (int i = 0; i < hosts.length; i++){
+                    res[i] = uploadFileService.getCloudIdByFileNameAndHost(uploadFileName, hosts[i]);
+                }
+                return res;
             } else {
-                return 2;
+                return new int[]{0, 1, 2};
             }
         }
 

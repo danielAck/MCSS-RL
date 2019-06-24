@@ -1,5 +1,8 @@
 package com.linghang.service;
 
+import com.linghang.dao.UploadFileManageable;
+import com.linghang.dao.impl.UploadFileManageImpl;
+import com.linghang.pojo.UploadFile;
 import com.linghang.proto.Block;
 import com.linghang.proto.GetBlockHeader;
 import com.linghang.util.ConstantUtil;
@@ -19,6 +22,9 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class DownLoadService implements Service{
@@ -48,7 +54,7 @@ public class DownLoadService implements Service{
 
     @Override
     public void call() {
-        String[] downloadHosts = getDownloadHosts(hosts);
+        Object[] downloadHosts = getDownloadHosts(hosts);
         getBlock(downloadHosts);
 
         if (checkNeedRSCalc(hosts)){
@@ -56,37 +62,40 @@ public class DownLoadService implements Service{
         }
     }
 
-    // TODO: 利用数据库，判断选择的结点中是否含有冗余块存储结点
     private boolean checkNeedRSCalc(String[] hosts){
-        for (String host : hosts){
-            if (host.equals("192.168.0.123")){
-                return true;
-            }
-        }
-        return false;
+        UploadFileManageable uploadFileService = new UploadFileManageImpl();
+        String redundantHost = uploadFileService.getRedundantHostByFileName(Util.getFileUploadName(fileName));
+        return Arrays.asList(hosts).contains(redundantHost);
     }
 
     // get block from hosts
-    private void getBlock(String[] hosts){
+    private void getBlock(Object[] hosts){
         Thread getBlockJob = new Thread(new GetBlockJob(hosts, fileName));
         getBlockJob.setName(fileName + "-get_block-job");
         getBlockJob.start();
     }
 
-    private String[] getDownloadHosts(String[] hosts){
-        // TODO: 从数据库中依次判断hosts中只需直接下载的结点
+    private Object[] getDownloadHosts(String[] hosts){
 
-        return new String[]{"192.168.0.120", "192.168.0.121"};
+        UploadFileManageable uploadFileService = new UploadFileManageImpl();
+        String redundantHost = uploadFileService.getRedundantHostByFileName(Util.getFileUploadName(fileName));
+        List<String> temp = new ArrayList<>(Arrays.asList(hosts));
+        if (!temp.contains(redundantHost)){
+            return hosts;
+        } else {
+            temp.remove(redundantHost);
+            return temp.toArray();
+        }
     }
 
     private class GetBlockJob implements Runnable{
 
-        private String[] hosts;
+        private Object[] hosts;
         private String fileName;
         private NioEventLoopGroup group;
         private CountDownLatch getBlockFinishCdl;
 
-        public GetBlockJob(String[] hosts, String fileName) {
+        public GetBlockJob(Object[] hosts, String fileName) {
             this.hosts = hosts;
             this.fileName = fileName;
             this.group = new NioEventLoopGroup(1);
@@ -95,9 +104,8 @@ public class DownLoadService implements Service{
 
         @Override
         public void run() {
-
-            for (String host : hosts){
-                createGetBlockClient(host, fileName, group, getBlockFinishCdl);
+            for (Object host : hosts){
+                createGetBlockClient((String) host, fileName, group, getBlockFinishCdl);
             }
             try {
                 getBlockFinishCdl.await();
@@ -135,19 +143,12 @@ public class DownLoadService implements Service{
         b.connect();
     }
 
-    // TODO：从数据库中根据IP获取需要下载文件对应的起始下标
     private long getStartPos(String host){
 
-        switch (host){
-            case "192.168.0.120":
-                return 0;
-            case "192.168.0.121":
-                return 377448;
-            case "192.168.0.122":
-                return 754896;
-            default:
-                return 0;
-        }
+        UploadFileManageable uploadFileService = new UploadFileManageImpl();
+        Integer cloudId = uploadFileService.getCloudIdByFileNameAndHost(Util.getFileUploadName(fileName), host);
+        UploadFile file = uploadFileService.getUploadFileByFileName(Util.getFileUploadName(fileName));
+        return file.getLength()/3 * cloudId;
     }
 
     private class GetBlockHandler extends ChannelInboundHandlerAdapter{

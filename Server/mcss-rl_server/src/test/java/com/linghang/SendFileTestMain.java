@@ -9,17 +9,11 @@ public class SendFileTestMain {
         testMain.clusterTest();
     }
 
-    public void standaloneTest(){
-        String filePath = "F:\\WUST\\program\\dsz\\";
-        String fileName = "1M.pdf";
-        NameNode nameNode = new NameNode(true);
-        nameNode.sendData(filePath, fileName, true);
-    }
-
     public void clusterTest(){
         String filePath = "F:\\WUST\\program\\dsz\\";
-        String fileName = "1M.pdf";
+        String fileName = "2M.txt";
+        int[] alpha = {-6, 5, 4};
         NameNode nameNode = new NameNode(false);
-        nameNode.sendData(filePath, fileName, false);
+        nameNode.sendData(filePath, fileName, alpha, false);
     }
 }

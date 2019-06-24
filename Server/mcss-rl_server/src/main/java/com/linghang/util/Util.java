@@ -226,6 +226,14 @@ public class Util {
         return splitName + ".temp";
     }
 
+    public static String getFileUploadName(String fileName){
+        return fileName.split("\\.")[0];
+    }
+
+    public static String getFileSubfix(String fileName){
+        return fileName.split("\\.")[1];
+    }
+
     public static void main(String[] args) {
         PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
         String path = propertiesUtil.getValue("service.local_redundant_save_path");

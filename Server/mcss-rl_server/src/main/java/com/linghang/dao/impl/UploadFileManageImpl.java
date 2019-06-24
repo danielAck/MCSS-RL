@@ -1,0 +1,234 @@
+package com.linghang.dao.impl;
+
+import com.linghang.dao.DBConnection;
+import com.linghang.dao.DBSingleton;
+import com.linghang.dao.UploadFileManageable;
+import com.linghang.pojo.UploadDetail;
+import com.linghang.pojo.UploadFile;
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.PreparedStatement;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+public class UploadFileManageImpl implements UploadFileManageable {
+
+    private Connection conn;
+    private PreparedStatement pstmt;
+
+    public UploadFileManageImpl(){
+        conn = DBSingleton.INSTANCE.getConn();
+    }
+
+    @Override
+    public Integer insertUploadFile(UploadFile file) {
+        String sql = "insert into upload_file (filename,subfix,length) values (?,?,?)";
+        if (conn == null)
+            return -1;
+
+        try {
+            pstmt = (PreparedStatement) conn.prepareStatement(sql);
+            pstmt.setString(1, file.getFileName());
+            pstmt.setString(2,file.getSubfix());
+            pstmt.setLong(3, file.getLength());
+            int i = pstmt.executeUpdate();
+            pstmt.close();
+
+            return i;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    @Override
+    public Integer insertUploadDetail(UploadDetail detail) {
+        String sql = "insert into upload_detail (filename,cloud_id,ip) values (?,?,?)";
+        if (conn == null)
+            return -1;
+
+        try {
+            pstmt = (PreparedStatement) conn.prepareStatement(sql);
+            pstmt.setString(1, detail.getFileName());
+            pstmt.setInt(2,detail.getCloudId());
+            pstmt.setString(3, detail.getIp());
+            int i = pstmt.executeUpdate();
+            pstmt.close();
+
+            return i;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    @Override
+    public ArrayList<UploadFile> getAllUploadFile() {
+        String sql = "select * from upload_file";
+        try {
+            ArrayList<UploadFile> uploadFiles = new ArrayList<UploadFile>();
+            pstmt = (PreparedStatement)conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                uploadFiles.add(new UploadFile(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getLong(4)));
+            }
+            return uploadFiles;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public UploadFile getUploadFileByFileName(String fileName) {
+        String sql = "select * from upload_file where filename = ?";
+        try {
+            pstmt = (PreparedStatement)conn.prepareStatement(sql);
+            pstmt.setString(1, fileName);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                return new UploadFile(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getLong(4));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return null;
+    }
+
+    @Override
+    public ArrayList<UploadDetail> getUploadDetailByFileName(String fileName) {
+        String sql = "select * from upload_detail where filename = ?";
+        ArrayList<UploadDetail> uploadedDetails = new ArrayList<>();
+        try {
+            pstmt = (PreparedStatement)conn.prepareStatement(sql);
+            pstmt.setString(1, fileName);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                uploadedDetails.add(new UploadDetail(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getString(4)));
+            }
+            return uploadedDetails;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public UploadDetail getUploadDetailByFileNameAndCloudId(String fileName, Integer cloudId) {
+        String sql = "select * from upload_detail where filename = ? and cloud_id = ?";
+        try {
+            pstmt = (PreparedStatement)conn.prepareStatement(sql);
+            pstmt.setString(1, fileName);
+            pstmt.setInt(2, cloudId);
+            ResultSet rs = pstmt.executeQuery();
+            rs.next();
+            return new UploadDetail(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getString(4));
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public Integer getCloudIdByFileNameAndHost(String fileName, String host) {
+        String sql = "select cloud_id from upload_detail where filename = ? and ip = ?";
+        try {
+            pstmt = (PreparedStatement)conn.prepareStatement(sql);
+            pstmt.setString(1, fileName);
+            pstmt.setString(2, host);
+            ResultSet rs = pstmt.executeQuery();
+            rs.next();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    @Override
+    public String getRedundantHostByFileName(String fileName) {
+        String sql = "select ip from upload_detail where filename = ? and cloud_id = 3";
+        try {
+            pstmt = (PreparedStatement)conn.prepareStatement(sql);
+            pstmt.setString(1, fileName);
+            ResultSet rs = pstmt.executeQuery();
+            rs.next();
+            return rs.getString(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public Integer checkFileUploaded(String fileName) {
+        String sql = "select COUNT(*) from upload_file where filename = ?";
+        try {
+            pstmt = (PreparedStatement)conn.prepareStatement(sql);
+            pstmt.setString(1, fileName);
+            ResultSet rs = pstmt.executeQuery();
+            rs.next();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    @Override
+    public Integer deleteUploadFileByFileName(String fileName) {
+        String sql = "DELETE FROM upload_file WHERE filename=?";
+        try {
+            pstmt = (PreparedStatement)conn.prepareStatement(sql);
+            pstmt.setString(1, fileName);
+            int i = pstmt.executeUpdate();
+            pstmt.close();
+
+            return i;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    @Override
+    public Integer deleteUploadDetailByFileName(String fileName) {
+        String sql = "DELETE FROM upload_detail WHERE filename=?";
+        try {
+            pstmt = (PreparedStatement)conn.prepareStatement(sql);
+            pstmt.setString(1, fileName);
+            int i = pstmt.executeUpdate();
+            pstmt.close();
+
+            return i;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    @Override
+    public Integer deleteUploadDetailByFileNameAndCloudId(String fileName, Integer cloudId) {
+        String sql = "DELETE FROM upload_detail WHERE filename=? AND cloud_id=?";
+        try {
+            pstmt = (PreparedStatement)conn.prepareStatement(sql);
+            pstmt.setString(1, fileName);
+            pstmt.setInt(2, cloudId);
+            int i = pstmt.executeUpdate();
+            pstmt.close();
+
+            return i;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public static void main(String[] args) {
+        UploadFileManageable uploadFileService = new UploadFileManageImpl();
+        int res = uploadFileService.getCloudIdByFileNameAndHost("1M.pdf", "192.168.0.122");
+        System.out.println(res);
+    }
+}

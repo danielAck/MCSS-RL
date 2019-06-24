@@ -8,7 +8,7 @@ public class DownLoadTest {
 
     public static void main(String[] args) {
         NameNode nameNode = new NameNode(true);
-        String fileName = "1M.pdf";
+        String fileName = "2M.txt";
         String filePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.local_download_path");
         int[] selectedIdx = new int[]{0, 1, 3};
         nameNode.download(fileName, filePath, selectedIdx);

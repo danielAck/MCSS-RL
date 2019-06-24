@@ -97,6 +97,8 @@ public class SendDataService implements Service {
                 } else {
                     System.err.println("========= RECEIVE ERROR DATA TYPE ========");
                     ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
+                    rf.close();
+                    sendCdl.countDown();
                 }
             } else if (msg instanceof Long) {
                 long res = localSendPos.getStartPos() + ((Long) msg - remoteSendPos.getStartPos());
@@ -105,6 +107,8 @@ public class SendDataService implements Service {
             } else {
                 System.out.println("======== GET WRONG DATA TYPE =========");
                 ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
+                rf.close();
+                sendCdl.countDown();
             }
         }
 
@@ -144,40 +148,7 @@ public class SendDataService implements Service {
         private void read(ChannelHandlerContext ctx, long res) throws Exception {
 
             int readByte;
-//            try{
-//                if ((readByte = rf.read(buf)) != -1){
-//                    block.setReadByte(readByte);
-//                    block.setBytes(buf);
-//                } else {
-//                    ctx.writeAndFlush(ConstantUtil.SEND_FINISH_CODE);
-//                    System.err.println("========= " + ctx.channel().remoteAddress() + ": SENDING JOB FINISH ========");
-//                    sendCdl.countDown();
-//                    return;
-//                }
-//            } catch (IOException e){
-//                System.err.println("======== " + ctx.channel().remoteAddress() +  ": IO EXCEPTION OCCUR WHILE SENDING DATA =======");
-//                e.printStackTrace();
-//                ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
-//                sendCdl.countDown();
-//                return;
-//            }
-//
             long remainByteCnt = localSendPos.getEndPos() - res;
-//            if (remainByte == 0 || remainByte < 0){
-//                ctx.writeAndFlush(ConstantUtil.SEND_FINISH_CODE);
-//                System.err.println("========= " + ctx.channel().remoteAddress() + ": SENDING JOB FINISH ========");
-//                sendCdl.countDown();
-//                return;
-//            }
-//            else if (remainByte >= ConstantUtil.BUFLENGTH){
-//                ctx.writeAndFlush(block);
-//            } else {
-//                block.setReadByte((int) remainByte);
-//                readByte = (int)remainByte;
-//                ctx.writeAndFlush(block);
-//            }
-//
-//            System.out.println("======== SEND DATA CLIENT SEND " + readByte + " bytes ========");
 
             if ((readByte = rf.read(buf)) != -1
                     && remainByteCnt > 0) {
@@ -202,6 +173,7 @@ public class SendDataService implements Service {
                     } else {
                         System.err.println("======== SERVER SEND WORN READ BYTE COUNT ! =========");
                         ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
+                        rf.close();
                         sendCdl.countDown();
                     }
                 } else {

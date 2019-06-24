@@ -1,20 +1,30 @@
 package com.linghang.rpc;
 
 
+import com.linghang.dao.DBConnection;
+import com.linghang.dao.UploadFileManageable;
+import com.linghang.dao.impl.UploadFileManageImpl;
 import com.linghang.pojo.*;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
+import com.linghang.util.Util;
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.PreparedStatement;
 import io.netty.channel.nio.NioEventLoopGroup;
 
+import java.io.File;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 
 public class NameNode {
 
     private HashMap<Integer, String> slaves;
+    private UploadFileManageable uploadFileService;
 
     public NameNode(boolean test) {
         initSlaves(test);
+        uploadFileService = new UploadFileManageImpl();
     }
 
     private void initSlaves(boolean test){
@@ -40,10 +50,10 @@ public class NameNode {
      * @param filePath 需要上传的文件的路径
      * @param fileName 需要上传的文件的文件名
      */
-    public void sendData(String filePath, String fileName, boolean test) {
+    public void sendData(String filePath, String fileName, int[] alpha, boolean test) {
         CountDownLatch sendCdl = new CountDownLatch(slaves.size());
         NioEventLoopGroup group = new NioEventLoopGroup(1);
-        Runnable[] jobs = createJobs(filePath, fileName, sendCdl, group, test);
+        Runnable[] jobs = createJobs(filePath, fileName, alpha, sendCdl, group, test);
         for (int i = 0; i < slaves.size(); i ++){
             if (jobs[i] != null){
                 Thread t = new Thread(jobs[i]);
@@ -69,19 +79,34 @@ public class NameNode {
      * @param fileName 需要上传的文件的文件名
      * @return 可执行任务列表
      */
-    private Runnable[] createJobs(String filePath, String fileName, CountDownLatch sendCdl, NioEventLoopGroup group, boolean test){
+    private Runnable[] createJobs(String filePath, String fileName, int[] alpha, CountDownLatch sendCdl, NioEventLoopGroup group, boolean test){
         SendFileJobFactory sendFileJobFactory = new SendFileJobFactory(filePath, fileName, slaves, sendCdl, group, test);
         Runnable[] jobs = new Runnable[slaves.size()];
 
-        // TODO: 随机确定冗余数据接收结点，剩下的接收正常数据
+        // TODO: 随机确定冗余数据接收结点，剩下的接收正常数据（负载均衡）
 
+        File file = new File(filePath, fileName);
+        long length = Util.getColSize(file.length()) * 3;
+        String uploadFileName = Util.getFileUploadName(fileName);
+        String subfix = Util.getFileSubfix(fileName);
+        uploadFileService.insertUploadFile(new UploadFile(uploadFileName, subfix, length));
+
+        // TODO：记录普通结点，记录 alpha
         for (int i = 0; i < slaves.size(); i++){
 
-            // TODO: 将文件块号和对应的slave编号写入数据库
             sendFileJobFactory.setBlockIdx(i);
             sendFileJobFactory.setSlaveId(i);
+
+            uploadFileService.insertUploadDetail(new UploadDetail(uploadFileName, i, slaves.get(i)));
+            saveAlpha(slaves.get(i), uploadFileName, alpha[i]);
             jobs[i] = sendFileJobFactory.createJob();
         }
+
+        // 记录冗余接收结点
+        String redundancyRecvHost = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("host.slave4");
+        uploadFileService.insertUploadDetail(new UploadDetail(Util.getFileUploadName(fileName), 3, redundancyRecvHost));
+        int alphaSum = alpha[0] + alpha[1] + alpha[2];
+        saveAlpha(redundancyRecvHost, uploadFileName, alphaSum);
         return jobs;
     }
 
@@ -107,5 +132,31 @@ public class NameNode {
 
         Job job = new DownloadFileJob(fileName, filePath, hosts);
         job.start();
+    }
+
+    private int saveAlpha(String host, String fileName, int alpha){
+        PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
+        String driver = propertiesUtil.getValue("db.driver");
+        String username = propertiesUtil.getValue("db.username");
+        String password = propertiesUtil.getValue("db.slave.password");
+        String url = "jdbc:mysql://" + host + ":3306/dsz";
+        DBConnection dbConnection = new DBConnection(driver, username, password, url);
+        Connection conn = dbConnection.getConnection();
+        if (conn != null){
+            String sql = "insert into alpha_map (filename,alpha) values (?,?)";
+            try {
+                PreparedStatement pstmt = (PreparedStatement) conn.prepareStatement(sql);
+                pstmt.setString(1, fileName);
+                pstmt.setInt(2, alpha);
+                int i = pstmt.executeUpdate();
+                pstmt.close();
+                return i;
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return -1;
+            }
+        }
+        return -1;
     }
 }

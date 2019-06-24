@@ -11,6 +11,7 @@ import com.linghang.service.SendDataService;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
 import com.linghang.util.Util;
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -163,7 +164,6 @@ public class RSCalcRPCServer {
             }
             long startPos = blockLength * blockIdx;
 
-            // TODO: 看怎么处理这个 blockLength 好一些
             return new GetBlockHeader(calcFileName, calcFilePath, startPos, blockLength);
         }
 
@@ -209,7 +209,6 @@ public class RSCalcRPCServer {
                 File sendFile = new File(sendFilePath + sendFileName);
                 remoteSendStartPos = getRemoteSendStartPos(sendFilePath, sendFileName, idx, isDownload);
 
-                // TODO: 解决发送位置问题
                 SendPosition localSendPos = new SendPosition(0, sendFile.length());
                 SendPosition remoteSendPos = new SendPosition(remoteSendStartPos, 0);
                 String[] sendHost = new String[]{host};
@@ -228,12 +227,32 @@ public class RSCalcRPCServer {
                 System.out.println("======== SEND REDUNDANT DATA TO " + host + " FINISH ========");
                 group.shutdownGracefully();
 
-                // ======== Test ========
-//                try {
-//                    startSendRedundantBlockClient(localFileName, header);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
+                // 删除RS计算临时文件
+                if (!deleteFile(sendFilePath, sendFileName)){
+                    System.err.println("======== DELETE RS CALC TEMP FILE FAILED ========");
+                } else {
+                    System.out.println("======== DELETE RS CALC TEMP FILE SUCCESSFULLY ========");
+                }
+
+                // 下载情况删除插值计算临时文件
+                if (isDownload){
+                   String lagCalcTempPath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.lag_decode_temp_path");
+                   String lagCalcTempFileName = Util.geneTempName(sendFileName);
+                   if (!deleteFile(lagCalcTempPath, lagCalcTempFileName)){
+                       System.err.println("======== DELETE LAG CALC TEMP FILE FAILED ========");
+                   } else {
+                       System.out.println("======== DELETE LAG CALC TEMP FILE SUCCESSFULLY ========");
+                   }
+                }
+            }
+
+            private boolean deleteFile(String path, String fileName){
+                File file = new File(path + fileName);
+                if (file.exists()){
+                    return file.delete();
+                } else {
+                    return false;
+                }
             }
 
             private void startSendRedundantBlockClient(final String localFileName, final RedundancyBlockHeader header) throws Exception{

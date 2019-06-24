@@ -1,5 +1,7 @@
 package com.linghang.rpc;
 
+import com.linghang.dao.UploadFileManageable;
+import com.linghang.dao.impl.UploadFileManageImpl;
 import com.linghang.service.LagCalcService;
 import com.linghang.service.RSCalcServiceFactory;
 import com.linghang.service.Service;
@@ -16,8 +18,8 @@ public class DataNode {
         DataNode datanode = new DataNode();
         int[] x = {1, 2, -3};
         int[] alpha = {-6, 5, 4};
-//        datanode.doRSCalc("1M.pdf", redundantBlockRecvHost, RSCalcHosts);
-        datanode.doLagEncode("1M.pdf", x, alpha, lagCalcHosts);
+//        datanode.doRSCalc("2M.txt", redundantBlockRecvHost, RSCalcHosts);
+        datanode.doLagEncode("2M.txt", x, alpha, lagCalcHosts);
 //        datanode.doLagDecode("1M.pdf", x, alpha, lagCalcHosts);
     }
 
@@ -25,14 +27,20 @@ public class DataNode {
     }
 
     private void doRSCalc(String fileName, String redundantBlockRecvHost, String[] hosts){
-        // TODO: 先从数据库中查询是否已经上传
-
-        String calcFileName = Util.genePartName(fileName);
-        String calcFilePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.part_save_path");
-        RSCalcServiceFactory factory = new RSCalcServiceFactory(calcFileName, calcFilePath, calcFileName, calcFilePath,
-                hosts, redundantBlockRecvHost, false);
-        Service service = factory.createService();
-        service.call();
+        UploadFileManageable uploadFileService = new UploadFileManageImpl();
+        int res = uploadFileService.checkFileUploaded(Util.getFileUploadName(fileName));
+        if (res > 0){
+            String calcFileName = Util.genePartName(fileName);
+            String calcFilePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.part_save_path");
+            RSCalcServiceFactory factory = new RSCalcServiceFactory(calcFileName, calcFilePath, calcFileName, calcFilePath,
+                    hosts, redundantBlockRecvHost, false);
+            Service service = factory.createService();
+            service.call();
+        } else if (res == 0){
+            System.err.println("======== PLEASE UPLOAD FILE FIRST ========");
+        } else {
+            System.err.println("======== ERROR OCCUR IN DB CONNECTION ========");
+        }
     }
 
     public void doLagEncode(String fileName, int[] x, int[] alpha, String[] hosts){
