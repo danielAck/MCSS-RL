@@ -11,7 +11,7 @@ public class SendFileTestMain {
 
     public void clusterTest(){
         String filePath = "F:\\WUST\\program\\dsz\\";
-        String fileName = "2M.txt";
+        String fileName = "20x.pdf";
         int[] alpha = {-6, 5, 4};
         NameNode nameNode = new NameNode(false);
         nameNode.sendData(filePath, fileName, alpha, false);

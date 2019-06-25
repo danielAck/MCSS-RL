@@ -163,6 +163,24 @@ public class UploadFileManageImpl implements UploadFileManageable {
     }
 
     @Override
+    public int[] getXValues() {
+        String sql = "select * from x_value";
+        int[] res = new int[3];
+        try {
+            pstmt = (PreparedStatement)conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
+            rs.next();
+            for (int i = 0; i < 3; i++){
+                res[i] = rs.getInt(i+1);
+            }
+            return res;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
     public Integer checkFileUploaded(String fileName) {
         String sql = "select COUNT(*) from upload_file where filename = ?";
         try {
@@ -228,7 +246,9 @@ public class UploadFileManageImpl implements UploadFileManageable {
 
     public static void main(String[] args) {
         UploadFileManageable uploadFileService = new UploadFileManageImpl();
-        int res = uploadFileService.getCloudIdByFileNameAndHost("1M.pdf", "192.168.0.122");
-        System.out.println(res);
+        int[] res = uploadFileService.getXValues();
+        if (res != null)
+            for (int i : res)
+                System.out.print(i + ", ");
     }
 }

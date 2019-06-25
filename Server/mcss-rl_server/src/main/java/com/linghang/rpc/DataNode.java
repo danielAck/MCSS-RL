@@ -18,8 +18,8 @@ public class DataNode {
         DataNode datanode = new DataNode();
         int[] x = {1, 2, -3};
         int[] alpha = {-6, 5, 4};
-//        datanode.doRSCalc("2M.txt", redundantBlockRecvHost, RSCalcHosts);
-        datanode.doLagEncode("2M.txt", x, alpha, lagCalcHosts);
+//        datanode.doRSCalc("20x.pdf", redundantBlockRecvHost, RSCalcHosts);
+        datanode.doLagEncode("20x.pdf", x, alpha, lagCalcHosts);
 //        datanode.doLagDecode("1M.pdf", x, alpha, lagCalcHosts);
     }
 

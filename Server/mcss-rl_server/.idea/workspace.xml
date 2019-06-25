@@ -2,72 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3cd609f4-65f6-4a0d-ae7c-9778a1cd05b4" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/linghang/dao/DBConnection.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/linghang/dao/DBSingleton.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/linghang/dao/UploadFileManageable.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/linghang/dao/impl/UploadFileManageImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/linghang/pojo/UploadDetail.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/linghang/pojo/UploadFile.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/linghang/dao/DBConnection.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/linghang/dao/DBSingleton.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/linghang/dao/UploadFileManageable.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/linghang/dao/impl/UploadFileManageImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/linghang/pojo/UploadDetail.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/linghang/pojo/UploadFile.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/test-classes/com/linghang/DBTest/Test.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/linghang/ssh/RemoteConnect.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/linghang/ssh/SSHConnection.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/NIO/Data.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/NIO/NIOClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/NIO/NIOServer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/netty/EchoClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/netty/EchoClientHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/netty/EchoServer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/netty/EchoServerHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/dao/UploadFileManageable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/linghang/dao/UploadFileManageable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/dao/impl/UploadFileManageImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/linghang/dao/impl/UploadFileManageImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/pojo/DownloadFileJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/linghang/pojo/DownloadFileJob.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/rpc/DataNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/linghang/rpc/DataNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/rpc/NameNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/linghang/rpc/NameNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/rpc/RSCalcServiceProxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/linghang/rpc/RSCalcServiceProxy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/RSCalcRPCServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/RSCalcRPCServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/service/DownLoadService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/linghang/service/DownLoadService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/service/SendDataService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/linghang/service/SendDataService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/linghang/util/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/linghang/util/Util.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/server.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/server.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/linghang/DownLoadTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/linghang/DownLoadTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/linghang/SendFileTestMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/linghang/SendFileTestMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/NIO/Data.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/NIO/NIOClient.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/NIO/NIOServer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/netty/EchoClient$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/netty/EchoClient.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/netty/EchoClientHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/netty/EchoServer$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/netty/EchoServer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/netty/EchoServerHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/DataNode.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/DataNode.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/NameNode.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/NameNode.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcRPCClientHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcRPCClientHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcServiceDemonTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcServiceDemonTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcServiceJob$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcServiceJob$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcServiceJob.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy$RSCalcServiceJob.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/RSCalcServiceProxy.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/server/RSCalcRPCServer$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/server/RSCalcRPCServer$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/server/RSCalcRPCServer$RSCalcRPCServerHandler$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/server/RSCalcRPCServer$RSCalcRPCServerHandler$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/server/RSCalcRPCServer$RSCalcRPCServerHandler$SendRedundantBlockJob$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/server/RSCalcRPCServer$RSCalcRPCServerHandler$SendRedundantBlockJob$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/server/RSCalcRPCServer$RSCalcRPCServerHandler$SendRedundantBlockJob.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/server/RSCalcRPCServer$RSCalcRPCServerHandler$SendRedundantBlockJob.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/server/RSCalcRPCServer$RSCalcRPCServerHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/server/RSCalcRPCServer$RSCalcRPCServerHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/rpc/server/RSCalcRPCServer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/rpc/server/RSCalcRPCServer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/service/DownLoadService$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/service/DownLoadService$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/service/DownLoadService$GetBlockHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/service/DownLoadService$GetBlockHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/service/DownLoadService$GetBlockJob.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/service/DownLoadService$GetBlockJob.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/service/DownLoadService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/service/DownLoadService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/service/SendDataService$SendDataClientHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/service/SendDataService$SendDataClientHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/service/SendDataService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/service/SendDataService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/linghang/util/Util.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/linghang/util/Util.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/server.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/server.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/linghang/DeBugTest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/linghang/DownLoadTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/linghang/DownLoadTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/linghang/Lag.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/linghang/PolyLag.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/linghang/SendFileTestMain.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/linghang/SendFileTestMain.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/test-classes/com/linghang/AlphaTest.class" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -95,11 +41,11 @@
     <session id="915031519">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="32" />
+          <entry key="project.closed" value="33" />
           <entry key="project.open.time.13" value="1" />
           <entry key="project.open.time.14" value="1" />
           <entry key="project.open.time.16" value="1" />
-          <entry key="project.open.time.17" value="3" />
+          <entry key="project.open.time.17" value="4" />
           <entry key="project.open.time.18" value="6" />
           <entry key="project.open.time.19" value="9" />
           <entry key="project.open.time.2" value="1" />
@@ -111,42 +57,42 @@
           <entry key="project.open.time.25" value="1" />
           <entry key="project.open.time.3" value="1" />
           <entry key="project.open.time.40" value="1" />
-          <entry key="project.opened" value="36" />
+          <entry key="project.opened" value="37" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="236" />
-          <entry key="java" value="82161" />
-          <entry key="properties" value="1084" />
+          <entry key="java" value="85686" />
+          <entry key="properties" value="1085" />
           <entry key="txt" value="3" />
-          <entry key="xml" value="4" />
+          <entry key="xml" value="8" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="82161" />
+          <entry key="JAVA" value="85686" />
           <entry key="PLAIN_TEXT" value="239" />
-          <entry key="Properties" value="1084" />
-          <entry key="XML" value="4" />
+          <entry key="Properties" value="1085" />
+          <entry key="XML" value="8" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="class" value="6" />
+          <entry key="class" value="7" />
           <entry key="iml" value="1" />
-          <entry key="java" value="1418" />
-          <entry key="properties" value="55" />
-          <entry key="xml" value="4" />
+          <entry key="java" value="1433" />
+          <entry key="properties" value="57" />
+          <entry key="xml" value="5" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="CLASS" value="6" />
+          <entry key="CLASS" value="7" />
           <entry key="IDEA_MODULE" value="1" />
-          <entry key="JAVA" value="1418" />
-          <entry key="Properties" value="55" />
-          <entry key="XML" value="4" />
+          <entry key="JAVA" value="1433" />
+          <entry key="Properties" value="57" />
+          <entry key="XML" value="5" />
         </counts>
       </usages-collector>
     </session>
@@ -156,17 +102,32 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/NameNode.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="429">
-              <caret line="160" column="5" lean-forward="true" selection-start-line="136" selection-start-column="4" selection-end-line="160" selection-end-column="5" />
+            <state relative-caret-position="305">
+              <caret line="132" column="29" lean-forward="true" selection-start-line="132" selection-start-column="29" selection-end-line="132" selection-end-column="29" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/AlphaTest.java">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/pojo/SendFileJobFactory.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
+            <state relative-caret-position="261">
+              <caret line="53" column="61" selection-start-line="53" selection-start-column="41" selection-end-line="53" selection-end-column="61" />
+              <folding>
+                <element signature="e#2708#2709#0" expanded="true" />
+                <element signature="e#2748#2749#0" expanded="true" />
+                <element signature="e#2860#2861#0" expanded="true" />
+                <element signature="e#2898#2899#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/DownLoadTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="170">
+              <caret line="10" column="30" selection-start-line="10" selection-start-column="30" selection-end-line="10" selection-end-column="30" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -175,10 +136,19 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/SendFileServer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="89">
+              <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/dao/impl/UploadFileManageImpl.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="30" column="67" lean-forward="true" selection-start-line="30" selection-start-column="12" selection-end-line="30" selection-end-column="67" />
+            <state relative-caret-position="799">
+              <caret line="187" column="28" lean-forward="true" selection-start-line="187" selection-start-column="28" selection-end-line="187" selection-end-column="28" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#560#561#0" expanded="true" />
@@ -188,20 +158,20 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/SendFileTestMain.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="16" column="53" lean-forward="true" selection-start-line="16" selection-start-column="53" selection-end-line="16" selection-end-column="53" />
+            <state relative-caret-position="221">
+              <caret line="13" column="30" selection-start-line="13" selection-start-column="30" selection-end-line="13" selection-end-column="30" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/pojo/DownloadFileJob.java">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/DataNode.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="98">
-              <caret line="40" column="12" selection-start-line="40" selection-start-column="12" selection-end-line="40" selection-end-column="37" />
+            <state relative-caret-position="221">
+              <caret line="22" column="34" selection-start-line="22" selection-start-column="34" selection-end-line="22" selection-end-column="34" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -210,10 +180,25 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/server.properties">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/pojo/DownloadFileJob.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="152">
+              <caret line="52" column="46" lean-forward="true" selection-start-line="52" selection-start-column="46" selection-end-line="52" selection-end-column="46" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="method#getAlphaValues#0;class#DownLoadJobExecutor#0;class#DownloadFileJob#0" />
+                <element signature="method#getAlphaValue#0;class#DownLoadJobExecutor#0;class#DownloadFileJob#0" />
+                <element signature="method#getRedundantHost#0;class#DownLoadJobExecutor#0;class#DownloadFileJob#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/service/LagCalcService.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="170">
-              <caret line="10" column="24" selection-start-line="10" selection-start-column="24" selection-end-line="10" selection-end-column="24" />
+              <caret line="39" column="11" selection-start-line="39" selection-start-column="11" selection-end-line="39" selection-end-column="11" />
             </state>
           </provider>
         </entry>
@@ -271,10 +256,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/com/linghang/service/GetDataService.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/GetBlockServer.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/linghang/service/LagDecodeService.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/linghang/service/LagEncodeService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/proto/LagCalcRequestHeader.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/LagCalcRPCServer.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/proto/GetBlockHeader.java" />
@@ -303,25 +284,29 @@
         <option value="$PROJECT_DIR$/src/test/java/com/linghang/PolyLag.java" />
         <option value="$PROJECT_DIR$/src/test/java/com/linghang/DeBugTest.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/core/Lagrange.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/linghang/pojo/DownloadFileJob.java" />
         <option value="$PROJECT_DIR$/src/test/java/com/linghang/DBTest/Test.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/pojo/UploadDetail.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/pojo/UploadFile.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/util/Util.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/linghang/dao/UploadFileManageable.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/linghang/dao/impl/UploadFileManageImpl.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/RSCalcServiceProxy.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/service/SendDataService.java" />
-        <option value="$PROJECT_DIR$/src/test/java/com/linghang/DownLoadTest.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/DataNode.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/RSCalcRPCServer.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/service/DownLoadService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/dao/DBSingleton.java" />
-        <option value="$PROJECT_DIR$/src/main/resources/server.properties" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/dao/DBConnection.java" />
-        <option value="$PROJECT_DIR$/src/test/java/com/linghang/SendFileTestMain.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/NameNode.java" />
+        <option value="$PROJECT_DIR$/src/test/java/com/linghang/ssh/SSHTest.java" />
+        <option value="$PROJECT_DIR$/src/test/java/com/linghang/ssh/RemoteConnect.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/test/java/com/linghang/ssh/SSHConnection.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/linghang/dao/UploadFileManageable.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/linghang/dao/impl/UploadFileManageImpl.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/linghang/pojo/DownloadFileJob.java" />
         <option value="$PROJECT_DIR$/src/test/java/com/linghang/AlphaTest.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/server.properties" />
+        <option value="$PROJECT_DIR$/src/main/java/com/linghang/rpc/DataNode.java" />
+        <option value="$PROJECT_DIR$/src/test/java/com/linghang/DownLoadTest.java" />
+        <option value="$PROJECT_DIR$/src/test/java/com/linghang/SendFileTestMain.java" />
       </list>
     </option>
   </component>
@@ -340,9 +325,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="366" />
-    <option name="width" value="1355" />
-    <option name="height" value="1050" />
+    <option name="x" value="-8" />
+    <option name="width" value="977" />
+    <option name="height" value="1048" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -505,7 +490,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
@@ -609,17 +593,7 @@
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="com" type="462c0819:PsiDirectoryNode" />
               <item name="linghang" type="462c0819:PsiDirectoryNode" />
-              <item name="service" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="mcss_rl" type="b2602c69:ProjectViewProjectNode" />
-              <item name="mcss-rl_server" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="com" type="462c0819:PsiDirectoryNode" />
-              <item name="linghang" type="462c0819:PsiDirectoryNode" />
-              <item name="util" type="462c0819:PsiDirectoryNode" />
+              <item name="ssh" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="mcss_rl" type="b2602c69:ProjectViewProjectNode" />
@@ -666,14 +640,15 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="DatabaseDriversLRU" value="mysql" />
-    <property name="SearchEverywhereHistoryKey" value="datano&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/rpc/DataNode.java&#10;datanode&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/rpc/DataNode.java&#10;Client&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/rpc/client/handler/ClientRSCalcHandler.java&#10;nameno&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/rpc/NameNode.java&#10;delete&#9;PSI&#9;JAVA://com.linghang.rpc.client.handler.SendRedundantBlockHandler#deleteCalcTempFile&#10;C&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/proto/RSCalcRequestHeader.java&#10;getdata&#9;PSI&#9;JAVA://com.linghang.util.ConstantUtil#GET_DATA_SERVICE_PORT&#10;deletecal&#9;PSI&#9;JAVA://com.linghang.rpc.server.RSCalcRPCServer.RSCalcRPCServerHandler.SendRedundantBlockJob.SendRedundantBlockHandler#deleteCalcTempFile&#10;filew&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/io/FileWriter.java&#10;Filew&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/io/FileWriter.java&#10;getColsize&#9;PSI&#9;JAVA://com.linghang.NIO.Data#getColSize&#10;doRS&#9;PSI&#9;JAVA://com.linghang.rpc.DataNode#doRSCalc&#10;ClientRSCalcHandler&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/rpc/client/ClientRSCalcHandler.java&#10;CALCULATE_SERVICE_PORT&#9;PSI&#9;JAVA://com.linghang.util.ConstantUtil#CALCULATE_SERVICE_PORT&#10;ServerFileRequestHandler&#9;PSI&#9;JAVA://com.linghang.rpc.server.ServerFileRequestHandler" />
+    <property name="SearchEverywhereHistoryKey" value="datanode&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/rpc/DataNode.java&#10;datano&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/rpc/DataNode.java&#10;Client&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/rpc/client/handler/ClientRSCalcHandler.java&#10;nameno&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/rpc/NameNode.java&#10;delete&#9;PSI&#9;JAVA://com.linghang.rpc.client.handler.SendRedundantBlockHandler#deleteCalcTempFile&#10;C&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/proto/RSCalcRequestHeader.java&#10;getdata&#9;PSI&#9;JAVA://com.linghang.util.ConstantUtil#GET_DATA_SERVICE_PORT&#10;deletecal&#9;PSI&#9;JAVA://com.linghang.rpc.server.RSCalcRPCServer.RSCalcRPCServerHandler.SendRedundantBlockJob.SendRedundantBlockHandler#deleteCalcTempFile&#10;filew&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/io/FileWriter.java&#10;Filew&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/io/FileWriter.java&#10;getColsize&#9;PSI&#9;JAVA://com.linghang.NIO.Data#getColSize&#10;doRS&#9;PSI&#9;JAVA://com.linghang.rpc.DataNode#doRSCalc&#10;ClientRSCalcHandler&#9;FILE&#9;file://F:/WUST/program/dsz/code/Server/mcss-rl_server/src/main/java/com/linghang/rpc/client/ClientRSCalcHandler.java&#10;CALCULATE_SERVICE_PORT&#9;PSI&#9;JAVA://com.linghang.util.ConstantUtil#CALCULATE_SERVICE_PORT&#10;ServerFileRequestHandler&#9;PSI&#9;JAVA://com.linghang.rpc.server.ServerFileRequestHandler" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1561387884251" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1561455612524" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../../DbAccess/mysql-connector-java-5.1.6-bin.jar!/" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -689,6 +664,7 @@
       <recent name="com.linghang.rpc.rscalc" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="F:\WUST\program\dsz\code\Server\mcss-rl_server\src\main\java\com\linghang\ssh" />
       <recent name="F:\WUST\program\dsz\code\Server\mcss-rl_server\src\main\resources" />
       <recent name="F:\WUST\program\dsz\code\Server\mcss-rl_server\src\main\java\com\linghang\rpc" />
       <recent name="F:\WUST\program\dsz\code\Server\mcss-rl_server\src\test\java\com\linghang" />
@@ -707,7 +683,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.AlphaTest">
+  <component name="RunManager" selected="Application.DownLoadTest">
     <configuration name="AlphaTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.linghang.AlphaTest" />
       <module name="mcss-rl_server" />
@@ -774,19 +750,19 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Application.AlphaTest" />
       <item itemvalue="Application.SendFileTestMain" />
       <item itemvalue="Application.DataNode" />
       <item itemvalue="Application.SendFileServer" />
       <item itemvalue="Application.DownLoadTest" />
-      <item itemvalue="Application.AlphaTest" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.AlphaTest" />
         <item itemvalue="Application.DownLoadTest" />
-        <item itemvalue="Application.SendFileServer" />
         <item itemvalue="Application.DataNode" />
         <item itemvalue="Application.SendFileTestMain" />
+        <item itemvalue="Application.SendFileServer" />
+        <item itemvalue="Application.AlphaTest" />
       </list>
     </recent_temporary>
   </component>
@@ -835,12 +811,13 @@
       <workItem from="1559277858958" duration="18262000" />
       <workItem from="1561250934484" duration="36632000" />
       <workItem from="1561340513820" duration="22561000" />
-      <workItem from="1561381198615" duration="4929000" />
+      <workItem from="1561381198615" duration="5147000" />
+      <workItem from="1561429496350" duration="20069000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="499750000" />
+    <option name="totallyTimeSpent" value="520037000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -853,8 +830,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="846" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4990138" visible="true" weight="0.29490617" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4990138" visible="true" weight="0.29088473" />
       <window_info id="Structure" order="1" sideWeight="0.5009862" side_tool="true" weight="0.2922252" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -870,11 +848,11 @@
       <window_info anchor="bottom" id="TODO" order="5" weight="0.26610646" />
       <window_info anchor="bottom" id="Version Control" order="6" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Terminal" order="8" weight="0.23529412" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.18067227" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5013405" side_tool="true" weight="0.21568628" />
       <window_info anchor="bottom" id="Messages" order="10" sideWeight="0.49932975" weight="0.20728292" />
       <window_info anchor="bottom" id="Alibaba Cloud View" order="11" weight="0.32913166" />
-      <window_info anchor="bottom" id="Run" order="12" sideWeight="0.49865952" weight="0.14425771" />
+      <window_info active="true" anchor="bottom" id="Run" order="12" sideWeight="0.49865952" visible="true" weight="0.28711486" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -933,62 +911,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/pojo/SendFileJobFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="22" column="19" lean-forward="true" selection-start-line="22" selection-start-column="19" selection-end-line="22" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/SendFileClient.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="13" column="17" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/client/handler/SendRedundantBlockHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" column="29" lean-forward="true" selection-start-line="15" selection-start-column="29" selection-end-line="15" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/proto/RedundancyBlockHeader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/pojo/SendPosition.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="33" column="18" selection-start-line="33" selection-start-column="18" selection-end-line="33" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/proto/BlockHeader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="491">
-          <caret line="49" column="59" selection-start-line="49" selection-start-column="59" selection-end-line="49" selection-end-column="59" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_45/src.zip!/java/io/RandomAccessFile.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="91">
-          <caret line="523" column="16" selection-start-line="523" selection-start-column="16" selection-end-line="523" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/proto/Block.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="10" column="11" selection-start-line="10" selection-start-column="11" selection-end-line="10" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/GetBlockServer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="243">
@@ -1038,17 +960,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_45/src.zip!/java/util/ArrayList.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="133">
-          <caret line="163" column="11" selection-start-line="163" selection-start-column="11" selection-end-line="163" selection-end-column="11" />
-          <folding>
-            <element signature="e#6252#6253#0" expanded="true" />
-            <element signature="e#6320#6321#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/PolyLag.java" />
     <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/Lag.java" />
     <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/DeBugTest.java" />
@@ -1056,12 +967,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="291">
           <caret line="27" column="22" lean-forward="true" selection-start-line="27" selection-start-column="22" selection-end-line="27" selection-end-column="22" />
-          <folding>
-            <element signature="e#1272#1273#0" expanded="true" />
-            <element signature="e#1301#1302#0" expanded="true" />
-            <element signature="e#1540#1541#0" expanded="true" />
-            <element signature="e#1573#1574#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1076,12 +981,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="253">
           <caret line="93" lean-forward="true" selection-start-line="93" selection-end-line="94" selection-end-column="33" />
-          <folding>
-            <element signature="e#737#738#0" expanded="true" />
-            <element signature="e#782#783#0" expanded="true" />
-            <element signature="e#936#937#0" expanded="true" />
-            <element signature="e#981#982#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1092,16 +991,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/DBTest/Test.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" column="5" lean-forward="true" selection-start-line="14" selection-start-column="5" selection-end-line="14" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/DBTest/Test.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/pojo/UploadDetail.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="374">
@@ -1157,24 +1047,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-583">
           <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-          <folding>
-            <element signature="e#562#563#0" expanded="true" />
-            <element signature="e#587#588#0" expanded="true" />
-            <element signature="e#624#625#0" expanded="true" />
-            <element signature="e#652#653#0" expanded="true" />
-            <element signature="e#687#688#0" expanded="true" />
-            <element signature="e#718#719#0" expanded="true" />
-            <element signature="e#766#767#0" expanded="true" />
-            <element signature="e#806#807#0" expanded="true" />
-            <element signature="e#839#840#0" expanded="true" />
-            <element signature="e#868#869#0" expanded="true" />
-            <element signature="e#912#913#0" expanded="true" />
-            <element signature="e#948#949#0" expanded="true" />
-            <element signature="e#979#980#0" expanded="true" />
-            <element signature="e#1008#1009#0" expanded="true" />
-            <element signature="e#1050#1051#0" expanded="true" />
-            <element signature="e#1086#1087#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1203,9 +1075,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="40">
           <caret line="16" column="31" selection-start-line="16" selection-start-column="11" selection-end-line="16" selection-end-column="31" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1216,34 +1085,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/SendFileServer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="493">
-          <caret line="45" column="52" selection-start-line="45" selection-start-column="52" selection-end-line="45" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/DownLoadTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" column="45" selection-start-line="12" selection-start-column="45" selection-end-line="12" selection-end-column="45" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/service/SendDataService.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2550">
           <caret line="169" column="39" selection-start-line="169" selection-start-column="39" selection-end-line="169" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/service/LagCalcService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-697">
-          <caret line="24" column="20" lean-forward="true" selection-start-line="24" selection-start-column="20" selection-end-line="24" selection-end-column="20" />
         </state>
       </provider>
     </entry>
@@ -1254,37 +1099,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/DataNode.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-87">
-          <caret line="29" column="28" selection-start-line="29" selection-start-column="28" selection-end-line="29" selection-end-column="28" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/server.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="10" column="24" selection-start-line="10" selection-start-column="24" selection-end-line="10" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/dao/DBSingleton.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="301">
           <caret line="22" column="29" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="29" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/dao/UploadFileManageable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="23" column="55" selection-start-line="23" selection-start-column="55" selection-end-line="23" selection-end-column="55" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1312,35 +1130,133 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
           <caret line="13" column="33" selection-start-line="13" selection-start-column="23" selection-end-line="13" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/commons/commons-lang3/3.6/commons-lang3-3.6.jar!/org/apache/commons/lang3/StringUtils.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="185">
+          <caret line="78" column="26" selection-start-line="78" selection-start-column="26" selection-end-line="78" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="39" column="17" selection-start-line="39" selection-start-column="17" selection-end-line="39" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/ssh/RemoteConnect.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1185#1186#0" expanded="true" />
-            <element signature="e#1218#1219#0" expanded="true" />
+            <element signature="e#334#335#0" expanded="true" />
+            <element signature="e#359#360#0" expanded="true" />
+            <element signature="e#395#396#0" expanded="true" />
+            <element signature="e#423#424#0" expanded="true" />
+            <element signature="e#458#459#0" expanded="true" />
+            <element signature="e#489#490#0" expanded="true" />
+            <element signature="e#537#538#0" expanded="true" />
+            <element signature="e#577#578#0" expanded="true" />
+            <element signature="e#612#613#0" expanded="true" />
+            <element signature="e#643#644#0" expanded="true" />
+            <element signature="e#691#692#0" expanded="true" />
+            <element signature="e#731#732#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/SendFileTestMain.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/ssh/SSHConnection.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" column="53" lean-forward="true" selection-start-line="16" selection-start-column="53" selection-end-line="16" selection-end-column="53" />
+        <state relative-caret-position="225">
+          <caret line="74" column="39" lean-forward="true" selection-start-line="74" selection-start-column="39" selection-end-line="74" selection-end-column="39" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/pojo/DownloadFileJob.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/ssh/SSHTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="98">
-          <caret line="40" column="12" selection-start-line="40" selection-start-column="12" selection-end-line="40" selection-end-column="37" />
+        <state relative-caret-position="68">
+          <caret line="4" selection-start-line="4" selection-end-line="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_45/src.zip!/java/util/ArrayList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="507" column="70" selection-start-line="507" selection-start-column="70" selection-end-line="507" selection-end-column="70" />
+          <folding>
+            <element signature="e#6252#6253#0" expanded="true" />
+            <element signature="e#6320#6321#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/ssh/RemoteConnect.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/ssh/SSHConnection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-697">
+          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/dao/UploadFileManageable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="167">
+          <caret line="25" column="10" selection-start-line="25" selection-start-column="10" selection-end-line="25" selection-end-column="10" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/AlphaTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="269">
+          <caret line="27" column="22" selection-start-line="27" selection-start-column="22" selection-end-line="27" selection-end-column="22" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#getAlphaValues#0;class#AlphaTest#0" />
+            <element signature="method#getAlphaValue#0;class#AlphaTest#0" />
+            <element signature="method#getRedundantHost#0;class#AlphaTest#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/pojo/SendFileJobFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="261">
+          <caret line="53" column="61" selection-start-line="53" selection-start-column="41" selection-end-line="53" selection-end-column="61" />
+          <folding>
+            <element signature="e#2708#2709#0" expanded="true" />
+            <element signature="e#2748#2749#0" expanded="true" />
+            <element signature="e#2860#2861#0" expanded="true" />
+            <element signature="e#2898#2899#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/server.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="27" selection-start-column="27" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/NameNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="305">
+          <caret line="132" column="29" lean-forward="true" selection-start-line="132" selection-start-column="29" selection-end-line="132" selection-end-column="29" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/dao/impl/UploadFileManageImpl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="30" column="67" lean-forward="true" selection-start-line="30" selection-start-column="12" selection-end-line="30" selection-end-column="67" />
+        <state relative-caret-position="799">
+          <caret line="187" column="28" lean-forward="true" selection-start-line="187" selection-start-column="28" selection-end-line="187" selection-end-column="28" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#560#561#0" expanded="true" />
@@ -1349,20 +1265,57 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/NameNode.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/pojo/DownloadFileJob.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="429">
-          <caret line="160" column="5" lean-forward="true" selection-start-line="136" selection-start-column="4" selection-end-line="160" selection-end-column="5" />
+        <state relative-caret-position="152">
+          <caret line="52" column="46" lean-forward="true" selection-start-line="52" selection-start-column="46" selection-end-line="52" selection-end-column="46" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#getAlphaValues#0;class#DownLoadJobExecutor#0;class#DownloadFileJob#0" />
+            <element signature="method#getAlphaValue#0;class#DownLoadJobExecutor#0;class#DownloadFileJob#0" />
+            <element signature="method#getRedundantHost#0;class#DownLoadJobExecutor#0;class#DownloadFileJob#0" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/AlphaTest.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/service/LagCalcService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
+        <state relative-caret-position="170">
+          <caret line="39" column="11" selection-start-line="39" selection-start-column="11" selection-end-line="39" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/server/SendFileServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="89">
+          <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/linghang/rpc/DataNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="22" column="34" selection-start-line="22" selection-start-column="34" selection-end-line="22" selection-end-column="34" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/DownLoadTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" column="30" selection-start-line="10" selection-start-column="30" selection-end-line="10" selection-end-column="30" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/linghang/SendFileTestMain.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" column="30" selection-start-line="13" selection-start-column="30" selection-end-line="13" selection-end-column="30" />
         </state>
       </provider>
     </entry>

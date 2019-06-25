@@ -23,6 +23,8 @@ public interface UploadFileManageable {
 
     String getRedundantHostByFileName(String fileName);
 
+    int[] getXValues();
+
     Integer checkFileUploaded(String fileName);
 
     Integer deleteUploadFileByFileName(String fileName);
