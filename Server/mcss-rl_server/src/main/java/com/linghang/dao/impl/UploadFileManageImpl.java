@@ -3,6 +3,7 @@ package com.linghang.dao.impl;
 import com.linghang.dao.DBConnection;
 import com.linghang.dao.DBSingleton;
 import com.linghang.dao.UploadFileManageable;
+import com.linghang.pojo.CloudFile;
 import com.linghang.pojo.UploadDetail;
 import com.linghang.pojo.UploadFile;
 import com.mysql.jdbc.Connection;
@@ -64,14 +65,31 @@ public class UploadFileManageImpl implements UploadFileManageable {
     }
 
     @Override
-    public ArrayList<UploadFile> getAllUploadFile() {
-        String sql = "select * from upload_file";
+    public ArrayList<CloudFile> getAllCloudRecords() {
+        String sql = "select upload_file.filename,subfix,ip from upload_file,upload_detail where upload_file.filename=upload_detail.filename and upload_file.status = 2";
         try {
-            ArrayList<UploadFile> uploadFiles = new ArrayList<UploadFile>();
+            ArrayList<CloudFile> uploadFiles = new ArrayList<CloudFile>();
             pstmt = (PreparedStatement)conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                uploadFiles.add(new UploadFile(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getLong(4)));
+                uploadFiles.add(new CloudFile(rs.getString(1) + "\\." + rs.getString(2), rs.getString(3)));
+            }
+            return uploadFiles;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public ArrayList<CloudFile> getUploadedRecords() {
+        String sql = "select * from upload_file where status = 2";
+        try {
+            ArrayList<CloudFile> uploadFiles = new ArrayList<CloudFile>();
+            pstmt = (PreparedStatement)conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                uploadFiles.add(new CloudFile(rs.getString(1) + "\\." + rs.getString(2), rs.getString(3)));
             }
             return uploadFiles;
         } catch (SQLException e) {
@@ -88,7 +106,7 @@ public class UploadFileManageImpl implements UploadFileManageable {
             pstmt.setString(1, fileName);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                return new UploadFile(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getLong(4));
+                return new UploadFile(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getLong(4), rs.getInt(5));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -181,11 +199,26 @@ public class UploadFileManageImpl implements UploadFileManageable {
     }
 
     @Override
-    public Integer checkFileUploaded(String fileName) {
-        String sql = "select COUNT(*) from upload_file where filename = ?";
+    public Integer checkFileUploadedByStatus(String fileName, Integer status) {
+        String sql = "select COUNT(*) from upload_file where filename = ? and status = ?";
         try {
             pstmt = (PreparedStatement)conn.prepareStatement(sql);
             pstmt.setString(1, fileName);
+            pstmt.setInt(2, status);
+            ResultSet rs = pstmt.executeQuery();
+            rs.next();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    @Override
+    public Integer checkXValueSet() {
+        String sql = "select COUNT(*) from x_value;";
+        try {
+            pstmt = (PreparedStatement)conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
             rs.next();
             return rs.getInt(1);
@@ -241,6 +274,14 @@ public class UploadFileManageImpl implements UploadFileManageable {
         } catch (SQLException e) {
             e.printStackTrace();
             return -1;
+        }
+    }
+
+    public void closeConn(){
+        try {
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

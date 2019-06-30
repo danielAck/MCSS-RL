@@ -22,27 +22,22 @@ public class NameNode {
     private HashMap<Integer, String> slaves;
     private UploadFileManageable uploadFileService;
 
-    public NameNode(boolean test) {
-        initSlaves(test);
+    public NameNode() {
+        initSlaves();
         uploadFileService = new UploadFileManageImpl();
     }
 
-    private void initSlaves(boolean test){
-        slaves = new HashMap<>();
-        if (test){
-            slaves = new HashMap<>();
-            String slave1IP = "127.0.0.1";
-            slaves.put(0, slave1IP);
-        } else {
-            PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
-            String slave1IP = propertiesUtil.getValue("host.slave1");
-            String slave2IP = propertiesUtil.getValue("host.slave2");
-            String slave3IP = propertiesUtil.getValue("host.slave3");
-            slaves.put(0, slave1IP);
-            slaves.put(1, slave2IP);
-            slaves.put(2, slave3IP);
-        }
+    private void initSlaves(){
 
+        // TODO: 随机确定冗余数据接收结点，剩下的接收正常数据（负载均衡）
+        slaves = new HashMap<>();
+        PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
+        String slave1IP = propertiesUtil.getValue("host.slave1");
+        String slave2IP = propertiesUtil.getValue("host.slave2");
+        String slave3IP = propertiesUtil.getValue("host.slave3");
+        slaves.put(0, slave1IP);
+        slaves.put(1, slave2IP);
+        slaves.put(2, slave3IP);
     }
 
     /**
@@ -50,10 +45,21 @@ public class NameNode {
      * @param filePath 需要上传的文件的路径
      * @param fileName 需要上传的文件的文件名
      */
-    public void sendData(String filePath, String fileName, int[] alpha, boolean test) {
+    public void sendData(String filePath, String fileName, int[] alpha) {
+
+        // 检查文件是否已经上传过
+        UploadFileManageable uploadFileService = new UploadFileManageImpl();
+        if (uploadFileService.checkFileUploadedByStatus(fileName, ConstantUtil.UPLOADED) > 0){
+            System.err.println("======== " + fileName + " HAS ALREADY BEEN UPLOADED ========");
+            return;
+        }
+
         CountDownLatch sendCdl = new CountDownLatch(slaves.size());
         NioEventLoopGroup group = new NioEventLoopGroup(1);
-        Runnable[] jobs = createJobs(filePath, fileName, alpha, sendCdl, group, test);
+        Runnable[] jobs = createJobs(filePath, fileName, alpha, sendCdl, group);
+
+        long startTime = System.currentTimeMillis();
+
         for (int i = 0; i < slaves.size(); i ++){
             if (jobs[i] != null){
                 Thread t = new Thread(jobs[i]);
@@ -69,8 +75,39 @@ public class NameNode {
             e.printStackTrace();
         }
 
+        long endTime = System.currentTimeMillis();
+        System.err.println("******** SEND DATA RUN " + (endTime - startTime) + " ms ********");
         System.out.println("======== ALL SENDING FINISH FINISH ========");
         group.shutdownGracefully();
+
+        // 记录上传信息
+        File file = new File(filePath, fileName);
+        long length = Util.getColSize(file.length()) * 3;
+        String uploadFileName = Util.getFileUploadName(fileName);
+        String subfix = Util.getFileSubfix(fileName);
+        uploadFileService.insertUploadFile(new UploadFile(uploadFileName, subfix, length, 0));
+
+        // 记录alpha
+        for (int i = 0; i < slaves.size(); i++){
+            uploadFileService.insertUploadDetail(new UploadDetail(uploadFileName, i, slaves.get(i)));
+            saveAlpha(slaves.get(i), uploadFileName, alpha[i]);
+        }
+
+        // 记录冗余接收结点
+        String redundancyRecvHost = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("host.slave4");
+        uploadFileService.insertUploadDetail(new UploadDetail(Util.getFileUploadName(fileName), 3, redundancyRecvHost));
+        int alphaSum = alpha[0] + alpha[1] + alpha[2];
+        saveAlpha(redundancyRecvHost, uploadFileName, alphaSum);
+//
+//        // 进行RS计算
+//        DataNode dataNode = new DataNode();
+//        String[] hosts = {slaves.get(0), slaves.get(1), slaves.get(2)};
+//        dataNode.doRSCalc(fileName, redundancyRecvHost, hosts);
+//
+//        // 进行Lag插值计算
+//        int[] x = uploadFileService.getXValues();
+//        String[] lagCalcHosts = {slaves.get(0), slaves.get(1), slaves.get(1), redundancyRecvHost};
+//        dataNode.doLagEncode(fileName, x, alpha, lagCalcHosts);
     }
 
     /**
@@ -79,34 +116,15 @@ public class NameNode {
      * @param fileName 需要上传的文件的文件名
      * @return 可执行任务列表
      */
-    private Runnable[] createJobs(String filePath, String fileName, int[] alpha, CountDownLatch sendCdl, NioEventLoopGroup group, boolean test){
-        SendFileJobFactory sendFileJobFactory = new SendFileJobFactory(filePath, fileName, slaves, sendCdl, group, test);
+    private Runnable[] createJobs(String filePath, String fileName, int[] alpha, CountDownLatch sendCdl, NioEventLoopGroup group){
+        SendFileJobFactory sendFileJobFactory = new SendFileJobFactory(filePath, fileName, slaves, sendCdl, group);
         Runnable[] jobs = new Runnable[slaves.size()];
 
-        // TODO: 随机确定冗余数据接收结点，剩下的接收正常数据（负载均衡）
-
-        File file = new File(filePath, fileName);
-        long length = Util.getColSize(file.length()) * 3;
-        String uploadFileName = Util.getFileUploadName(fileName);
-        String subfix = Util.getFileSubfix(fileName);
-        uploadFileService.insertUploadFile(new UploadFile(uploadFileName, subfix, length));
-
-        // TODO：记录普通结点，记录 alpha
         for (int i = 0; i < slaves.size(); i++){
-
             sendFileJobFactory.setBlockIdx(i);
-            sendFileJobFactory.setSlaveId(i);
-
-            uploadFileService.insertUploadDetail(new UploadDetail(uploadFileName, i, slaves.get(i)));
-            saveAlpha(slaves.get(i), uploadFileName, alpha[i]);
             jobs[i] = sendFileJobFactory.createJob();
         }
 
-        // 记录冗余接收结点
-        String redundancyRecvHost = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("host.slave4");
-        uploadFileService.insertUploadDetail(new UploadDetail(Util.getFileUploadName(fileName), 3, redundancyRecvHost));
-        int alphaSum = alpha[0] + alpha[1] + alpha[2];
-        saveAlpha(redundancyRecvHost, uploadFileName, alphaSum);
         return jobs;
     }
 

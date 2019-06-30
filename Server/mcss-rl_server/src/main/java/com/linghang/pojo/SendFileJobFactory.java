@@ -15,25 +15,22 @@ public class SendFileJobFactory implements JobFactory {
     private String localFileName;
     private HashMap<Integer, String> slaves;
     private Integer blockIdx;
-    private Integer slaveId;
     private CountDownLatch sendCdl;
     private NioEventLoopGroup group;
-    private boolean test;
 
     public SendFileJobFactory(String localFilePath, String localFileName,
-                              HashMap<Integer, String> slaves, CountDownLatch sendCdl, NioEventLoopGroup group, boolean test) {
+                              HashMap<Integer, String> slaves, CountDownLatch sendCdl, NioEventLoopGroup group) {
         this.localFilePath = localFilePath;
         this.localFileName = localFileName;
         this.slaves = slaves;
         this.group = group;
         this.sendCdl = sendCdl;
-        this.test = test;
     }
 
     @Override
     public Runnable createJob() {
 
-        if (blockIdx == null || slaveId == null){
+        if (blockIdx == null){
             System.err.println("======= PLEASE SET blockIdx & slaveId FIRST ! =======");
             return null;
         }
@@ -44,9 +41,9 @@ public class SendFileJobFactory implements JobFactory {
             return null;
 
         // get slave IP
-        String slaveIP = slaves.get(slaveId);
+        String slaveIP = slaves.get(blockIdx);
         if (slaveIP == null){
-            System.err.println("======= SLAVE ID:" + slaveId + " DOESN'T EXIST !");
+            System.err.println("======= SLAVE ID:" + blockIdx + " DOESN'T EXIST !");
             return null;
         }
 
@@ -54,7 +51,7 @@ public class SendFileJobFactory implements JobFactory {
         SendPosition localSendPosition = getLocalSendPosition();
         SendPosition remoteSendPosition = getRemoteSendPosition();
 
-        return new SendFileJob(localFilePath, localFileName, localSendPosition, remoteSendPosition, slaveIP, sendCdl, group, test);
+        return new SendFileJob(localFilePath, localFileName, localSendPosition, remoteSendPosition, slaveIP, sendCdl, group);
     }
 
     private boolean checkFileExist(){
@@ -86,11 +83,4 @@ public class SendFileJobFactory implements JobFactory {
         this.blockIdx = blockIdx;
     }
 
-    public Integer getSlaveId() {
-        return slaveId;
-    }
-
-    public void setSlaveId(Integer slaveId) {
-        this.slaveId = slaveId;
-    }
 }

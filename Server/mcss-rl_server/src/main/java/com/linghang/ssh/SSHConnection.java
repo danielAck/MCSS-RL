@@ -53,7 +53,7 @@ public class SSHConnection {
             return null;
         }
         try{
-            String line = null;
+            String line;
             while ((line = br.readLine()) != null) {
                 result.add(line);
             }
@@ -64,27 +64,11 @@ public class SSHConnection {
         }
     }
 
-    private static void closeConnection(){
+    public static void closeConnection(){
         if (conn != null){
             conn.close();
             conn = null;
         }
-    }
-
-    public static void main(String[] args) {
-        String delete = "rm -rf /linghang/dsz/a.txt";
-        String ls = "ls /linghang/dsz";
-        RemoteConnect remoteConnect = new RemoteConnect("192.168.0.120", "root", "123456");
-        boolean loginSuccess = SSHConnection.login(remoteConnect);
-        if (loginSuccess){
-            ArrayList<String> res = SSHConnection.execute(delete);
-            if (res != null){
-                System.out.println(res.size());
-                for (String str : res)
-                    System.out.println(str);
-            }
-        }
-        SSHConnection.closeConnection();
     }
 
 }

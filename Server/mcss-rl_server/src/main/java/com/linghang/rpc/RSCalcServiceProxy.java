@@ -53,9 +53,6 @@ public class RSCalcServiceProxy implements InvocationHandler{
     public Object invoke(Object proxy, Method method, Object[] args) {
 
         // 开启 Demon线程 拉起3个service线程
-//        Thread demonThread = new Thread(new RSCalcServiceDemon(fileName));
-//        demonThread.setName(fileName + "-demon");
-//        demonThread.start();
 
         Thread demonThread  = new Thread(new RSCalcServiceDemonTest(calcFileName, calcFilePath, redundancySaveFileName, redundancySaveFilePath,
                 hosts, redundantBlockRecvHost, isDownload));
@@ -98,6 +95,11 @@ public class RSCalcServiceProxy implements InvocationHandler{
             System.out.println("======== " + calcFileName + "-demon" + " THREAD BEGIN ========");
             PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
 
+            Integer lackIdx = null;
+            if (isDownload){
+                lackIdx = getLackIdx(Util.getFileUploadName(calcFileName), slaves);
+            }
+
             // 获取 RPC 结点IP, 拉起 3 个 RPC 连接
             int[] blockIds = getCalcBlockIdx(slaves, isDownload);
             for (int i = 0; i < slaves.length; i++){
@@ -106,6 +108,8 @@ public class RSCalcServiceProxy implements InvocationHandler{
                     System.err.println("========= ERROR OCCUR IN DB CONNECTION =========");
                     return;
                 }
+
+                // 获得排除当前遍历结点外后的计算结点
                 ArrayList<String> calcHosts = new ArrayList<>();
                 for (String t : slaves){
                     if (!t.equals(slaves[i]))
@@ -113,11 +117,13 @@ public class RSCalcServiceProxy implements InvocationHandler{
                 }
 
                 RSCalcRequestHeader header = new RSCalcRequestHeader(calcFileName, calcFilePath, redundancySaveFileName,
-                        redundancySaveFilePath, calcHosts, redundantBlockRecvHost, blockIdx, isDownload);
+                        redundancySaveFilePath, calcHosts, redundantBlockRecvHost,lackIdx, blockIdx, isDownload);
                 Thread t = new Thread(new RSCalcServiceJob(slaves[i], header, group, demon));
                 t.setName(calcFileName + "-thread");
                 t.start();
             }
+
+            long startTime = System.currentTimeMillis();
 
             // 等待冗余块计算完毕
             try {
@@ -126,6 +132,8 @@ public class RSCalcServiceProxy implements InvocationHandler{
                 e.printStackTrace();
             }
 
+            long endTime = System.currentTimeMillis();
+            System.err.println("******** RS CALC RUN " + (endTime - startTime) + " ms ********");
             System.out.println("======== ALL RS CALC JOB FINISHED ========");
             group.shutdownGracefully();
 
@@ -145,6 +153,21 @@ public class RSCalcServiceProxy implements InvocationHandler{
             } else {
                 return new int[]{0, 1, 2};
             }
+        }
+
+        private int getLackIdx(String fileName, String[] hosts){
+            int[] temp = new int[hosts.length];
+            UploadFileManageable uploadFileService = new UploadFileManageImpl();
+            for(String host : hosts){
+                int cloudIdx = uploadFileService.getCloudIdByFileNameAndHost(fileName, host);
+                if (cloudIdx != 3)
+                    temp[cloudIdx] = 1;
+            }
+            for (int i = 0; i < temp.length; i++){
+                if (temp[i] == 0)
+                    return i;
+            }
+            return -1;
         }
 
     }

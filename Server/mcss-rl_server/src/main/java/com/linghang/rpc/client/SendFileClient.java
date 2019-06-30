@@ -17,11 +17,9 @@ public class SendFileClient {
     private Service sendService;
     private CountDownLatch sendCdl;
     private NioEventLoopGroup group;
-    private boolean test;
 
-    public SendFileClient(SendFileJobDescription jobDescription, CountDownLatch sendCdl, NioEventLoopGroup group, boolean test) {
+    public SendFileClient(SendFileJobDescription jobDescription, CountDownLatch sendCdl, NioEventLoopGroup group) {
         this.jobDescription = jobDescription;
-        this.test = test;
         this.sendCdl = sendCdl;
         this.group = group;
         initSendDataService();
@@ -31,11 +29,7 @@ public class SendFileClient {
         File file = new File(jobDescription.getFilePath() + jobDescription.getFileName());
         String remoteFileName = Util.genePartName(jobDescription.getFileName());
         String remoteFilePath;
-        if (test){
-            remoteFilePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.local_part_save_path");
-        } else {
-            remoteFilePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.part_save_path");
-        }
+        remoteFilePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.part_save_path");
 
         String[] hosts = new String[] {jobDescription.getHost()};
         this.sendService = new SendDataService(file, jobDescription.getLocalSendPos(), jobDescription.getRemoteSendPos(),

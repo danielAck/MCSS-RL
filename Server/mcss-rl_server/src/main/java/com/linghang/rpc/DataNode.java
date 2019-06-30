@@ -18,18 +18,24 @@ public class DataNode {
         DataNode datanode = new DataNode();
         int[] x = {1, 2, -3};
         int[] alpha = {-6, 5, 4};
-//        datanode.doRSCalc("20x.pdf", redundantBlockRecvHost, RSCalcHosts);
-        datanode.doLagEncode("20x.pdf", x, alpha, lagCalcHosts);
+//        datanode.doRSCalc("1M.pdf", redundantBlockRecvHost, RSCalcHosts);
+        datanode.doLagEncode("1M.pdf", x, alpha, lagCalcHosts);
 //        datanode.doLagDecode("1M.pdf", x, alpha, lagCalcHosts);
     }
 
     public DataNode() {
     }
 
-    private void doRSCalc(String fileName, String redundantBlockRecvHost, String[] hosts){
+    public void doRSCalc(String fileName, String redundantBlockRecvHost, String[] hosts){
         UploadFileManageable uploadFileService = new UploadFileManageImpl();
-        int res = uploadFileService.checkFileUploaded(Util.getFileUploadName(fileName));
+        String uploadFileName = Util.getFileUploadName(fileName);
+        int res = uploadFileService.checkFileUploadedByStatus(uploadFileName, ConstantUtil.UPLOADED);
         if (res > 0){
+            res = uploadFileService.checkFileUploadedByStatus(uploadFileName, ConstantUtil.RSCALCED);
+            if (res > 0){
+                System.err.println("======== " + fileName + " HAS ALREADY BEEN UPLOADED ========");
+                return;
+            }
             String calcFileName = Util.genePartName(fileName);
             String calcFilePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.part_save_path");
             RSCalcServiceFactory factory = new RSCalcServiceFactory(calcFileName, calcFilePath, calcFileName, calcFilePath,

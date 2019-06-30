@@ -80,9 +80,13 @@ public class LagCalcService implements Service{
                 callLagCalcRPC(lagGroup, host, header);
             }
 
+            long startTime = System.currentTimeMillis();
+
             // 等待Lag计算完毕
             try {
                 lagCountDownLatch.await();
+                long endTime = System.currentTimeMillis();
+                System.err.println("******** LAG CALC RUN " + (endTime - startTime) + " ms ********");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

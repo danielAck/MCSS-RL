@@ -1,5 +1,6 @@
 package com.linghang.dao;
 
+import com.linghang.pojo.CloudFile;
 import com.linghang.pojo.UploadDetail;
 import com.linghang.pojo.UploadFile;
 
@@ -11,7 +12,9 @@ public interface UploadFileManageable {
 
     Integer insertUploadDetail(UploadDetail detail);
 
-    ArrayList<UploadFile> getAllUploadFile();
+    ArrayList<CloudFile> getAllCloudRecords();
+
+    ArrayList<CloudFile> getUploadedRecords();
 
     UploadFile getUploadFileByFileName(String fileName);
 
@@ -25,12 +28,16 @@ public interface UploadFileManageable {
 
     int[] getXValues();
 
-    Integer checkFileUploaded(String fileName);
+    Integer checkFileUploadedByStatus(String fileName, Integer status);
+
+    Integer checkXValueSet();
 
     Integer deleteUploadFileByFileName(String fileName);
 
     Integer deleteUploadDetailByFileName(String fileName);
 
     Integer deleteUploadDetailByFileNameAndCloudId(String fileName, Integer cloudId);
+
+    void closeConn();
 
 }

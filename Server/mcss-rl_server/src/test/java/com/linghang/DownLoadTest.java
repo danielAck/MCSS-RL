@@ -7,10 +7,10 @@ import com.linghang.util.PropertiesUtil;
 public class DownLoadTest {
 
     public static void main(String[] args) {
-        NameNode nameNode = new NameNode(true);
-        String fileName = "20x.pdf";
+        NameNode nameNode = new NameNode();
+        String fileName = "1M.pdf";
         String filePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.local_download_path");
-        int[] selectedIdx = new int[]{0, 1, 3};
+        int[] selectedIdx = new int[]{2, 0, 3};
         nameNode.download(fileName, filePath, selectedIdx);
     }
 

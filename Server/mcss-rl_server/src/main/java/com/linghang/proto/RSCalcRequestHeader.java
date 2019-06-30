@@ -13,17 +13,19 @@ public class RSCalcRequestHeader implements Serializable {
     private String redundancySaveFilePath;
     private ArrayList<String> calcHosts;
     private String redundantBlockRecvHost;
+    private Integer lackIdx;
     private int blockIdx;
     private boolean isDownLoad;
 
     public RSCalcRequestHeader(String calcFileName, String calcFilePath, String redundancySaveFileName, String redundancySaveFilePath,
-                               ArrayList<String> calcHosts, String redundantBlockRecvHost, int blockIdx, boolean isDownLoad) {
+                               ArrayList<String> calcHosts, String redundantBlockRecvHost, Integer lackIdx, int blockIdx, boolean isDownLoad) {
         this.calcFileName = calcFileName;
         this.calcFilePath = calcFilePath;
         this.redundancySaveFileName = redundancySaveFileName;
         this.redundancySaveFilePath = redundancySaveFilePath;
         this.calcHosts = calcHosts;
         this.redundantBlockRecvHost = redundantBlockRecvHost;
+        this.lackIdx = lackIdx;
         this.blockIdx = blockIdx;
         this.isDownLoad = isDownLoad;
     }
@@ -74,6 +76,14 @@ public class RSCalcRequestHeader implements Serializable {
 
     public void setRedundantBlockRecvHost(String redundantBlockRecvHost) {
         this.redundantBlockRecvHost = redundantBlockRecvHost;
+    }
+
+    public Integer getLackIdx() {
+        return lackIdx;
+    }
+
+    public void setLackIdx(Integer lackIdx) {
+        this.lackIdx = lackIdx;
     }
 
     public int getBlockIdx() {

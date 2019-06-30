@@ -47,6 +47,10 @@ public class FileWriter {
         return res;
     }
 
+    public static void deleteReadFlg(String fileName){
+        fileReadFlg.remove(fileName);
+    }
+
     private void initFlg(){
         fileReadFlg = ClientRSCalcHandler.fileReadFlg;
         if (fileReadFlg.get(questFileName) == null){

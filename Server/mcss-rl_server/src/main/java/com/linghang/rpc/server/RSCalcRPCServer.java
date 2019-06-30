@@ -1,5 +1,6 @@
 package com.linghang.rpc.server;
 
+import com.linghang.io.FileWriter;
 import com.linghang.pojo.SendPosition;
 import com.linghang.proto.Block;
 import com.linghang.proto.GetBlockHeader;
@@ -11,7 +12,6 @@ import com.linghang.service.SendDataService;
 import com.linghang.util.ConstantUtil;
 import com.linghang.util.PropertiesUtil;
 import com.linghang.util.Util;
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -76,20 +76,21 @@ public class RSCalcRPCServer {
 
 
                 // start send redundancy block job
-                CountDownLatch sendWaitCdl = new CountDownLatch(calcHosts.size());
-                String sendFileName = Util.geneTempName(calcFileName);
-                String sendFilePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.calc_temp_save_path");
-                Thread t = new Thread(new SendRedundantBlockJob(redundantBlockRecvHost, sendWaitCdl,
-                        sendFileName, sendFilePath, redundancySaveFileName, redundancySaveFilePath,
-                        questHeader.getBlockIdx(), questHeader.isDownLoad()));
-                t.start();
-
-                // start get block client
                 GetBlockHeader getBlockHeader = createGetBlockHeader(calcFileName, calcFilePath, questHeader.getBlockIdx());
                 if (getBlockHeader == null){
                     ctx.writeAndFlush(ConstantUtil.SEND_ERROR_CODE);
                     return;
                 }
+
+                CountDownLatch sendWaitCdl = new CountDownLatch(calcHosts.size());
+                String sendFileName = Util.geneTempName(calcFileName);
+                String sendFilePath = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME).getValue("service.calc_temp_save_path");
+                Thread t = new Thread(new SendRedundantBlockJob(redundantBlockRecvHost, sendWaitCdl,
+                        sendFileName, sendFilePath, redundancySaveFileName, redundancySaveFilePath,
+                        getBlockHeader.getRemoteFileName(), questHeader.getLackIdx(), questHeader.getBlockIdx(), questHeader.isDownLoad()));
+                t.start();
+
+                // start get block client
                 for (String calcHost : calcHosts){
                     // 创建的文件传输客户端与当前rpc服务端共用同一个I/O线程
                     // TODO：当调用当前服务端多个文件的传输服务时同一个IO线程需要为2*rpc连接数个连接服务，响应变慢？
@@ -111,10 +112,10 @@ public class RSCalcRPCServer {
             ctx.close();
         }
 
-        private long getRemoteSendStartPos(String sendFilePath, String sendFileName, long idx, boolean isDownload){
+        private long getRemoteSendStartPos(String sendFilePath, String sendFileName,Integer lackIdx, long idx, boolean isDownload){
             File file = new File(sendFilePath + sendFileName);
             if (isDownload){
-                long startPos = 2*file.length()*3 + idx*file.length();
+                long startPos = lackIdx*file.length()*3 + idx*file.length();
                 System.out.println("{ File :" + file.toString() + "file length = " + file.length() + " idx = " + idx + " startPos = " + startPos +" }");
                 return startPos;
             } else {
@@ -176,12 +177,14 @@ public class RSCalcRPCServer {
             private String sendFilePath;
             private String remoteFileName;
             private String remoteFilePath;
+            private String readFlgFileName;
+            private Integer lackIdx;
             private int idx;
             private boolean isDownload;
             private long remoteSendStartPos;
 
             public SendRedundantBlockJob(String host, CountDownLatch sendWaitCdl, String sendFileName, String sendFilePath,
-                                         String remoteFileName, String remoteFilePath, int idx, boolean isDownload) {
+                                         String remoteFileName, String remoteFilePath, String readFlgFileName, Integer lackIdx, int idx, boolean isDownload) {
                 this.host = host;
                 this.sendWaitCdl = sendWaitCdl;
                 this.waitSendFinishCdl = new CountDownLatch(1);
@@ -189,6 +192,8 @@ public class RSCalcRPCServer {
                 this.sendFilePath = sendFilePath;
                 this.remoteFileName = remoteFileName;
                 this.remoteFilePath = remoteFilePath;
+                this.readFlgFileName = readFlgFileName;
+                this.lackIdx = lackIdx;
                 this.idx = idx;
                 this.isDownload = isDownload;
             }
@@ -207,7 +212,7 @@ public class RSCalcRPCServer {
 
                 // ======== Test ========
                 File sendFile = new File(sendFilePath + sendFileName);
-                remoteSendStartPos = getRemoteSendStartPos(sendFilePath, sendFileName, idx, isDownload);
+                remoteSendStartPos = getRemoteSendStartPos(sendFilePath, sendFileName, lackIdx, idx, isDownload);
 
                 SendPosition localSendPos = new SendPosition(0, sendFile.length());
                 SendPosition remoteSendPos = new SendPosition(remoteSendStartPos, 0);
@@ -244,6 +249,8 @@ public class RSCalcRPCServer {
                        System.out.println("======== DELETE LAG CALC TEMP FILE SUCCESSFULLY ========");
                    }
                 }
+
+                FileWriter.deleteReadFlg(readFlgFileName);
             }
 
             private boolean deleteFile(String path, String fileName){

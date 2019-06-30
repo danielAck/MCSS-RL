@@ -1,10 +1,19 @@
 package com.linghang.util;
 
+import com.linghang.dao.DBConnection;
+import com.linghang.dao.UploadFileManageable;
+import com.linghang.dao.impl.UploadFileManageImpl;
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.PreparedStatement;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
@@ -232,6 +241,76 @@ public class Util {
 
     public static String getFileSubfix(String fileName){
         return fileName.split("\\.")[1];
+    }
+
+    public static int[] getAlphaValues(String[] hosts, String fileName){
+
+        int[] alpha = new int[3];
+        int[] check = new int[3];
+        ArrayList<String> checkedList = new ArrayList<>(Arrays.asList(hosts));
+        String redundantHost = getRedundantHost(fileName);
+        checkedList.remove(redundantHost);
+
+        for (String host : checkedList){
+            UploadFileManageable uploadFileService = new UploadFileManageImpl();
+            int cloudId = uploadFileService.getCloudIdByFileNameAndHost(fileName, host);
+            Integer res = getAlphaValue(host, fileName);
+            if (res != null) {
+                alpha[cloudId] = res;
+                check[cloudId] = 1;
+            }
+            else{
+                System.err.println("======== ERROR OCCURS WHILE SELECTING ALPHA VALUE IN HOST : " + host + " ========");
+                return null;
+            }
+        }
+        if (checkedList.size() == 2){
+            Integer value = getAlphaValue(redundantHost, fileName);
+            if (value != null){
+                int temp = 0;
+                int idx = -1;
+                for (int i = 0; i < 3; i++){
+                    if (check[i] == 0){
+                        idx = i;
+                    } else {
+                        temp += alpha[i];
+                    }
+                }
+                alpha[idx] = value - temp;
+            } else {
+                System.err.println("======== ERROR OCCURS WHILE SELECTING ALPHA VALUE IN HOST : " + redundantHost + " ========");
+                return null;
+            }
+        }
+        return alpha;
+    }
+
+    private static Integer getAlphaValue(String host, String fileName){
+        PropertiesUtil propertiesUtil = new PropertiesUtil(ConstantUtil.SERVER_PROPERTY_NAME);
+        String driver = propertiesUtil.getValue("db.driver");
+        String username = propertiesUtil.getValue("db.username");
+        String password = propertiesUtil.getValue("db.slave.password");
+
+        String url = "jdbc:mysql://" + host + ":3306/dsz";
+        DBConnection dbConnection = new DBConnection(driver, username, password, url);
+        Connection conn = dbConnection.getConnection();
+
+        String sql = "select alpha from alpha_map where filename = ?";
+        try {
+            PreparedStatement pstmt = (PreparedStatement)conn.prepareStatement(sql);
+            pstmt.setString(1, fileName);
+            ResultSet rs = pstmt.executeQuery();
+            rs.next();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static String getRedundantHost(String fileName){
+        UploadFileManageable uploadFileService = new UploadFileManageImpl();
+        return uploadFileService.getRedundantHostByFileName(fileName);
     }
 
     public static void main(String[] args) {
